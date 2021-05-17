@@ -1,0 +1,40 @@
+{
+    "name": "klimick/decode",
+    "description": "Decoding untrusted data in typesafe way",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Klimenko Andrew (klimick)",
+            "email": "klimichkartorgnusov@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Klimick\\Decode\\": ["./src"],
+            "Klimick\\PsalmDecode\\": ["./psalm"]
+        },
+        "files": [
+            "decoders.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Klimick\\Decode\\Test\\": ["./test"]
+        },
+        "files": [
+            "test/Helper/Eris.php"
+        ]
+    },
+    "require": {
+        "php": "^8.0",
+        "whsv26/functional": "^1.0"
+    },
+    "require-dev": {
+        "vimeo/psalm": "^4.7",
+        "klimick/psalm-show-type": "^1.0",
+        "psalm/plugin-phpunit": "^0.15.1",
+        "giorgiosironi/eris": "^0.12.0",
+        "phpunit/phpunit": "^9.5"
+    }
+}

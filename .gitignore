@@ -1,0 +1,5 @@
+.idea
+vendor
+run.php
+psalm.local.xml
+.phpunit.result.cache
