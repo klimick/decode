@@ -55,4 +55,21 @@ final class DecodeIssue extends CodeIssue
             code_location: $code_location,
         );
     }
+
+    /**
+     * @param non-empty-list<string> $properties
+     */
+    public static function intersectionCollision(array $properties, CodeLocation $code_location): self
+    {
+        $duplicate = implode(', ', array_map(fn($p) => "'{$p}'",$properties));
+
+        $message = count($properties) > 1
+            ? "Intersection collision: properties {$duplicate} defined more than once."
+            : "Intersection collision: property {$duplicate} defined more than once.";
+
+        return new self(
+            message: $message,
+            code_location: $code_location,
+        );
+    }
 }

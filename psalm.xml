@@ -11,6 +11,7 @@
     </projectFiles>
     <plugins>
         <pluginClass class="Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider"/>
+        <pluginClass class="Klimick\PsalmDecode\ShapeDecoder\IntersectionReturnTypeProvider"/>
         <pluginClass class="Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider"/>
         <pluginClass class="Klimick\PsalmShowType\ShowTypePlugin"/>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>

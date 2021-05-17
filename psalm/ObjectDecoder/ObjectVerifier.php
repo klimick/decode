@@ -13,7 +13,8 @@ use Psalm\Storage\ClassLikeStorage;
 use Psalm\Internal\Type\TypeExpander;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Klimick\PsalmDecode\DecodeIssue;
-use Klimick\Decode\DecoderInterface;
+use Klimick\PsalmDecode\ShapeDecoder\ShapeDecoderType;
+use Klimick\PsalmDecode\ShapeDecoder\ShapePropertiesExtractor;
 use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
 use Fp\Functional\Option\Option;
 use function Fp\Cast\asList;
@@ -111,15 +112,7 @@ final class ObjectVerifier
             }
         }
 
-        $mapped_shape = new Type\Union([
-            empty($shape)
-                ? new Type\Atomic\TArray([Type::getEmpty(), Type::getEmpty()])
-                : new Type\Atomic\TKeyedArray($shape),
-        ]);
-
-        $inferred_decoder = new Type\Atomic\TGenericObject(DecoderInterface::class, [$mapped_shape]);
-
-        return new Type\Union([$inferred_decoder]);
+        return ShapeDecoderType::create($shape);
     }
 
     /**
@@ -207,56 +200,12 @@ final class ObjectVerifier
     ): void
     {
         Option::do(function() use ($actual_decoder_type, $expected_decoder_type, $method_code_location, $arg_code_locations, $codebase) {
-            $actual_shape = yield self::extractShapeFromDecoderTypeParam($actual_decoder_type);
-            $expected_shape = yield self::extractShapeFromDecoderTypeParam($expected_decoder_type);
+            $actual_shape = yield ShapePropertiesExtractor::fromDecoder($actual_decoder_type);
+            $expected_shape = yield ShapePropertiesExtractor::fromDecoder($expected_decoder_type);
 
             ObjectPropertiesValidator::checkPropertyTypes($codebase, $method_code_location, $arg_code_locations, $expected_shape, $actual_shape);
             ObjectPropertiesValidator::checkNonexistentProperties($actual_shape, $expected_shape, $arg_code_locations, $method_code_location);
             ObjectPropertiesValidator::checkMissingProperties($method_code_location, $expected_shape, $actual_shape);
         });
-    }
-
-    /**
-     * @param Type\Union $shape_decoder_type
-     * @return Option<array<string, Type\Union>>
-     */
-    private static function extractShapeFromDecoderTypeParam(Type\Union $shape_decoder_type): Option
-    {
-        return Option::do(function() use ($shape_decoder_type) {
-            $atomics = asList($shape_decoder_type->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            $decoder = yield firstOf($atomics, Type\Atomic\TGenericObject::class);
-            yield proveTrue(DecoderInterface::class === $decoder->value);
-            yield proveTrue(1 === count($decoder->type_params));
-
-            $decoder_type_param = yield first($decoder->type_params);
-
-            $type_param_atomic = $decoder_type_param->getAtomicTypes();
-            yield proveTrue(1 === count($type_param_atomic));
-
-            $keyed_array = yield first($type_param_atomic);
-
-            $extracted_shape = match (true) {
-                ($keyed_array instanceof Type\Atomic\TArray) => [],
-                ($keyed_array instanceof Type\Atomic\TKeyedArray) => self::remapKeys($keyed_array)
-            };
-
-            return yield Option::of($extracted_shape);
-        });
-    }
-
-    /**
-     * @return array<string, Type\Union>
-     */
-    private static function remapKeys(Type\Atomic\TKeyedArray $keyed_array): array
-    {
-        $properties = [];
-
-        foreach ($keyed_array->properties as $property => $type) {
-            $properties[(string) $property] = $type;
-        }
-
-        return $properties;
     }
 }

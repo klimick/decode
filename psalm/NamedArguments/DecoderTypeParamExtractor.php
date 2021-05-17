@@ -17,12 +17,12 @@ use function Fp\Collection\flatMap;
 use function Fp\Collection\second;
 use function Fp\Evidence\proveTrue;
 
-final class DecoderTypeParamGetter
+final class DecoderTypeParamExtractor
 {
     /**
      * @return Option<Type\Union>
      */
-    public static function get(Type\Union $named_arg_type, StatementsAnalyzer $source, Codebase $codebase): Option
+    public static function extract(Type\Union $named_arg_type, StatementsAnalyzer $source, Codebase $codebase): Option
     {
         return Option::do(function() use ($named_arg_type, $source, $codebase) {
             $atomics = asList($named_arg_type->getAtomicTypes());
@@ -33,6 +33,8 @@ final class DecoderTypeParamGetter
             return yield match (true) {
                 ($decoder instanceof Type\Atomic\TLiteralString) => self::fromStringCallable($decoder, $source, $codebase),
                 ($decoder instanceof Type\Atomic\TKeyedArray) => self::fromArrayCallable($decoder, $source, $codebase),
+                ($decoder instanceof Type\Atomic\TCallable) => self::fromCallable($decoder),
+                ($decoder instanceof Type\Atomic\TClosure) => self::fromClosure($decoder),
                 default => self::fromPlainDecoder($named_arg_type),
             };
         });
@@ -104,6 +106,24 @@ final class DecoderTypeParamGetter
                 new Type\Atomic\TLiteralString("{$class->value}::$method->value"), $source, $codebase
             );
         });
+    }
+
+    /**
+     * @return Option<Type\Union>
+     */
+    private static function fromClosure(Type\Atomic\TClosure $closure): Option
+    {
+        return Option::of($closure->return_type)
+            ->flatMap(fn(Type\Union $return_type) => self::fromPlainDecoder($return_type));
+    }
+
+    /**
+     * @return Option<Type\Union>
+     */
+    private static function fromCallable(Type\Atomic\TCallable $closure): Option
+    {
+        return Option::of($closure->return_type)
+            ->flatMap(fn(Type\Union $return_type) => self::fromPlainDecoder($return_type));
     }
 
     /**

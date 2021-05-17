@@ -356,6 +356,27 @@ function union(callable|DecoderInterface $first, callable|DecoderInterface $seco
 }
 
 /**
+ * @template T of array
+ * @psalm-pure
+ * @no-named-arguments
+ *
+ * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $first
+ * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $second
+ * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> ...$rest
+ * @return DecoderInterface<T>
+ */
+function intersection(callable|DecoderInterface $first, callable|DecoderInterface $second, callable|DecoderInterface ...$rest): DecoderInterface
+{
+    $restDecoders = array_values(Internal\ToDecoder::forAll($rest));
+
+    return new Internal\IntersectionDecoder(
+        Internal\ToDecoder::for($first),
+        Internal\ToDecoder::for($second),
+        ...$restDecoders,
+    );
+}
+
+/**
  * @template T
  * @psalm-pure
  *

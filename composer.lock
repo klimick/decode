@@ -902,16 +902,16 @@
         },
         {
             "name": "klimick/psalm-show-type",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/klimick/psalm-show-type.git",
-                "reference": "431f531af7f35744ea4fee57e28bfc6ba861b9d4"
+                "reference": "d11a4f73bc34bcc074f0ed2c79cb43423d9fd67a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/klimick/psalm-show-type/zipball/431f531af7f35744ea4fee57e28bfc6ba861b9d4",
-                "reference": "431f531af7f35744ea4fee57e28bfc6ba861b9d4",
+                "url": "https://api.github.com/repos/klimick/psalm-show-type/zipball/d11a4f73bc34bcc074f0ed2c79cb43423d9fd67a",
+                "reference": "d11a4f73bc34bcc074f0ed2c79cb43423d9fd67a",
                 "shasum": ""
             },
             "require": {
@@ -939,9 +939,9 @@
             "description": "Analog for psalm-trace but with pretty print",
             "support": {
                 "issues": "https://github.com/klimick/psalm-show-type/issues",
-                "source": "https://github.com/klimick/psalm-show-type/tree/v1.0.1"
+                "source": "https://github.com/klimick/psalm-show-type/tree/v1.0.2"
             },
-            "time": "2021-04-19T20:08:20+00:00"
+            "time": "2021-05-17T19:32:53+00:00"
         },
         {
             "name": "myclabs/deep-copy",

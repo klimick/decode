@@ -11,7 +11,7 @@ use Psalm\NodeTypeProvider;
 use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use PhpParser\Node;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\DecoderInterface;
+use Klimick\PsalmDecode\ShapeDecoder\ShapeDecoderType;
 use function Fp\Evidence\proveString;
 
 final class NamedArgumentsMapper
@@ -43,15 +43,7 @@ final class NamedArgumentsMapper
                     : $info['type'];
             }
 
-            $mapped_shape = new Type\Union([
-                empty($properties)
-                    ? new Type\Atomic\TArray([Type::getEmpty(), Type::getEmpty()])
-                    : new Type\Atomic\TKeyedArray($properties)
-            ]);
-
-            $inferred_decoder = new Type\Atomic\TGenericObject(DecoderInterface::class, [$mapped_shape]);
-
-            return new Type\Union([$inferred_decoder]);
+            return ShapeDecoderType::create($properties);
         });
     }
 
@@ -76,7 +68,7 @@ final class NamedArgumentsMapper
 
             return [
                 'property' => yield proveString($arg_identifier->name),
-                'type' => yield DecoderTypeParamGetter::get($named_arg_type, $source, $codebase),
+                'type' => yield DecoderTypeParamExtractor::extract($named_arg_type, $source, $codebase),
             ];
         });
     }
