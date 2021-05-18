@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpInternalEntityUsedInspection */
+<?php
 
 declare(strict_types=1);
 
@@ -17,8 +17,6 @@ final class ObjectPropertiesValidator
      * @param array<string, Type\Union> $expected_shape
      * @param array<string, Type\Union> $actual_shape
      * @param array<string, CodeLocation> $arg_code_locations
-     *
-     * @psalm-suppress InternalClass, InternalMethod
      */
     public static function checkPropertyTypes(
         Codebase $codebase,

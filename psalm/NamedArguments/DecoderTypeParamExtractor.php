@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpInternalEntityUsedInspection */
+<?php
 
 declare(strict_types=1);
 
@@ -15,6 +15,7 @@ use function Fp\Collection\first;
 use function Fp\Collection\firstOf;
 use function Fp\Collection\flatMap;
 use function Fp\Collection\second;
+use function Fp\Evidence\proveNonEmptyString;
 use function Fp\Evidence\proveTrue;
 
 final class DecoderTypeParamExtractor
@@ -68,10 +69,8 @@ final class DecoderTypeParamExtractor
     ): Option
     {
         return Option::do(function() use ($callable, $source, $codebase) {
-            yield proveTrue('' !== $callable->value);
-
-            /** @psalm-var non-empty-lowercase-string $callable_id */
-            $callable_id = strtolower($callable->value);
+            $callable_id = yield proveNonEmptyString($callable->value)
+                ->map(fn($id) => strtolower($id));
 
             $decoder_from_callable = yield match (true) {
                 str_contains($callable_id, '::') => self::fromStaticMethod($callable_id, $codebase),
@@ -128,7 +127,6 @@ final class DecoderTypeParamExtractor
 
     /**
      * @return Option<Type\Union>
-     * @psalm-suppress InternalMethod
      */
     private static function fromStaticMethod(string $function_id, Codebase $codebase): Option
     {
@@ -148,7 +146,6 @@ final class DecoderTypeParamExtractor
     /**
      * @psalm-param non-empty-lowercase-string $function_id
      * @return Option<Type\Union>
-     * @psalm-suppress InternalMethod
      */
     private static function fromFunction(
         Codebase $codebase,

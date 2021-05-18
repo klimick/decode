@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpInternalEntityUsedInspection */
+<?php
 
 declare(strict_types=1);
 
@@ -29,9 +29,6 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
         return ['klimick\decode\intersection'];
     }
 
-    /**
-     * @psalm-suppress InternalMethod
-     */
     public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
     {
         $type = Option::do(function() use ($event) {

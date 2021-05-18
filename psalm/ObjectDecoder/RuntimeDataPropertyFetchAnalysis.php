@@ -1,5 +1,4 @@
-<?php /** @noinspection PhpInternalEntityUsedInspection */
-/** @noinspection PhpComposerExtensionStubsInspection */
+<?php
 
 declare(strict_types=1);
 
@@ -33,9 +32,6 @@ final class RuntimeDataPropertyFetchAnalysis implements AfterExpressionAnalysisI
         $registration->registerHooksFromClass(self::class);
     }
 
-    /**
-     * @psalm-suppress InternalMethod, InternalClass
-     */
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
         $analysis = Option::do(function() use ($event) {
@@ -82,9 +78,6 @@ final class RuntimeDataPropertyFetchAnalysis implements AfterExpressionAnalysisI
         });
     }
 
-    /**
-     * @psalm-suppress InternalMethod
-     */
     private static function removeKnownMixedPropertyFetch(StatementsAnalyzer $source, PropertyFetch $fetch): void
     {
         $mixed_property_fetches = filter(

@@ -11,7 +11,6 @@ final class GetGeneralParentClass
 {
     /**
      * @return Option<string>
-     * @psalm-suppress InternalMethod
      */
     public static function for(string $class, Codebase $codebase): Option
     {

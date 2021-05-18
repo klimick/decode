@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpInternalEntityUsedInspection */
+<?php
 
 declare(strict_types=1);
 
@@ -26,9 +26,6 @@ use function Fp\Evidence\proveTrue;
 
 final class ObjectVerifier
 {
-    /**
-     * @psalm-suppress InternalMethod
-     */
     public static function verify(MethodReturnTypeProviderEvent $event): void
     {
         Option::do(function() use ($event) {
@@ -130,9 +127,6 @@ final class ObjectVerifier
         return ShapeDecoderType::create($shape);
     }
 
-    /**
-     * @psalm-suppress InternalClass, InternalMethod
-     */
     private static function expandType(
         Codebase $codebase,
         ClassLikeStorage $class,
@@ -187,7 +181,6 @@ final class ObjectVerifier
 
     /**
      * @return Option<ClassLikeStorage>
-     * @psalm-suppress InternalMethod
      */
     private static function extractClassStorage(Type\Union $object_class, Codebase $codebase): Option
     {

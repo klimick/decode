@@ -10,6 +10,18 @@
             <directory name="vendor"/>
         </ignoreFiles>
     </projectFiles>
+    <issueHandlers>
+        <InternalClass>
+            <errorLevel type="suppress">
+                <directory name="psalm"/>
+            </errorLevel>
+        </InternalClass>
+        <InternalMethod>
+            <errorLevel type="suppress">
+                <directory name="psalm"/>
+            </errorLevel>
+        </InternalMethod>
+    </issueHandlers>
     <plugins>
         <pluginClass class="Fp\Psalm\PartialFunctionReturnTypeProvider"/>
         <pluginClass class="Fp\Psalm\PartitionFunctionReturnTypeProvider"/>
