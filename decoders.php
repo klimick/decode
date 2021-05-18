@@ -335,6 +335,18 @@ function partialObject(string $objectClass): ObjectDecoderFactory
 }
 
 /**
+ * @template T of object
+ * @psalm-pure
+ *
+ * @param callable(): DecoderInterface<T> $type
+ * @return DecoderInterface<T>
+ */
+function rec(callable $type): DecoderInterface
+{
+    return new Internal\RecursionDecoder(Closure::fromCallable($type));
+}
+
+/**
  * @template T
  * @psalm-pure
  * @no-named-arguments
