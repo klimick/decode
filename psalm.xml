@@ -2,6 +2,7 @@
 <psalm errorLevel="1"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns="https://getpsalm.org/schema/config"
+       cacheDirectory="/tmp/decode-psalm"
        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd">
     <projectFiles>
         <directory name="src"/>
@@ -10,10 +11,18 @@
         </ignoreFiles>
     </projectFiles>
     <plugins>
+        <pluginClass class="Fp\Psalm\PartialFunctionReturnTypeProvider"/>
+        <pluginClass class="Fp\Psalm\PartitionFunctionReturnTypeProvider"/>
+        <pluginClass class="Fp\Psalm\PluckFunctionReturnTypeProvider"/>
+        <pluginClass class="Fp\Psalm\OptionGetOrElseMethodReturnTypeProvider"/>
+        <pluginClass class="Fp\Psalm\ProveTrueExpressionAnalysis"/>
+
         <pluginClass class="Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider"/>
         <pluginClass class="Klimick\PsalmDecode\ShapeDecoder\IntersectionReturnTypeProvider"/>
         <pluginClass class="Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider"/>
+        <pluginClass class="Klimick\PsalmDecode\ObjectDecoder\RuntimeDataPropertyFetchAnalysis"/>
         <pluginClass class="Klimick\PsalmShowType\ShowTypePlugin"/>
+
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
     </plugins>
 </psalm>

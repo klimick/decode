@@ -18,7 +18,7 @@ use function Klimick\Decode\valid;
  */
 final class ObjectDecoder implements DecoderInterface
 {
-    private ShapeDecoder $decoder;
+    public ShapeDecoder $shape;
 
     /**
      * @param class-string<T> $objectClass
@@ -30,7 +30,7 @@ final class ObjectDecoder implements DecoderInterface
         public bool $partial = false,
     )
     {
-        $this->decoder = new ShapeDecoder($decoders, $partial);
+        $this->shape = new ShapeDecoder($decoders, $partial);
     }
 
     public function name(): string
@@ -40,7 +40,7 @@ final class ObjectDecoder implements DecoderInterface
 
     public function decode(mixed $value, Context $context): Either
     {
-        return $this->decoder
+        return $this->shape
             ->decode($value, $context)
             ->flatMap(function(Valid $valid) {
                 /** @psalm-suppress MixedMethodCall */

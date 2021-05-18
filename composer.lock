@@ -149,16 +149,16 @@
         },
         {
             "name": "whsv26/functional",
-            "version": "v1.0.1",
+            "version": "v1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/whsv26/functional.git",
-                "reference": "a2bc700e9dab404f66e1a934cbe5c68b6516691e"
+                "reference": "e386712d7ab5a27911ca8d540b8aeabe3424e28b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/whsv26/functional/zipball/a2bc700e9dab404f66e1a934cbe5c68b6516691e",
-                "reference": "a2bc700e9dab404f66e1a934cbe5c68b6516691e",
+                "url": "https://api.github.com/repos/whsv26/functional/zipball/e386712d7ab5a27911ca8d540b8aeabe3424e28b",
+                "reference": "e386712d7ab5a27911ca8d540b8aeabe3424e28b",
                 "shasum": ""
             },
             "require": {
@@ -216,8 +216,6 @@
                     "src/Fp/Functions/Collection/Tail.php",
                     "src/Fp/Functions/Evidence/ProveArray.php",
                     "src/Fp/Functions/Evidence/ProveBool.php",
-                    "src/Fp/Functions/Evidence/ProveCallableString.php",
-                    "src/Fp/Functions/Evidence/ProveClassString.php",
                     "src/Fp/Functions/Evidence/ProveFloat.php",
                     "src/Fp/Functions/Evidence/ProveInt.php",
                     "src/Fp/Functions/Evidence/ProveList.php",
@@ -242,9 +240,9 @@
             "description": "PHP Functional Programming library",
             "support": {
                 "issues": "https://github.com/whsv26/functional/issues",
-                "source": "https://github.com/whsv26/functional/tree/v1.0.1"
+                "source": "https://github.com/whsv26/functional/tree/v1.0.2"
             },
-            "time": "2021-05-16T15:03:56+00:00"
+            "time": "2021-05-17T22:47:40+00:00"
         }
     ],
     "packages-dev": [

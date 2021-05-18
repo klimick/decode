@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder;
 
+use Klimick\Decode\RuntimeData;
 use Psalm\Type;
 use Psalm\Codebase;
 use Psalm\IssueBuffer;
@@ -25,11 +26,25 @@ use function Fp\Evidence\proveTrue;
 
 final class ObjectVerifier
 {
+    /**
+     * @psalm-suppress InternalMethod
+     */
     public static function verify(MethodReturnTypeProviderEvent $event): void
     {
         Option::do(function() use ($event) {
             $source = $event->getSource();
             $codebase = $source->getCodebase();
+            $context = $event->getContext();
+
+            $inside_class = null !== $context->self && $codebase->classlike_storage_provider->has($context->self);
+
+            if ($inside_class) {
+                $general_class = yield GetGeneralParentClass::for($context->self, $codebase);
+
+                if ($general_class === RuntimeData::class) {
+                    return;
+                }
+            }
 
             $actual_shape = yield NamedArgumentsMapper::map(
                 call_args: $event->getCallArgs(),
