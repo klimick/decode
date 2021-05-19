@@ -59,7 +59,7 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
                 IssueBuffer::accepts($issue);
             }
 
-            return ShapeDecoderType::create($properties);
+            return DecoderType::createShape($properties);
         });
 
         return $type->get();

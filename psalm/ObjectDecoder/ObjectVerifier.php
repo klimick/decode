@@ -14,7 +14,7 @@ use Psalm\Storage\ClassLikeStorage;
 use Psalm\Internal\Type\TypeExpander;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Klimick\PsalmDecode\DecodeIssue;
-use Klimick\PsalmDecode\ShapeDecoder\ShapeDecoderType;
+use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use Klimick\PsalmDecode\ShapeDecoder\ShapePropertiesExtractor;
 use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
 use Fp\Functional\Option\Option;
@@ -123,7 +123,7 @@ final class ObjectVerifier
             }
         }
 
-        return ShapeDecoderType::create($shape);
+        return DecoderType::createShape($shape);
     }
 
     private static function expandType(

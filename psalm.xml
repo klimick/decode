@@ -29,12 +29,14 @@
         <pluginClass class="Fp\Psalm\OptionGetOrElseMethodReturnTypeProvider"/>
         <pluginClass class="Fp\Psalm\ProveTrueExpressionAnalysis"/>
 
+        <pluginClass class="Klimick\PsalmShowType\ShowTypePlugin"/>
 
-        <pluginClass class="Klimick\PsalmDecode\ObjectDecoder\RuntimeDataPseudoPropertiesAnalysis"/>
         <pluginClass class="Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider"/>
         <pluginClass class="Klimick\PsalmDecode\ShapeDecoder\IntersectionReturnTypeProvider"/>
         <pluginClass class="Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider"/>
-        <pluginClass class="Klimick\PsalmShowType\ShowTypePlugin"/>
+        <pluginClass class="Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionCallAnalysis"/>
+        <pluginClass class="Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionReturnAnalysis"/>
+        <pluginClass class="Klimick\PsalmDecode\ObjectDecoder\RuntimeDataPseudoPropertiesAnalysis"/>
 
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
     </plugins>

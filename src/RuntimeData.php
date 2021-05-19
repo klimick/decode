@@ -40,8 +40,5 @@ abstract class RuntimeData
         return $this->properties[$name];
     }
 
-    /**
-     * @return DecoderInterface<static>
-     */
     abstract public static function definition(): DecoderInterface;
 }

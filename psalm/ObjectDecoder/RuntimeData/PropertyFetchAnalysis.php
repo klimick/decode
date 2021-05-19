@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ObjectDecoder;
+namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Internal\ObjectDecoder;
@@ -25,7 +25,7 @@ use function Fp\Collection\firstOf;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
-final class RuntimeDataPropertyFetchAnalysis implements AfterExpressionAnalysisInterface, PluginEntryPointInterface
+final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface, PluginEntryPointInterface
 {
     public function __invoke(RegistrationInterface $registration, ?SimpleXMLElement $config = null): void
     {

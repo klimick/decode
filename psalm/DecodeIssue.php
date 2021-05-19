@@ -72,4 +72,19 @@ final class DecodeIssue extends CodeIssue
             code_location: $code_location,
         );
     }
+
+    public static function invalidRuntimeDataDefinition(
+        Union $expected_decoder_type,
+        Union $return_decoder_type,
+        CodeLocation $code_location,
+    ): self
+    {
+        return new self(
+            message: implode('', [
+                "The declared return type '{$expected_decoder_type->getId()}' is incorrect, ",
+                "got '{$return_decoder_type->getId()}'",
+            ]),
+            code_location: $code_location,
+        );
+    }
 }

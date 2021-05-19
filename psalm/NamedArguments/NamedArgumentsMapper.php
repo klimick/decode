@@ -9,7 +9,7 @@ use Psalm\Codebase;
 use Psalm\NodeTypeProvider;
 use PhpParser\Node;
 use Fp\Functional\Option\Option;
-use Klimick\PsalmDecode\ShapeDecoder\ShapeDecoderType;
+use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use function Fp\Evidence\proveString;
 
 final class NamedArgumentsMapper
@@ -36,7 +36,7 @@ final class NamedArgumentsMapper
                     : $info['type'];
             }
 
-            return ShapeDecoderType::create($properties);
+            return DecoderType::createShape($properties);
         });
     }
 
