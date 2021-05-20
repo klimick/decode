@@ -6,7 +6,6 @@ namespace Klimick\PsalmDecode\NamedArguments;
 
 use Psalm\Type;
 use Psalm\Codebase;
-use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\DecoderInterface;
 use function Fp\Cast\asList;
@@ -23,17 +22,17 @@ final class DecoderTypeParamExtractor
     /**
      * @return Option<Type\Union>
      */
-    public static function extract(Type\Union $named_arg_type, StatementsAnalyzer $source, Codebase $codebase): Option
+    public static function extract(Type\Union $named_arg_type, Codebase $codebase): Option
     {
-        return Option::do(function() use ($named_arg_type, $source, $codebase) {
+        return Option::do(function() use ($named_arg_type, $codebase) {
             $atomics = asList($named_arg_type->getAtomicTypes());
             yield proveTrue(1 === count($atomics));
 
             $decoder = yield first($atomics);
 
             return yield match (true) {
-                ($decoder instanceof Type\Atomic\TLiteralString) => self::fromStringCallable($decoder, $source, $codebase),
-                ($decoder instanceof Type\Atomic\TKeyedArray) => self::fromArrayCallable($decoder, $source, $codebase),
+                ($decoder instanceof Type\Atomic\TLiteralString) => self::fromStringCallable($decoder, $codebase),
+                ($decoder instanceof Type\Atomic\TKeyedArray) => self::fromArrayCallable($decoder, $codebase),
                 ($decoder instanceof Type\Atomic\TCallable) => self::fromCallable($decoder),
                 ($decoder instanceof Type\Atomic\TClosure) => self::fromClosure($decoder),
                 default => self::fromPlainDecoder($named_arg_type),
@@ -64,17 +63,16 @@ final class DecoderTypeParamExtractor
      */
     private static function fromStringCallable(
         Type\Atomic\TLiteralString $callable,
-        StatementsAnalyzer $source,
         Codebase $codebase,
     ): Option
     {
-        return Option::do(function() use ($callable, $source, $codebase) {
+        return Option::do(function() use ($callable, $codebase) {
             $callable_id = yield proveNonEmptyString($callable->value)
                 ->map(fn($id) => strtolower($id));
 
             $decoder_from_callable = yield match (true) {
                 str_contains($callable_id, '::') => self::fromStaticMethod($callable_id, $codebase),
-                default => self::fromFunction($codebase, $source, $callable_id),
+                default => self::fromFunction($codebase, $callable_id),
             };
 
             return yield self::fromPlainDecoder($decoder_from_callable);
@@ -86,11 +84,10 @@ final class DecoderTypeParamExtractor
      */
     private static function fromArrayCallable(
         Type\Atomic\TKeyedArray $callable,
-        StatementsAnalyzer $source,
         Codebase $codebase,
     ): Option
     {
-        return Option::do(function() use ($callable, $source, $codebase) {
+        return Option::do(function() use ($callable, $codebase) {
             yield proveTrue($callable->is_list && 2 === count($callable->properties));
 
             $properties = flatMap(
@@ -102,7 +99,7 @@ final class DecoderTypeParamExtractor
             $method = yield firstOf($properties, Type\Atomic\TLiteralString::class, invariant: true);
 
             return yield self::fromStringCallable(
-                new Type\Atomic\TLiteralString("{$class->value}::$method->value"), $source, $codebase
+                new Type\Atomic\TLiteralString("{$class->value}::$method->value"), $codebase
             );
         });
     }
@@ -149,13 +146,12 @@ final class DecoderTypeParamExtractor
      */
     private static function fromFunction(
         Codebase $codebase,
-        StatementsAnalyzer $source,
         string $function_id,
     ): Option
     {
         return Option::try(
             fn() => $codebase->functions
-                ->getStorage($source, $function_id)
+                ->getStorage(null, $function_id)
                 ->return_type
         );
     }

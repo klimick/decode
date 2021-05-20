@@ -42,7 +42,7 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
             foreach ($event->getCallArgs() as $arg) {
                 $arg_type = yield Option::of($provider->getType($arg->value));
 
-                $decoder_type_param = yield DecoderTypeParamExtractor::extract($arg_type, $source, $codebase);
+                $decoder_type_param = yield DecoderTypeParamExtractor::extract($arg_type, $codebase);
                 $shape_type = yield ShapePropertiesExtractor::fromDecoderTypeParam($decoder_type_param);
 
                 foreach ($shape_type as $property => $type) {
