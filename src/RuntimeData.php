@@ -22,7 +22,7 @@ abstract class RuntimeData
 
     final public static function of(array $args): static
     {
-        $decoded = decode(static::definition())($args);
+        $decoded = decode(static::definition(), $args);
 
         if ($decoded instanceof Right) {
             return $decoded->get()->value;

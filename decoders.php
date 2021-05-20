@@ -4,30 +4,30 @@ declare(strict_types=1);
 
 namespace Klimick\Decode;
 
-use Closure;
+use DateTimeImmutable;
 use Fp\Functional\Either\Either;
+use Fp\Functional\Either\Right;
 use Klimick\Decode\Internal;
 use Klimick\PsalmDecode\ShapeDecoder\PartialShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
+use RuntimeException;
 
 /**
  * @template T
  * @psalm-pure
  *
  * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $decoder
- * @psalm-return Closure(mixed): Either<Invalid, Valid<T>>
+ * @psalm-return Either<Invalid, Valid<T>>
  */
-function decode(callable|DecoderInterface $decoder): Closure
+function decode(callable|DecoderInterface $decoder, mixed $data): Either
 {
     $decoder = Internal\ToDecoder::for($decoder);
 
-    return function(mixed $value) use ($decoder) {
-        $context = new Context([
-            new ContextEntry($decoder->name(), $value),
-        ]);
+    $context = new Context([
+        new ContextEntry($decoder->name(), $data),
+    ]);
 
-        return $decoder->decode($value, $context);
-    };
+    return $decoder->decode($data, $context);
 }
 
 /**
@@ -187,6 +187,16 @@ function nonEmptyString(): DecoderInterface
 function scalar(): DecoderInterface
 {
     return new Internal\ScalarDecoder();
+}
+
+/**
+ * @psalm-pure
+ *
+ * @return DecoderInterface<DateTimeImmutable>
+ */
+function datetime(string $timezone = 'UTC'): DecoderInterface
+{
+    return new Internal\DatetimeDecoder($timezone);
 }
 
 /**
