@@ -31,6 +31,26 @@ function decode(callable|DecoderInterface $decoder, mixed $data): Either
 }
 
 /**
+ * @template T
+ * @psalm-pure
+ *
+ * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $decoder
+ * @psalm-return T
+ */
+function cast(callable|DecoderInterface $decoder, mixed $data): mixed
+{
+    $decoder = Internal\ToDecoder::for($decoder);
+
+    $decoded = decode($decoder, $data);
+
+    if ($decoded instanceof Right) {
+        return $decoded->get()->value;
+    }
+
+    throw new RuntimeException("Cannot cast given value to {$decoder->name()}");
+}
+
+/**
  * @psalm-pure
  *
  * @param non-empty-list<TypeError> $errors
