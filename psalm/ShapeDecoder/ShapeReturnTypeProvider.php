@@ -4,21 +4,13 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
-use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
-use SimpleXMLElement;
+use Psalm\Type;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
-use Psalm\Plugin\PluginEntryPointInterface;
-use Psalm\Plugin\RegistrationInterface;
-use Psalm\Type;
+use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
 
-final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterface, PluginEntryPointInterface
+final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterface
 {
-    public function __invoke(RegistrationInterface $registration, ?SimpleXMLElement $config = null): void
-    {
-        $registration->registerHooksFromClass(self::class);
-    }
-
     public static function getFunctionIds(): array
     {
         return ['klimick\decode\shape', 'klimick\decode\partialshape'];

@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
-use SimpleXMLElement;
 use Psalm\Type;
 use Psalm\IssueBuffer;
-use Psalm\Plugin\RegistrationInterface;
-use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
@@ -17,13 +14,8 @@ use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
 use Fp\Functional\Option\Option;
 use function Fp\Evidence\proveOf;
 
-final class IntersectionReturnTypeProvider implements FunctionReturnTypeProviderInterface, PluginEntryPointInterface
+final class IntersectionReturnTypeProvider implements FunctionReturnTypeProviderInterface
 {
-    public function __invoke(RegistrationInterface $registration, ?SimpleXMLElement $config = null): void
-    {
-        $registration->registerHooksFromClass(self::class);
-    }
-
     public static function getFunctionIds(): array
     {
         return ['klimick\decode\intersection'];

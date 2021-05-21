@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder;
 
-use Fp\Functional\Option\Option;
 use Psalm\Codebase;
+use Fp\Functional\Option\Option;
 
 final class GetGeneralParentClass
 {

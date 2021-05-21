@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder;
 
-use Klimick\PsalmDecode\DecodeIssue;
 use Psalm\Type;
 use Psalm\Codebase;
+use Psalm\IssueBuffer;
 use Psalm\CodeLocation;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
-use Psalm\IssueBuffer;
+use Klimick\PsalmDecode\DecodeIssue;
 
 final class ObjectPropertiesValidator
 {

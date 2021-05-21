@@ -5,43 +5,35 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Internal\ObjectDecoder;
-use Klimick\Decode\RuntimeData;
-use PhpParser\Node\Expr\PropertyFetch;
-use PhpParser\Node\Identifier;
-use Psalm\Internal\Analyzer\IssueData;
-use Psalm\Internal\Analyzer\StatementsAnalyzer;
+
+use PhpParser\Node;
+use Psalm\Type;
 use Psalm\IssueBuffer;
 use Psalm\NodeTypeProvider;
+use Psalm\Internal\Analyzer\IssueData;
+use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
-use Psalm\Plugin\PluginEntryPointInterface;
-use Psalm\Plugin\RegistrationInterface;
-use Psalm\Type;
-use SimpleXMLElement;
+use Klimick\Decode\Internal\ObjectDecoder;
+use Klimick\Decode\RuntimeData;
 use function Fp\Cast\asList;
 use function Fp\Collection\filter;
 use function Fp\Collection\firstOf;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
-final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface, PluginEntryPointInterface
+final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface
 {
-    public function __invoke(RegistrationInterface $registration, ?SimpleXMLElement $config = null): void
-    {
-        $registration->registerHooksFromClass(self::class);
-    }
-
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
         $analysis = Option::do(function() use ($event) {
-            $property_fetch = yield proveOf($event->getExpr(), PropertyFetch::class);
+            $property_fetch = yield proveOf($event->getExpr(), Node\Expr\PropertyFetch::class);
 
             $source = yield proveOf($event->getStatementsSource(), StatementsAnalyzer::class);
             $provider = $source->getNodeTypeProvider();
 
             $properties = yield self::getPropertiesFromDecoder($property_fetch, $provider);
-            $identifier = yield proveOf($property_fetch->name, Identifier::class);
+            $identifier = yield proveOf($property_fetch->name, Node\Identifier::class);
 
             yield proveTrue(array_key_exists($identifier->name, $properties));
             $provider->setType($property_fetch, $properties[$identifier->name]);
@@ -55,7 +47,7 @@ final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface, P
     /**
      * @return Option<array<array-key, Type\Union>>
      */
-    private static function getPropertiesFromDecoder(PropertyFetch $fetch, NodeTypeProvider $provider): Option
+    private static function getPropertiesFromDecoder(Node\Expr\PropertyFetch $fetch, NodeTypeProvider $provider): Option
     {
         return Option::do(function() use ($provider, $fetch) {
             $class_string = yield Option
@@ -78,7 +70,7 @@ final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface, P
         });
     }
 
-    private static function removeKnownMixedPropertyFetch(StatementsAnalyzer $source, PropertyFetch $fetch): void
+    private static function removeKnownMixedPropertyFetch(StatementsAnalyzer $source, Node\Expr\PropertyFetch $fetch): void
     {
         $mixed_property_fetches = filter(
             IssueBuffer::getIssuesDataForFile($source->getFilePath()),

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder;
 
-use Klimick\Decode\RuntimeData;
 use Psalm\Type;
 use Psalm\Codebase;
 use Psalm\IssueBuffer;
@@ -17,6 +16,7 @@ use Klimick\PsalmDecode\DecodeIssue;
 use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use Klimick\PsalmDecode\ShapeDecoder\ShapePropertiesExtractor;
 use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
+use Klimick\Decode\RuntimeData;
 use Fp\Functional\Option\Option;
 use function Fp\Cast\asList;
 use function Fp\Collection\first;

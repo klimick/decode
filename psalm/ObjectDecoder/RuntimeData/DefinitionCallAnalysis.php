@@ -4,28 +4,20 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
-use SimpleXMLElement;
 use PhpParser\Node;
 use Psalm\Internal\Analyzer\ProjectAnalyzer;
 use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
-use Psalm\Plugin\PluginEntryPointInterface;
-use Psalm\Plugin\RegistrationInterface;
-use Klimick\Decode\RuntimeData;
 use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use Klimick\PsalmDecode\ObjectDecoder\GetGeneralParentClass;
+use Klimick\Decode\RuntimeData;
 use Fp\Functional\Option\Option;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
 use function Fp\Evidence\proveTrue;
 
-final class DefinitionCallAnalysis implements PluginEntryPointInterface, AfterExpressionAnalysisInterface
+final class DefinitionCallAnalysis implements AfterExpressionAnalysisInterface
 {
-    public function __invoke(RegistrationInterface $registration, ?SimpleXMLElement $config = null): void
-    {
-        $registration->registerHooksFromClass(self::class);
-    }
-
     public static function getClassLikeNames(): array
     {
         return [RuntimeData::class];
@@ -49,12 +41,10 @@ final class DefinitionCallAnalysis implements PluginEntryPointInterface, AfterEx
             $general_class = yield GetGeneralParentClass::for($class_name, ProjectAnalyzer::$instance->getCodebase());
             yield proveTrue(RuntimeData::class === $general_class);
 
-            $return_type = DecoderType::createObject($class_name);
-
             $event
                 ->getStatementsSource()
                 ->getNodeTypeProvider()
-                ->setType($method_call, $return_type);
+                ->setType($method_call, DecoderType::createObject($class_name));
         });
 
         return $analysis->get();

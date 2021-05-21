@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\NamedArguments;
 
+use PhpParser\Node;
 use Psalm\Type;
 use Psalm\Codebase;
 use Psalm\NodeTypeProvider;
-use PhpParser\Node;
 use Fp\Functional\Option\Option;
 use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use function Fp\Evidence\proveString;
