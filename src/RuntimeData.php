@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Klimick\Decode;
 
 use Fp\Functional\Either\Right;
+use JsonSerializable;
 use OutOfRangeException;
 use RuntimeException;
 
 /**
  * @psalm-immutable
  */
-abstract class RuntimeData
+abstract class RuntimeData implements JsonSerializable
 {
     private array $properties;
 
@@ -38,6 +39,11 @@ abstract class RuntimeData
         }
 
         return $this->properties[$name];
+    }
+
+    public function jsonSerialize(): array
+    {
+        return $this->properties;
     }
 
     abstract public static function definition(): DecoderInterface;
