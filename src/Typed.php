@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode;
 
-class t
+class Typed
 {
     public const null = 'Klimick\Decode\null';
     public const int = 'Klimick\Decode\int';

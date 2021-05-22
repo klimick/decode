@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test;
 
-use Klimick\Decode\t;
+use Klimick\Decode\Typed as t;
 use Klimick\Decode\Test\Helper\Gen;
 use Klimick\Decode\Test\Helper\Check;
 use PHPUnit\Framework\TestCase;

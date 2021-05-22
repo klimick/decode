@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test;
 
-use Klimick\Decode\t;
+use Klimick\Decode\Typed as t;
 use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\positiveInt;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class PositiveIntDecoderTest extends TestCase
@@ -22,6 +21,6 @@ final class PositiveIntDecoderTest extends TestCase
     {
         forAll(Gen::mixed())
             ->when(fn(mixed $value) => !is_int($value) || $value <= 0)
-            ->then(Check::thatInvalidFor(positiveInt()));
+            ->then(Check::thatInvalidFor(t::positiveInt));
     }
 }
