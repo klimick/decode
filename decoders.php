@@ -17,10 +17,10 @@ use RuntimeException;
  * @template T
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $decoder
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $decoder
  * @psalm-return Either<Invalid, Valid<T>>
  */
-function decode(callable|DecoderInterface $decoder, mixed $data): Either
+function decode(callable|Decoder $decoder, mixed $data): Either
 {
     $decoder = Internal\ToDecoder::for($decoder);
 
@@ -35,10 +35,10 @@ function decode(callable|DecoderInterface $decoder, mixed $data): Either
  * @template T
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $decoder
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $decoder
  * @psalm-return T
  */
-function cast(callable|DecoderInterface $decoder, mixed $data): mixed
+function cast(callable|Decoder $decoder, mixed $data): mixed
 {
     $decoder = Internal\ToDecoder::for($decoder);
 
@@ -91,9 +91,9 @@ function valid(mixed $value): Either
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<mixed>
+ * @return Decoder<mixed>
  */
-function mixed(): DecoderInterface
+function mixed(): Decoder
 {
     return new Internal\MixedDecoder();
 }
@@ -103,9 +103,9 @@ function mixed(): DecoderInterface
  * @psalm-pure
  *
  * @param T $value
- * @return DecoderInterface<T>
+ * @return Decoder<T>
  */
-function fallback(mixed $value): DecoderInterface
+function fallback(mixed $value): Decoder
 {
     return new Internal\FallbackDecoder($value);
 }
@@ -113,9 +113,9 @@ function fallback(mixed $value): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<null>
+ * @return Decoder<null>
  */
-function null(): DecoderInterface
+function null(): Decoder
 {
     return new Internal\NullDecoder();
 }
@@ -123,9 +123,9 @@ function null(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<int>
+ * @return Decoder<int>
  */
-function int(): DecoderInterface
+function int(): Decoder
 {
     return new Internal\IntDecoder();
 }
@@ -133,9 +133,9 @@ function int(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<positive-int>
+ * @return Decoder<positive-int>
  */
-function positiveInt(): DecoderInterface
+function positiveInt(): Decoder
 {
     return new Internal\PositiveIntDecoder();
 }
@@ -143,9 +143,9 @@ function positiveInt(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<float>
+ * @return Decoder<float>
  */
-function float(): DecoderInterface
+function float(): Decoder
 {
     return new Internal\FloatDecoder();
 }
@@ -153,9 +153,9 @@ function float(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<numeric>
+ * @return Decoder<numeric>
  */
-function numeric(): DecoderInterface
+function numeric(): Decoder
 {
     return new Internal\NumericDecoder();
 }
@@ -163,9 +163,9 @@ function numeric(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<numeric-string>
+ * @return Decoder<numeric-string>
  */
-function numericString(): DecoderInterface
+function numericString(): Decoder
 {
     return new Internal\NumericStringDecoder();
 }
@@ -173,9 +173,9 @@ function numericString(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<bool>
+ * @return Decoder<bool>
  */
-function bool(): DecoderInterface
+function bool(): Decoder
 {
     return new Internal\BoolDecoder();
 }
@@ -183,9 +183,9 @@ function bool(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<string>
+ * @return Decoder<string>
  */
-function string(): DecoderInterface
+function string(): Decoder
 {
     return new Internal\StringDecoder();
 }
@@ -193,9 +193,9 @@ function string(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<non-empty-string>
+ * @return Decoder<non-empty-string>
  */
-function nonEmptyString(): DecoderInterface
+function nonEmptyString(): Decoder
 {
     return new Internal\NonEmptyStringDecoder();
 }
@@ -203,9 +203,9 @@ function nonEmptyString(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<scalar>
+ * @return Decoder<scalar>
  */
-function scalar(): DecoderInterface
+function scalar(): Decoder
 {
     return new Internal\ScalarDecoder();
 }
@@ -213,9 +213,9 @@ function scalar(): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<DateTimeImmutable>
+ * @return Decoder<DateTimeImmutable>
  */
-function datetime(string $timezone = 'UTC'): DecoderInterface
+function datetime(string $timezone = 'UTC'): Decoder
 {
     return new Internal\DatetimeDecoder($timezone);
 }
@@ -223,9 +223,9 @@ function datetime(string $timezone = 'UTC'): DecoderInterface
 /**
  * @psalm-pure
  *
- * @return DecoderInterface<array-key>
+ * @return Decoder<array-key>
  */
-function arrKey(): DecoderInterface
+function arrKey(): Decoder
 {
     return new Internal\ArrKeyDecoder();
 }
@@ -237,9 +237,9 @@ function arrKey(): DecoderInterface
  *
  * @param T $head
  * @param T ...$tail
- * @return DecoderInterface<T>
+ * @return Decoder<T>
  */
-function literal(mixed $head, mixed ...$tail): DecoderInterface
+function literal(mixed $head, mixed ...$tail): Decoder
 {
     return new Internal\LiteralDecoder([$head, ...$tail]);
 }
@@ -248,10 +248,10 @@ function literal(mixed $head, mixed ...$tail): DecoderInterface
  * @template T
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $decoder
- * @return DecoderInterface<list<T>>
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $decoder
+ * @return Decoder<list<T>>
  */
-function arrList(callable|DecoderInterface $decoder): DecoderInterface
+function arrList(callable|Decoder $decoder): Decoder
 {
     return new Internal\ArrListDecoder(
         decoder: Internal\ToDecoder::for($decoder)
@@ -262,10 +262,10 @@ function arrList(callable|DecoderInterface $decoder): DecoderInterface
  * @template T
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $decoder
- * @return DecoderInterface<non-empty-list<T>>
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $decoder
+ * @return Decoder<non-empty-list<T>>
  */
-function nonEmptyArrList(callable|DecoderInterface $decoder): DecoderInterface
+function nonEmptyArrList(callable|Decoder $decoder): Decoder
 {
     return new Internal\NonEmptyArrListDecoder(
         decoder: Internal\ToDecoder::for($decoder)
@@ -277,12 +277,12 @@ function nonEmptyArrList(callable|DecoderInterface $decoder): DecoderInterface
  * @template V
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<K>|pure-callable(): DecoderInterface<K> $keyDecoder
- * @psalm-param DecoderInterface<V>|pure-callable(): DecoderInterface<V> $valDecoder
+ * @psalm-param Decoder<K>|pure-callable(): Decoder<K> $keyDecoder
+ * @psalm-param Decoder<V>|pure-callable(): Decoder<V> $valDecoder
  *
- * @return DecoderInterface<array<K, V>>
+ * @return Decoder<array<K, V>>
  */
-function arr(callable|DecoderInterface $keyDecoder, callable|DecoderInterface $valDecoder): DecoderInterface
+function arr(callable|Decoder $keyDecoder, callable|Decoder $valDecoder): Decoder
 {
     return new Internal\ArrDecoder(
         keyDecoder: Internal\ToDecoder::for($keyDecoder),
@@ -295,12 +295,12 @@ function arr(callable|DecoderInterface $keyDecoder, callable|DecoderInterface $v
  * @template V
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<K>|pure-callable(): DecoderInterface<K> $keyDecoder
- * @psalm-param DecoderInterface<V>|pure-callable(): DecoderInterface<V> $valDecoder
+ * @psalm-param Decoder<K>|pure-callable(): Decoder<K> $keyDecoder
+ * @psalm-param Decoder<V>|pure-callable(): Decoder<V> $valDecoder
  *
- * @return DecoderInterface<non-empty-array<K, V>>
+ * @return Decoder<non-empty-array<K, V>>
  */
-function nonEmptyArr(callable|DecoderInterface $keyDecoder, callable|DecoderInterface $valDecoder): DecoderInterface
+function nonEmptyArr(callable|Decoder $keyDecoder, callable|Decoder $valDecoder): Decoder
 {
     return new Internal\NonEmptyArrDecoder(
         keyDecoder: Internal\ToDecoder::for($keyDecoder),
@@ -312,12 +312,12 @@ function nonEmptyArr(callable|DecoderInterface $keyDecoder, callable|DecoderInte
  * @template T
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> ...$decoders
- * @return DecoderInterface<array<string, T>>
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> ...$decoders
+ * @return Decoder<array<string, T>>
  *
  * @see ShapeReturnTypeProvider
  */
-function shape(callable|DecoderInterface ...$decoders): DecoderInterface
+function shape(callable|Decoder ...$decoders): Decoder
 {
     return new Internal\Shape\ShapeDecoder(
         decoders: Internal\ToDecoder::forAll($decoders)
@@ -328,12 +328,12 @@ function shape(callable|DecoderInterface ...$decoders): DecoderInterface
  * @template T
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> ...$decoders
- * @return DecoderInterface<array<string, T>>
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> ...$decoders
+ * @return Decoder<array<string, T>>
  *
  * @see PartialShapeReturnTypeProvider
  */
-function partialShape(callable|DecoderInterface ...$decoders): DecoderInterface
+function partialShape(callable|Decoder ...$decoders): Decoder
 {
     return new Internal\Shape\ShapeDecoder(
         decoders: Internal\ToDecoder::forAll($decoders),
@@ -369,10 +369,10 @@ function partialObject(string $objectClass): ObjectDecoderFactory
  * @template T of object
  * @psalm-pure
  *
- * @param callable(): DecoderInterface<T> $type
- * @return DecoderInterface<T>
+ * @param callable(): Decoder<T> $type
+ * @return Decoder<T>
  */
-function rec(callable $type): DecoderInterface
+function rec(callable $type): Decoder
 {
     return new Internal\RecursionDecoder(Closure::fromCallable($type));
 }
@@ -382,12 +382,12 @@ function rec(callable $type): DecoderInterface
  * @psalm-pure
  * @no-named-arguments
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $first
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $second
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> ...$rest
- * @return DecoderInterface<T>
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $first
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $second
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> ...$rest
+ * @return Decoder<T>
  */
-function union(callable|DecoderInterface $first, callable|DecoderInterface $second, callable|DecoderInterface ...$rest): DecoderInterface
+function union(callable|Decoder $first, callable|Decoder $second, callable|Decoder ...$rest): Decoder
 {
     $restDecoders = array_values(Internal\ToDecoder::forAll($rest));
 
@@ -403,12 +403,12 @@ function union(callable|DecoderInterface $first, callable|DecoderInterface $seco
  * @psalm-pure
  * @no-named-arguments
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $first
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $second
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> ...$rest
- * @return DecoderInterface<T>
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $first
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $second
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> ...$rest
+ * @return Decoder<T>
  */
-function intersection(callable|DecoderInterface $first, callable|DecoderInterface $second, callable|DecoderInterface ...$rest): DecoderInterface
+function intersection(callable|Decoder $first, callable|Decoder $second, callable|Decoder ...$rest): Decoder
 {
     $restDecoders = array_values(Internal\ToDecoder::forAll($rest));
 
@@ -423,11 +423,11 @@ function intersection(callable|DecoderInterface $first, callable|DecoderInterfac
  * @template T
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $decoder
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $decoder
  * @param non-empty-string $alias
- * @return DecoderInterface<T>
+ * @return Decoder<T>
  */
-function aliased(callable|DecoderInterface $decoder, string $alias): DecoderInterface
+function aliased(callable|Decoder $decoder, string $alias): Decoder
 {
     return new Internal\HighOrder\AliasedDecoder($alias, Internal\ToDecoder::for($decoder));
 }
@@ -436,10 +436,10 @@ function aliased(callable|DecoderInterface $decoder, string $alias): DecoderInte
  * @template T
  * @psalm-pure
  *
- * @psalm-param DecoderInterface<T>|pure-callable(): DecoderInterface<T> $decoder
- * @return DecoderInterface<T>
+ * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $decoder
+ * @return Decoder<T>
  */
-function fromSelf(callable|DecoderInterface $decoder): DecoderInterface
+function fromSelf(callable|Decoder $decoder): Decoder
 {
     return new Internal\HighOrder\FromSelfDecoder(Internal\ToDecoder::for($decoder));
 }

@@ -40,7 +40,7 @@ final class DecoderGenerator
         'mixed',
     ];
 
-    private static function simpleDecoderByName(string $name): d\DecoderInterface
+    private static function simpleDecoderByName(string $name): d\Decoder
     {
         return match ($name) {
             'int' => d\int(),
@@ -132,7 +132,7 @@ final class DecoderGenerator
 
             $arrayKey = $arrayKeys[array_rand($arrayKeys)];
 
-            /** @var d\DecoderInterface<array-key> $arrayKeyD */
+            /** @var d\Decoder<array-key> $arrayKeyD */
             $arrayKeyD = self::simpleDecoderByName($arrayKey);
             $arrayKeyG = Gen::arrKey($arrayKey);
 

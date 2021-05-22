@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal;
 
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 
 final class ToDecoder
 {
@@ -12,10 +12,10 @@ final class ToDecoder
      * @template T
      * @psalm-pure
      *
-     * @psalm-param pure-callable(): DecoderInterface<T>|DecoderInterface<T> $decoder
-     * @return DecoderInterface<T>
+     * @psalm-param pure-callable(): Decoder<T>|Decoder<T> $decoder
+     * @return Decoder<T>
      */
-    public static function for(callable|DecoderInterface $decoder)
+    public static function for(callable|Decoder $decoder)
     {
         return is_callable($decoder) ? $decoder() : $decoder;
     }
@@ -24,8 +24,8 @@ final class ToDecoder
      * @template T
      * @psalm-pure
      *
-     * @psalm-param array<array-key, pure-callable(): DecoderInterface<T>|DecoderInterface<T>> $decoders
-     * @return array<array-key, DecoderInterface<T>>
+     * @psalm-param array<array-key, pure-callable(): Decoder<T>|Decoder<T>> $decoders
+     * @return array<array-key, Decoder<T>>
      */
     public static function forAll(array $decoders): array
     {

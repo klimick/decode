@@ -46,5 +46,5 @@ abstract class RuntimeData implements JsonSerializable
         return $this->properties;
     }
 
-    abstract public static function definition(): DecoderInterface;
+    abstract public static function definition(): Decoder;
 }

@@ -10,15 +10,15 @@ use Fp\Functional\Either\Either;
  * @template-covariant T
  * @psalm-immutable
  */
-interface DecoderInterface
+abstract class Decoder
 {
     /**
      * @return non-empty-string
      */
-    public function name(): string;
+    abstract public function name(): string;
 
     /**
      * @return Either<Invalid, Valid<T>>
      */
-    public function decode(mixed $value, Context $context): Either;
+    abstract public function decode(mixed $value, Context $context): Either;
 }

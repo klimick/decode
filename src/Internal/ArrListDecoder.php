@@ -8,22 +8,22 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Typed as t;
 use Klimick\Decode\Valid;
 use Klimick\Decode\Context;
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 use function Klimick\Decode\arr;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\valid;
 
 /**
  * @template A
- * @implements DecoderInterface<list<A>>
+ * @extends Decoder<list<A>>
  * @psalm-immutable
  */
-final class ArrListDecoder implements DecoderInterface
+final class ArrListDecoder extends Decoder
 {
     /**
-     * @param DecoderInterface<A> $decoder
+     * @param Decoder<A> $decoder
      */
-    public function __construct(public DecoderInterface $decoder) { }
+    public function __construct(public Decoder $decoder) { }
 
     public function name(): string
     {

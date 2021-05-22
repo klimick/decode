@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Shape;
 
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 use Klimick\Decode\Internal\HighOrder\AliasedDecoder;
 use Klimick\Decode\Internal\HighOrder\FromSelfDecoder;
 
@@ -16,7 +16,7 @@ final class ShapeAccessor
     /**
      * @psalm-pure
      */
-    public static function access(DecoderInterface $decoder, int|string $key, array $shape): mixed
+    public static function access(Decoder $decoder, int|string $key, array $shape): mixed
     {
         if ($decoder instanceof AliasedDecoder) {
             return self::dotAccess(explode('.', $decoder->alias), $shape);

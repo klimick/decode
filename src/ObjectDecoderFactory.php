@@ -25,12 +25,12 @@ final class ObjectDecoderFactory
     ) { }
 
     /**
-     * @psalm-param DecoderInterface<mixed>|pure-callable(): DecoderInterface<mixed> ...$decoders
-     * @return DecoderInterface<TObjectClass>
+     * @psalm-param Decoder<mixed>|pure-callable(): Decoder<mixed> ...$decoders
+     * @return Decoder<TObjectClass>
      *
      * @see ObjectDecoderFactoryReturnTypeProvider
      */
-    public function __invoke(callable|DecoderInterface ...$decoders): DecoderInterface
+    public function __invoke(callable|Decoder ...$decoders): Decoder
     {
         return new ObjectDecoder($this->objectClass, ToDecoder::forAll($decoders), $this->partial);
     }

@@ -7,7 +7,7 @@ namespace Klimick\PsalmDecode\NamedArguments;
 use Psalm\Type;
 use Psalm\Codebase;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 use function Fp\Cast\asList;
 use function Fp\Collection\at;
 use function Fp\Collection\first;
@@ -51,7 +51,7 @@ final class DecoderTypeParamExtractor
 
             $generic_object = yield firstOf($atomics, Type\Atomic\TGenericObject::class);
 
-            yield proveTrue($generic_object->value === DecoderInterface::class);
+            yield proveTrue($generic_object->value === Decoder::class);
             yield proveTrue(1 === count($generic_object->type_params));
 
             return yield first($generic_object->type_params);

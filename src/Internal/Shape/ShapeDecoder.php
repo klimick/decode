@@ -8,20 +8,20 @@ use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
 use Klimick\Decode\Valid;
 use Klimick\Decode\Context;
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\invalids;
 use function Klimick\Decode\valid;
 
 /**
  * @template TVal
- * @implements DecoderInterface<array<string, TVal>>
+ * @extends Decoder<array<string, TVal>>
  * @psalm-immutable
  */
-final class ShapeDecoder implements DecoderInterface
+final class ShapeDecoder extends Decoder
 {
     /**
-     * @param array<array-key, DecoderInterface<TVal>> $decoders
+     * @param array<array-key, Decoder<TVal>> $decoders
      */
     public function __construct(
         public array $decoders,
@@ -31,7 +31,7 @@ final class ShapeDecoder implements DecoderInterface
     public function name(): string
     {
         $properties = implode(', ', array_map(
-            fn(int|string $property, DecoderInterface $decoder) => "{$property}: {$decoder->name()}",
+            fn(int|string $property, Decoder $decoder) => "{$property}: {$decoder->name()}",
             array_keys($this->decoders),
             array_values($this->decoders),
         ));

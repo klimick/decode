@@ -4,16 +4,16 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\valid;
 
 /**
  * @template T of scalar
- * @implements DecoderInterface<T>
+ * @extends Decoder<T>
  * @psalm-immutable
  */
-final class LiteralDecoder implements DecoderInterface
+final class LiteralDecoder extends Decoder
 {
     /**
      * @param non-empty-list<T> $literals

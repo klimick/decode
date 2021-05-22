@@ -6,15 +6,15 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\valid;
 
 /**
- * @implements DecoderInterface<array-key>
+ * @extends Decoder<array-key>
  * @psalm-immutable
  */
-final class ArrKeyDecoder implements DecoderInterface
+final class ArrKeyDecoder extends Decoder
 {
     public function name(): string
     {

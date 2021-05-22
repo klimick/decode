@@ -8,7 +8,7 @@ use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
 use Klimick\Decode\Context;
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\invalids;
 use function Klimick\Decode\valid;
@@ -16,18 +16,18 @@ use function Klimick\Decode\valid;
 /**
  * @template TKey of array-key
  * @template TVal
- * @implements DecoderInterface<array<TKey, TVal>>
+ * @extends Decoder<array<TKey, TVal>>
  * @psalm-immutable
  */
-final class ArrDecoder implements DecoderInterface
+final class ArrDecoder extends Decoder
 {
     /**
-     * @param DecoderInterface<TKey> $keyDecoder
-     * @param DecoderInterface<TVal> $valDecoder
+     * @param Decoder<TKey> $keyDecoder
+     * @param Decoder<TVal> $valDecoder
      */
     public function __construct(
-        public DecoderInterface $keyDecoder,
-        public DecoderInterface $valDecoder,
+        public Decoder $keyDecoder,
+        public Decoder $valDecoder,
     ) { }
 
     public function name(): string

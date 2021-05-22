@@ -6,19 +6,19 @@ namespace Klimick\Decode\Internal\HighOrder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 
 /**
  * @template T
- * @implements DecoderInterface<T>
+ * @extends Decoder<T>
  * @psalm-immutable
  */
-final class FromSelfDecoder implements DecoderInterface
+final class FromSelfDecoder extends Decoder
 {
     /**
-     * @param DecoderInterface<T> $decoder
+     * @param Decoder<T> $decoder
      */
-    public function __construct(public DecoderInterface $decoder) { }
+    public function __construct(public Decoder $decoder) { }
 
     public function name(): string
     {

@@ -6,37 +6,37 @@ namespace Klimick\Decode\Internal;
 
 use Closure;
 use Fp\Functional\Either\Either;
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 use Klimick\Decode\Context;
 
 /**
  * @template T of object
  * @psalm-immutable
- * @implements DecoderInterface<T>
+ * @extends Decoder<T>
  */
-final class RecursionDecoder implements DecoderInterface
+final class RecursionDecoder extends Decoder
 {
     /**
-     * @var null|DecoderInterface<T>
+     * @var null|Decoder<T>
      * @psalm-allow-private-mutation
      */
-    private ?DecoderInterface $cache = null;
+    private ?Decoder $cache = null;
 
     /**
-     * @param Closure(): DecoderInterface<T> $type
+     * @param Closure(): Decoder<T> $type
      */
     public function __construct(public Closure $type) {}
 
     /**
-     * @return DecoderInterface<T>
+     * @return Decoder<T>
      */
-    private function type(): DecoderInterface
+    private function type(): Decoder
     {
         if (null === $this->cache) {
             $this->cache = ($this->type)();
         }
 
-        /** @var DecoderInterface<T> */
+        /** @var Decoder<T> */
         return $this->cache;
     }
 

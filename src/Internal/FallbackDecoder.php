@@ -6,15 +6,15 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\DecoderInterface;
+use Klimick\Decode\Decoder;
 use function Klimick\Decode\valid;
 
 /**
  * @template T
- * @implements DecoderInterface<T>
+ * @extends Decoder<T>
  * @psalm-immutable
  */
-final class FallbackDecoder implements DecoderInterface
+final class FallbackDecoder extends Decoder
 {
     /**
      * @param T $fallback
