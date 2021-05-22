@@ -18,11 +18,6 @@ use function Fp\Evidence\proveTrue;
 
 final class DefinitionCallAnalysis implements AfterExpressionAnalysisInterface
 {
-    public static function getClassLikeNames(): array
-    {
-        return [RuntimeData::class];
-    }
-
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
         $analysis = Option::do(function() use ($event) {

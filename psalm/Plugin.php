@@ -8,6 +8,7 @@ use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\AfterMethodAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionCallAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionReturnAnalysis;
+use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\OfCallAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\PropertyFetchAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\IntersectionReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
@@ -29,6 +30,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(DefinitionCallAnalysis::class);
         $register(DefinitionReturnAnalysis::class);
         $register(PropertyFetchAnalysis::class);
+        $register(OfCallAnalysis::class);
 
         $register(IntersectionReturnTypeProvider::class);
         $register(ShapeReturnTypeProvider::class);

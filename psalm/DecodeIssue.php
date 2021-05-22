@@ -4,12 +4,30 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode;
 
+use Klimick\Decode\Invalid;
+use Klimick\Decode\Report\DefaultReporter;
 use Psalm\CodeLocation;
 use Psalm\Issue\CodeIssue;
 use Psalm\Type\Union;
 
 final class DecodeIssue extends CodeIssue
 {
+    public static function couldNotDecodeRuntimeData(Invalid $invalid, CodeLocation $code_location): self
+    {
+        return new self(
+            message: json_encode(DefaultReporter::report($invalid), JSON_PRETTY_PRINT),
+            code_location: $code_location,
+        );
+    }
+
+    public static function couldNotAnalyzeOfCall(CodeLocation $code_location): self
+    {
+        return new self(
+            message: 'RuntimeData::of call could not be analyzed because array value is not literal',
+            code_location: $code_location
+        );
+    }
+
     public static function invalidPropertyDecoder(
         string $property,
         Union $actual_type,
