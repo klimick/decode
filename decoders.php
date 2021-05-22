@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode;
 
+use Closure;
 use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Right;
