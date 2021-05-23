@@ -10,11 +10,13 @@ namespace Klimick\Decode\Report;
 final class ErrorReport
 {
     /**
-     * @param list<TypeError> $typeErrors
-     * @param list<string> $undefinedProperties
+     * @param list<TypeErrorReport> $typeErrors
+     * @param list<ConstraintErrorReport> $constraintErrors
+     * @param list<string> $undefinedErrors
      */
     public function __construct(
         public array $typeErrors,
-        public array $undefinedProperties,
+        public array $constraintErrors,
+        public array $undefinedErrors,
     ) { }
 }

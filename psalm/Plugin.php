@@ -34,5 +34,7 @@ final class Plugin implements PluginEntryPointInterface
 
         $register(IntersectionReturnTypeProvider::class);
         $register(ShapeReturnTypeProvider::class);
+
+        $register(ConstrainedReturnTypeProvider::class);
     }
 }

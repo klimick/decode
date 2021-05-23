@@ -6,6 +6,7 @@ namespace Klimick\Decode\Internal\Shape;
 
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
+use Klimick\Decode\Error\UndefinedError;
 use Klimick\Decode\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder;
@@ -51,9 +52,15 @@ final class ShapeDecoder extends Decoder
 
         foreach ($this->decoders as $key => $decoder) {
             /** @var mixed $fromShape */
-            $fromShape = ShapeAccessor::access($decoder, $key, $value);
+            $fromShape = ShapeAccessor::access($decoder, $key, $value)->getOrElse(
+                new UndefinedError($context->append($decoder->name(), null, (string) $key))
+            );
 
-            if ($fromShape instanceof UndefinedProperty && $this->partial) {
+            if ($fromShape instanceof UndefinedError) {
+                if (!$this->partial) {
+                    $errors[] = $fromShape;
+                }
+
                 continue;
             }
 
