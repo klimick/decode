@@ -7,6 +7,7 @@ namespace Klimick\Decode\Internal\Shape;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
 use Klimick\Decode\Error\UndefinedError;
+use Klimick\Decode\Internal\HighOrder\OptionalDecoder;
 use Klimick\Decode\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder;
@@ -57,7 +58,7 @@ final class ShapeDecoder extends Decoder
             );
 
             if ($fromShape instanceof UndefinedError) {
-                if (!$this->partial) {
+                if (!$this->partial && !($decoder instanceof OptionalDecoder)) {
                     $errors[] = $fromShape;
                 }
 

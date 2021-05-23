@@ -12,6 +12,7 @@ use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionReturnAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\OfCallAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\PropertyFetchAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\IntersectionReturnTypeProvider;
+use Klimick\PsalmDecode\ShapeDecoder\OptionalReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
@@ -34,6 +35,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(OfCallAnalysis::class);
 
         $register(IntersectionReturnTypeProvider::class);
+        $register(OptionalReturnTypeProvider::class);
         $register(ShapeReturnTypeProvider::class);
 
         $register(ConstrainedContravariantCheckHandler::class);

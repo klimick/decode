@@ -25,7 +25,7 @@ final class ObjectDecoderFactory
     ) { }
 
     /**
-     * @psalm-param Decoder<mixed>|pure-callable(): Decoder<mixed> ...$decoders
+     * @psalm-param Decoder|pure-callable(): Decoder ...$decoders
      * @return Decoder<TObjectClass>
      *
      * @see ObjectDecoderFactoryReturnTypeProvider

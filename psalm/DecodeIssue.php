@@ -51,11 +51,15 @@ final class DecodeIssue extends CodeIssue
         CodeLocation $code_location,
     ): self
     {
+        $actual_type_decoder_type_param = $actual_type->possibly_undefined
+            ? "possibly-undefined|{$actual_type->getId()}>"
+            : $actual_type->getId();
+
         return new self(
             message: implode(' ', [
                 "Invalid decoder for property '{$property}'.",
                 "Expected: DecoderInterface<{$expected_type->getId()}>.",
-                "Actual: DecoderInterface<{$actual_type->getId()}>.",
+                "Actual: DecoderInterface<{$actual_type_decoder_type_param}>.",
             ]),
             code_location: $code_location,
         );

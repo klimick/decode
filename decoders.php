@@ -311,11 +311,10 @@ function nonEmptyArr(callable|Decoder $keyDecoder, callable|Decoder $valDecoder)
 }
 
 /**
- * @template T
  * @psalm-pure
  *
- * @psalm-param Decoder<T>|pure-callable(): Decoder<T> ...$decoders
- * @return Decoder<array<string, T>>
+ * @psalm-param Decoder|pure-callable(): Decoder ...$decoders
+ * @return Decoder<array<string, mixed>>
  *
  * @see ShapeReturnTypeProvider
  */
@@ -419,6 +418,18 @@ function intersection(callable|Decoder $first, callable|Decoder $second, callabl
         Internal\ToDecoder::for($second),
         ...$restDecoders,
     );
+}
+
+/**
+ * @template T
+ * @psalm-pure
+ *
+ * @psalm-param ((pure-callable(): Decoder<T>)| (Decoder<T>)) $decoder
+ * @return Decoder<T>
+ */
+function optional(callable|Decoder $decoder): Decoder
+{
+    return new Internal\HighOrder\OptionalDecoder(Internal\ToDecoder::for($decoder));
 }
 
 /**

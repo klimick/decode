@@ -35,4 +35,11 @@ final class DecoderType
             ]),
         ]);
     }
+
+    public static function withTypeParameter(Type\Union $type_parameter): Type\Union
+    {
+        return new Type\Union([
+            new Type\Atomic\TGenericObject(Decoder::class, [$type_parameter]),
+        ]);
+    }
 }
