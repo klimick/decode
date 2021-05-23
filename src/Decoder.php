@@ -29,11 +29,11 @@ abstract class Decoder
      * @template ContravariantT
      *
      * @param non-empty-list<ConstraintInterface<ContravariantT>> $constraints
-     * @return ConstrainedDecoder<T>
+     * @return Decoder<T>
      *
      * @see ConstrainedContravariantCheckHandler Contravariant check happens via plugin
      */
-    public function constrained(array $constraints): ConstrainedDecoder
+    public function constrained(array $constraints): Decoder
     {
         return new ConstrainedDecoder($this, $constraints);
     }
