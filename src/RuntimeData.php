@@ -23,7 +23,7 @@ abstract class RuntimeData implements JsonSerializable
 
     final public static function of(array $args): static
     {
-        $decoded = decode(static::definition(), $args);
+        $decoded = decode($args, static::definition());
 
         if ($decoded instanceof Right) {
             return $decoded->get()->value;

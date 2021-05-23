@@ -18,7 +18,7 @@ final class FallbackDecoderTest extends TestCase
         forAll(Gen::mixed())
             ->then(function(mixed $value) {
                 $decoder = fallback($value);
-                self::assertInstanceOf(Right::class, decode($decoder, $value));
+                self::assertInstanceOf(Right::class, decode($value, $decoder));
             });
     }
 }

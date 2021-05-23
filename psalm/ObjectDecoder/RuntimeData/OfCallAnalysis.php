@@ -52,7 +52,7 @@ final class OfCallAnalysis implements AfterExpressionAnalysisInterface
             }
 
             $decoder = yield RuntimeDecoder::instance($class_string);
-            $decoded = decode($decoder, $value);
+            $decoded = decode($value, $decoder);
 
             if ($decoded->isLeft()) {
                 /**

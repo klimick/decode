@@ -22,7 +22,7 @@ use RuntimeException;
  * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $decoder
  * @psalm-return Either<Invalid, Valid<T>>
  */
-function decode(callable|Decoder $decoder, mixed $data): Either
+function decode(mixed $data, callable|Decoder $decoder): Either
 {
     $decoder = Internal\ToDecoder::for($decoder);
 
@@ -40,11 +40,11 @@ function decode(callable|Decoder $decoder, mixed $data): Either
  * @psalm-param Decoder<T>|pure-callable(): Decoder<T> $decoder
  * @psalm-return T
  */
-function cast(callable|Decoder $decoder, mixed $data): mixed
+function cast(mixed $data, callable|Decoder $decoder): mixed
 {
     $decoder = Internal\ToDecoder::for($decoder);
 
-    $decoded = decode($decoder, $data);
+    $decoded = decode($data, $decoder);
 
     if ($decoded instanceof Right) {
         return $decoded->get()->value;

@@ -24,7 +24,7 @@ final class Check
             : $decoderOrCallable;
 
         return function(mixed $value) use ($decoder): void {
-            $result = decode($decoder, $value);
+            $result = decode($value, $decoder);
             assertInstanceOf(Right::class, $result, json_encode($value));
         };
     }
@@ -40,7 +40,7 @@ final class Check
             : $decoderOrCallable;
 
         return function(mixed $value) use ($decoder): void {
-            assertInstanceOf(Left::class, decode($decoder, $value));
+            assertInstanceOf(Left::class, decode($value, $decoder));
         };
     }
 }

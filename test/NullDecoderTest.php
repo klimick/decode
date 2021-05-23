@@ -17,7 +17,7 @@ final class NullDecoderTest extends TestCase
 {
     public function testValidOnlyForNullValue(): void
     {
-        assertInstanceOf(Right::class, decode(t::null, null));
+        assertInstanceOf(Right::class, decode(null, t::null));
     }
 
     public function testInvalidForAllNotNullValue(): void
