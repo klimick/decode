@@ -7,6 +7,7 @@ namespace Klimick\Decode;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Internal\Constraint\ConstraintInterface;
 use Klimick\Decode\Internal\HighOrder\ConstrainedDecoder;
+use Klimick\PsalmDecode\Constrain\ConstrainedContravariantCheckHandler;
 
 /**
  * @template-covariant T
@@ -29,6 +30,8 @@ abstract class Decoder
      *
      * @param non-empty-list<ConstraintInterface<ContravariantT>> $constraints
      * @return ConstrainedDecoder<T>
+     *
+     * @see ConstrainedContravariantCheckHandler Contravariant check happens via plugin
      */
     public function constrained(array $constraints): ConstrainedDecoder
     {

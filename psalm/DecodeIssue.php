@@ -8,10 +8,26 @@ use Klimick\Decode\Invalid;
 use Klimick\Decode\Report\DefaultReporter;
 use Psalm\CodeLocation;
 use Psalm\Issue\CodeIssue;
-use Psalm\Type\Union;
+use Psalm\Type;
 
 final class DecodeIssue extends CodeIssue
 {
+    public static function incompatibleConstraints(
+        Type\Union $constraints_type,
+        Type\Union $decoder_type_parameter,
+        CodeLocation $code_location,
+    ): self
+    {
+        return new self(
+            message: implode(' ', [
+                "Given constraints of type",
+                "non-empty-list<ConstraintInterface<{$constraints_type->getId()}>>",
+                "is not compatible with DecoderInterface<{$decoder_type_parameter->getId()}>.",
+            ]),
+            code_location: $code_location,
+        );
+    }
+
     public static function couldNotDecodeRuntimeData(Invalid $invalid, CodeLocation $code_location): self
     {
         return new self(
@@ -30,8 +46,8 @@ final class DecodeIssue extends CodeIssue
 
     public static function invalidPropertyDecoder(
         string $property,
-        Union $actual_type,
-        Union $expected_type,
+        Type\Union $actual_type,
+        Type\Union $expected_type,
         CodeLocation $code_location,
     ): self
     {
@@ -92,8 +108,8 @@ final class DecodeIssue extends CodeIssue
     }
 
     public static function invalidRuntimeDataDefinition(
-        Union $expected_decoder_type,
-        Union $return_decoder_type,
+        Type\Union $expected_decoder_type,
+        Type\Union $return_decoder_type,
         CodeLocation $code_location,
     ): self
     {
