@@ -12,7 +12,7 @@ final class ErrorReport
     /**
      * @param list<TypeErrorReport> $typeErrors
      * @param list<ConstraintErrorReport> $constraintErrors
-     * @param list<string> $undefinedErrors
+     * @param list<UndefinedErrorReport> $undefinedErrors
      */
     public function __construct(
         public array $typeErrors,

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode;
 
-use Klimick\Decode\Invalid;
-use Klimick\Decode\Report\DefaultReporter;
 use Psalm\CodeLocation;
 use Psalm\Issue\CodeIssue;
 use Psalm\Type;
@@ -24,14 +22,6 @@ final class DecodeIssue extends CodeIssue
                 "non-empty-list<ConstraintInterface<{$constraints_type->getId()}>>",
                 "is not compatible with DecoderInterface<{$decoder_type_parameter->getId()}>.",
             ]),
-            code_location: $code_location,
-        );
-    }
-
-    public static function couldNotDecodeRuntimeData(Invalid $invalid, CodeLocation $code_location): self
-    {
-        return new self(
-            message: json_encode(DefaultReporter::report($invalid), JSON_PRETTY_PRINT),
             code_location: $code_location,
         );
     }

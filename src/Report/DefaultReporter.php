@@ -13,6 +13,9 @@ use Klimick\Decode\Error\UndefinedError;
 
 final class DefaultReporter
 {
+    private const INDEXED_ACCESS_WITHOUT_BRACKETS = "~\.(\d+)~";
+    private const TO_INDEXED_ACCESS_WITH_BRACKETS = '[$1]';
+
     public static function report(Invalid $invalid, bool $useShortClassNames = false): ErrorReport
     {
         $typeErrors = [];
@@ -22,14 +25,10 @@ final class DefaultReporter
         foreach ($invalid->errors as $error) {
             if ($error instanceof TypeError) {
                 $typeErrors[] = self::reportTypeError($error, $useShortClassNames);
-            }
-
-            if ($error instanceof ConstraintError) {
+            } elseif ($error instanceof ConstraintError) {
                 $constraintErrors[] = self::reportConstraintError($error);
-            }
-
-            if ($error instanceof UndefinedError) {
-                $undefinedErrors[] = self::pathFromContext($error->context);
+            } elseif ($error instanceof UndefinedError) {
+                $undefinedErrors[] = self::reportUndefinedError($error);
             }
         }
 
@@ -63,6 +62,20 @@ final class DefaultReporter
         );
     }
 
+    private static function reportUndefinedError(UndefinedError $error): UndefinedErrorReport
+    {
+        $size = count($error->context->entries);
+
+        $last = $error->context->entries[$size - 1];
+        $rest = array_slice($error->context->entries, offset: 0, length: $size - 1);
+
+        $path = !empty($rest)
+            ? self::pathFromContext(new Context($rest))
+            : '$';
+
+        return new UndefinedErrorReport($path, $last->key);
+    }
+
     private static function formatExpectedType(string $type): string
     {
         $types = explode(' | ', $type);
@@ -79,16 +92,18 @@ final class DefaultReporter
 
     private static function pathFromContext(Context $context): string
     {
-        $pathParts = ['$'];
+        $pathParts = [];
 
         foreach ($context->entries as $entry) {
-            if ('' === $entry->key) {
-                continue;
+            if ('' !== $entry->key) {
+                $pathParts[] = $entry->key;
             }
-
-            $pathParts[] = $entry->key;
         }
 
-        return preg_replace("~\.(\d+)~", '[$1]', implode('.', $pathParts));
+        return preg_replace(
+            self::INDEXED_ACCESS_WITHOUT_BRACKETS,
+            self::TO_INDEXED_ACCESS_WITH_BRACKETS,
+            implode('.', ['$', ...$pathParts]),
+        );
     }
 }

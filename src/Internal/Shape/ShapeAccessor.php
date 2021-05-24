@@ -47,7 +47,12 @@ final class ShapeAccessor
         $rest = array_slice($path, offset: 1);
 
         if (empty($rest)) {
-            return new Some($shape[$key] ?? null);
+            /** @psalm-suppress MixedAssignment */
+            $value = $shape[$key] ?? null;
+
+            return null !== $value
+                ? new Some($value)
+                : new None();
         }
 
         if (array_key_exists($key, $shape) && is_array($shape[$key])) {
