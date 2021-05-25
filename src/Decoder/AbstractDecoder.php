@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode;
+namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Internal\Constraint\ConstraintInterface;
+use Klimick\Decode\Context;
+use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Internal\HighOrder\ConstrainedDecoder;
 use Klimick\PsalmDecode\Constrain\ConstrainedContravariantCheckHandler;
 

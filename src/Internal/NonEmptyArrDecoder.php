@@ -6,8 +6,8 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Valid;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\Valid;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\arr;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\valid;

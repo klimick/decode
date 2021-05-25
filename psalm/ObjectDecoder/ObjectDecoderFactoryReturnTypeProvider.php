@@ -7,7 +7,7 @@ namespace Klimick\PsalmDecode\ObjectDecoder;
 use Psalm\Type;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
-use Klimick\Decode\ObjectDecoderFactory;
+use Klimick\Decode\Decoder\ObjectDecoderFactory;
 
 final class ObjectDecoderFactoryReturnTypeProvider implements MethodReturnTypeProviderInterface
 {

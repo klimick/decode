@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Valid;
+use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use function Klimick\Decode\valid;
 

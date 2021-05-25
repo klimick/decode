@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode;
+namespace Klimick\Decode\Decoder;
 
 /**
  * @template TDecoded

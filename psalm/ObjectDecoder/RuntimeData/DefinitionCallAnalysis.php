@@ -10,7 +10,7 @@ use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
 use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use Klimick\PsalmDecode\ObjectDecoder\GetGeneralParentClass;
-use Klimick\Decode\RuntimeData;
+use Klimick\Decode\Decoder\RuntimeData;
 use Fp\Functional\Option\Option;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;

@@ -8,8 +8,13 @@ use Closure;
 use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Right;
-use Klimick\Decode\Error\ErrorInterface;
-use Klimick\Decode\Error\TypeError;
+use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\Invalid;
+use Klimick\Decode\Decoder\ObjectDecoderFactory;
+use Klimick\Decode\Decoder\Valid;
+use Klimick\Decode\Decoder\DecodeErrorInterface;
+use Klimick\Decode\Decoder\ErrorInterface;
+use Klimick\Decode\Decoder\TypeError;
 use Klimick\Decode\Internal;
 use Klimick\PsalmDecode\ShapeDecoder\PartialShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
@@ -56,7 +61,7 @@ function cast(mixed $data, callable|AbstractDecoder $decoder): mixed
 /**
  * @psalm-pure
  *
- * @param non-empty-list<ErrorInterface> $errors
+ * @param non-empty-list<DecodeErrorInterface> $errors
  * @return Either<Invalid, empty>
  */
 function invalids(array $errors): Either

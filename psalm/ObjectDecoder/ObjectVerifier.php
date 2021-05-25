@@ -16,7 +16,7 @@ use Klimick\PsalmDecode\DecodeIssue;
 use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use Klimick\PsalmDecode\ShapeDecoder\ShapePropertiesExtractor;
 use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
-use Klimick\Decode\RuntimeData;
+use Klimick\Decode\Decoder\RuntimeData;
 use Fp\Functional\Option\Option;
 use function Fp\Cast\asList;
 use function Fp\Collection\first;

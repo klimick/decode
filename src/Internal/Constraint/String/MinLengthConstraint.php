@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\String;
 
-use Klimick\Decode\Error\ConstraintError;
-use Klimick\Decode\Internal\Constraint\ConstraintInterface;
+use Klimick\Decode\Constraint\ConstraintError;
+use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 
 /**

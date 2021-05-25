@@ -8,7 +8,7 @@ use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
 use Klimick\Decode\Context;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\invalids;
 use function Klimick\Decode\valid;

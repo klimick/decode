@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode;
+namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Right;
 use JsonSerializable;
 use OutOfRangeException;
 use RuntimeException;
+use function Klimick\Decode\decode;
 
 /**
  * @psalm-immutable

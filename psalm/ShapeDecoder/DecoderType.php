@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
 use Psalm\Type;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 
 final class DecoderType
 {

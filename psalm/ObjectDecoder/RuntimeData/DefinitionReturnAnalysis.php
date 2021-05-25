@@ -10,7 +10,7 @@ use Psalm\CodeLocation;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Psalm\Plugin\EventHandler\AfterStatementAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterStatementAnalysisEvent;
-use Klimick\Decode\RuntimeData;
+use Klimick\Decode\Decoder\RuntimeData;
 use Klimick\PsalmDecode\DecodeIssue;
 use Klimick\PsalmDecode\ObjectDecoder\GetGeneralParentClass;
 use Klimick\PsalmDecode\ShapeDecoder\DecoderType;

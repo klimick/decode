@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Psalm\Type;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Internal\ObjectDecoder;
-use Klimick\Decode\RuntimeData;
+use Klimick\Decode\Decoder\RuntimeData;
 use Fp\Functional\Option\Option;
 use function Fp\Cast\asList;
 use function Fp\Collection\firstOf;

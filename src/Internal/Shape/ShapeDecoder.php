@@ -6,11 +6,11 @@ namespace Klimick\Decode\Internal\Shape;
 
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
-use Klimick\Decode\Error\UndefinedError;
+use Klimick\Decode\Decoder\UndefinedError;
 use Klimick\Decode\Internal\HighOrder\OptionalDecoder;
-use Klimick\Decode\Valid;
+use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\invalids;
 use function Klimick\Decode\valid;

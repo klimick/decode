@@ -7,7 +7,7 @@ namespace Klimick\PsalmDecode\NamedArguments;
 use Psalm\Type;
 use Psalm\Codebase;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use function Fp\Cast\asList;
 use function Fp\Collection\at;
 use function Fp\Collection\first;

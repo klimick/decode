@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Error;
+namespace Klimick\Decode\Constraint;
 
 use Klimick\Decode\Context;
 
 /**
  * @psalm-immutable
  */
-final class ConstraintError implements ErrorInterface
+final class ConstraintError
 {
     /**
      * @param non-empty-string $constraint

@@ -7,7 +7,7 @@ namespace Klimick\Decode\Test\Helper;
 use Closure;
 use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\decode;
 use function PHPUnit\Framework\assertInstanceOf;
 

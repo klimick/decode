@@ -2,10 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Internal\Constraint;
+namespace Klimick\Decode\Constraint;
 
 use Klimick\Decode\Context;
-use Klimick\Decode\Error\ConstraintError;
 
 /**
  * @template T

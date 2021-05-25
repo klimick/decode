@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal;
 
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 
 final class ToDecoder
 {

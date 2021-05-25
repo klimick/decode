@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
-use Klimick\Decode\Invalid;
+use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Report\DefaultReporter;
 use Klimick\Decode\Report\ErrorReport;
 use Klimick\PsalmDecode\DecodeIssue;
 use PhpParser\Node;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\RuntimeData;
+use Klimick\Decode\Decoder\RuntimeData;
 use Klimick\PsalmDecode\ObjectDecoder\GetGeneralParentClass;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;

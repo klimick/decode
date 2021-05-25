@@ -6,7 +6,7 @@ namespace Klimick\PsalmDecode\ShapeDecoder;
 
 use Psalm\Type;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use function Fp\Cast\asList;
 use function Fp\Collection\first;
 use function Fp\Collection\firstOf;

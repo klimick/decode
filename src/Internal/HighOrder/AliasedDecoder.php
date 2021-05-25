@@ -6,7 +6,7 @@ namespace Klimick\Decode\Internal\HighOrder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 
 /**
  * @template T

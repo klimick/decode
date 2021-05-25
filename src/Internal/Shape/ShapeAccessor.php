@@ -7,7 +7,7 @@ namespace Klimick\Decode\Internal\Shape;
 use Fp\Functional\Option\None;
 use Fp\Functional\Option\Option;
 use Fp\Functional\Option\Some;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Internal\HighOrder\AliasedDecoder;
 use Klimick\Decode\Internal\HighOrder\FromSelfDecoder;
 

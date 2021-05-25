@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Error;
+namespace Klimick\Decode\Decoder;
 
 /**
  * @psalm-immutable
  */
-interface ErrorInterface
+interface DecodeErrorInterface
 {
 }

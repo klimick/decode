@@ -6,7 +6,7 @@ namespace Klimick\Decode\Internal;
 
 use Closure;
 use Fp\Functional\Either\Either;
-use Klimick\Decode\AbstractDecoder;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Context;
 
 /**

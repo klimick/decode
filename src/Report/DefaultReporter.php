@@ -6,10 +6,10 @@ namespace Klimick\Decode\Report;
 
 use ReflectionClass;
 use Klimick\Decode\Context;
-use Klimick\Decode\Invalid;
-use Klimick\Decode\Error\TypeError;
-use Klimick\Decode\Error\ConstraintError;
-use Klimick\Decode\Error\UndefinedError;
+use Klimick\Decode\Decoder\Invalid;
+use Klimick\Decode\Decoder\TypeError;
+use Klimick\Decode\Constraint\ConstraintError;
+use Klimick\Decode\Decoder\UndefinedError;
 
 final class DefaultReporter
 {

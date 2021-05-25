@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode;
+namespace Klimick\Decode\Decoder;
 
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Internal\ToDecoder;

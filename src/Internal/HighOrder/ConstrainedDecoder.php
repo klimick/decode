@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\HighOrder;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Internal\Constraint\ConstraintInterface;
+use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
-use Klimick\Decode\AbstractDecoder;
-use Klimick\Decode\Valid;
+use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\ConstraintsError;
+use Klimick\Decode\Decoder\Valid;
 use function Klimick\Decode\invalids;
 use function Klimick\Decode\valid;
 
@@ -51,7 +52,9 @@ final class ConstrainedDecoder extends AbstractDecoder
                 }
 
                 return !empty($errors)
-                    ? invalids($errors)
+                    ? invalids([
+                        new ConstraintsError($errors)
+                    ])
                     : valid($decoded->value);
             });
     }
