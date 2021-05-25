@@ -2,20 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode;
+namespace Klimick\Decode\Decoder;
 
 use Closure;
 use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Right;
-use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\ObjectDecoderFactory;
-use Klimick\Decode\Decoder\Valid;
-use Klimick\Decode\Decoder\DecodeErrorInterface;
 use Klimick\Decode\Decoder\ErrorInterface;
-use Klimick\Decode\Decoder\TypeError;
 use Klimick\Decode\Internal;
+use Klimick\Decode\Context;
+use Klimick\Decode\ContextEntry;
 use Klimick\PsalmDecode\ShapeDecoder\PartialShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use RuntimeException;
@@ -429,7 +426,7 @@ function intersection(callable|AbstractDecoder $first, callable|AbstractDecoder 
  * @template T
  * @psalm-pure
  *
- * @psalm-param ((pure-callable(): Decoder<T>)| (Decoder<T>)) $decoder
+ * @psalm-param ((pure-callable(): AbstractDecoder<T>)| (AbstractDecoder<T>)) $decoder
  * @return AbstractDecoder<T>
  */
 function optional(callable|AbstractDecoder $decoder): AbstractDecoder

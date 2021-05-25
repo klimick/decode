@@ -9,7 +9,7 @@ use Klimick\Decode\Test\Helper\DecoderGenerator;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Test\Helper\forAll;
-use function Klimick\Decode\union;
+use function Klimick\Decode\Decoder\union;
 
 final class UnionDecoderTest extends TestCase
 {

@@ -8,7 +8,7 @@ use Closure;
 use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use function Klimick\Decode\decode;
+use function Klimick\Decode\Decoder\decode;
 use function PHPUnit\Framework\assertInstanceOf;
 
 final class Check

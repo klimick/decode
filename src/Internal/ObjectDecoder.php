@@ -9,7 +9,7 @@ use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use function Klimick\Decode\valid;
+use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template T of object

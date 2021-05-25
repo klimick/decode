@@ -8,9 +8,9 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use function Klimick\Decode\arrList;
-use function Klimick\Decode\invalid;
-use function Klimick\Decode\valid;
+use function Klimick\Decode\Decoder\arrList;
+use function Klimick\Decode\Decoder\invalid;
+use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template T

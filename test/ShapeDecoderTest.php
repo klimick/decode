@@ -8,7 +8,7 @@ use Eris\Generator\AssociativeArrayGenerator;
 use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\DecoderGenerator;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\shape;
+use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class ShapeDecoderTest extends TestCase

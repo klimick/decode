@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\HighOrder;
 
 use Fp\Functional\Either\Either;
+use Klimick\Decode\Constraint\ConstraintError;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\ConstraintsError;
 use Klimick\Decode\Decoder\Valid;
-use function Klimick\Decode\invalids;
-use function Klimick\Decode\valid;
+use function Klimick\Decode\Decoder\invalids;
+use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template T
@@ -46,8 +47,8 @@ final class ConstrainedDecoder extends AbstractDecoder
                 $errors = [];
 
                 foreach ($this->constraints as $constraint) {
-                    if (!$constraint->isValid($decoded->value)) {
-                        $errors[] = $constraint->createError($context, $decoded->value);
+                    if (!$constraint->check($context, $decoded->value)) {
+                        $errors[] = new ConstraintError($context, 'foo', []);
                     }
                 }
 

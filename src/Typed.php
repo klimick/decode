@@ -6,16 +6,16 @@ namespace Klimick\Decode;
 
 class Typed
 {
-    public const null = 'Klimick\Decode\null';
-    public const int = 'Klimick\Decode\int';
-    public const positiveInt = 'Klimick\Decode\positiveInt';
-    public const float = 'Klimick\Decode\float';
-    public const numeric = 'Klimick\Decode\numeric';
-    public const bool = 'Klimick\Decode\bool';
-    public const string = 'Klimick\Decode\string';
-    public const nonEmptyString = 'Klimick\Decode\nonEmptyString';
-    public const numericString = 'Klimick\Decode\numericString';
-    public const scalar = 'Klimick\Decode\scalar';
-    public const arrKey = 'Klimick\Decode\arrKey';
-    public const mixed = 'Klimick\Decode\mixed';
+    public const null = 'Klimick\Decode\Decoder\null';
+    public const int = 'Klimick\Decode\Decoder\int';
+    public const positiveInt = 'Klimick\Decode\Decoder\positiveInt';
+    public const float = 'Klimick\Decode\Decoder\float';
+    public const numeric = 'Klimick\Decode\Decoder\numeric';
+    public const bool = 'Klimick\Decode\Decoder\bool';
+    public const string = 'Klimick\Decode\Decoder\string';
+    public const nonEmptyString = 'Klimick\Decode\Decoder\nonEmptyString';
+    public const numericString = 'Klimick\Decode\Decoder\numericString';
+    public const scalar = 'Klimick\Decode\Decoder\scalar';
+    public const arrKey = 'Klimick\Decode\Decoder\arrKey';
+    public const mixed = 'Klimick\Decode\Decoder\mixed';
 }

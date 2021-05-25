@@ -11,9 +11,9 @@ use Klimick\Decode\Internal\HighOrder\OptionalDecoder;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use function Klimick\Decode\invalid;
-use function Klimick\Decode\invalids;
-use function Klimick\Decode\valid;
+use function Klimick\Decode\Decoder\invalid;
+use function Klimick\Decode\Decoder\invalids;
+use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template TVal

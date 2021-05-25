@@ -9,9 +9,9 @@ use Klimick\Decode\Typed as t;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use function Klimick\Decode\arr;
-use function Klimick\Decode\invalid;
-use function Klimick\Decode\valid;
+use function Klimick\Decode\Decoder\arr;
+use function Klimick\Decode\Decoder\invalid;
+use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template A

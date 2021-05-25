@@ -9,7 +9,7 @@ use Fp\Functional\Either\Right;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use function Klimick\Decode\invalids;
+use function Klimick\Decode\Decoder\invalids;
 
 /**
  * @template T

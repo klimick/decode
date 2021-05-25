@@ -10,7 +10,7 @@ use Klimick\Decode\Test\Helper\DecoderGenerator;
 use Klimick\Decode\Test\Helper\Gen;
 use Klimick\Decode\Test\Helper\Predicate;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\nonEmptyArr;
+use function Klimick\Decode\Decoder\nonEmptyArr;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class NonEmptyArrDecoderTest extends TestCase

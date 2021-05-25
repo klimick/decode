@@ -9,7 +9,6 @@ use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Test\Helper\forAll;
-use function Klimick\Decode\numericString;
 
 final class NumericStringDecoderTest extends TestCase
 {
@@ -22,6 +21,6 @@ final class NumericStringDecoderTest extends TestCase
     {
         forAll(Gen::mixed())
             ->when(fn(mixed $value) => !is_string($value))
-            ->then(Check::thatInvalidFor(numericString()));
+            ->then(Check::thatInvalidFor(t::numericString));
     }
 }

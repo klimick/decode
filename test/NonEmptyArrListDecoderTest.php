@@ -9,8 +9,8 @@ use Klimick\Decode\Test\Helper\DecoderGenerator;
 use Klimick\Decode\Test\Helper\Gen;
 use Klimick\Decode\Test\Helper\Predicate;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\mixed;
-use function Klimick\Decode\nonEmptyArrList;
+use function Klimick\Decode\Decoder\mixed;
+use function Klimick\Decode\Decoder\nonEmptyArrList;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class NonEmptyArrListDecoderTest extends TestCase

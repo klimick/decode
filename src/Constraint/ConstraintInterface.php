@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 
 /**
@@ -14,11 +15,7 @@ interface ConstraintInterface
 {
     /**
      * @param T $value
+     * @return Either<Invalid, Valid>
      */
-    public function createError(Context $context, mixed $value): ConstraintError;
-
-    /**
-     * @param T $value
-     */
-    public function isValid(mixed $value): bool;
+    public function check(Context $context, mixed $value): Either;
 }

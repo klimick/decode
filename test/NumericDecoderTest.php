@@ -8,7 +8,6 @@ use Klimick\Decode\Typed as t;
 use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\numeric;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class NumericDecoderTest extends TestCase
@@ -22,6 +21,6 @@ final class NumericDecoderTest extends TestCase
     {
         forAll(Gen::mixed())
             ->when(fn(mixed $value) => !is_numeric($value))
-            ->then(Check::thatInvalidFor(numeric()));
+            ->then(Check::thatInvalidFor(t::numeric));
     }
 }

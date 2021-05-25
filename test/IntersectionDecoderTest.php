@@ -8,8 +8,8 @@ use Eris\Generator\AssociativeArrayGenerator;
 use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\DecoderGenerator;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\intersection;
-use function Klimick\Decode\shape;
+use function Klimick\Decode\Decoder\intersection;
+use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class IntersectionDecoderTest extends TestCase

@@ -7,8 +7,8 @@ namespace Klimick\Decode\Test;
 use Fp\Functional\Either\Right;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\decode;
-use function Klimick\Decode\fallback;
+use function Klimick\Decode\Decoder\decode;
+use function Klimick\Decode\Decoder\fallback;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class FallbackDecoderTest extends TestCase

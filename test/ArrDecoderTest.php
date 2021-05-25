@@ -9,7 +9,7 @@ use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\DecoderGenerator;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\arr;
+use function Klimick\Decode\Decoder\arr;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class ArrDecoderTest extends TestCase

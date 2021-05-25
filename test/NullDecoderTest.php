@@ -9,7 +9,7 @@ use Klimick\Decode\Typed as t;
 use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\decode;
+use function Klimick\Decode\Decoder\decode;
 use function Klimick\Decode\Test\Helper\forAll;
 use function PHPUnit\Framework\assertInstanceOf;
 

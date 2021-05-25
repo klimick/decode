@@ -5,8 +5,8 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use function Klimick\Decode\invalid;
-use function Klimick\Decode\valid;
+use function Klimick\Decode\Decoder\invalid;
+use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template T of scalar

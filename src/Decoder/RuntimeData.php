@@ -8,7 +8,6 @@ use Fp\Functional\Either\Right;
 use JsonSerializable;
 use OutOfRangeException;
 use RuntimeException;
-use function Klimick\Decode\decode;
 
 /**
  * @psalm-immutable

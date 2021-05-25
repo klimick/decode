@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Helper;
 
 use Eris\Generator;
-use Klimick\Decode as d;
+use Klimick\Decode\Decoder as d;
 
 final class DecoderGenerator
 {
@@ -40,7 +40,7 @@ final class DecoderGenerator
         'mixed',
     ];
 
-    private static function simpleDecoderByName(string $name): d\Decoder\AbstractDecoder
+    private static function simpleDecoderByName(string $name): d\AbstractDecoder
     {
         return match ($name) {
             'int' => d\int(),
@@ -74,7 +74,7 @@ final class DecoderGenerator
 
     /**
      * @psalm-return array{
-     *     d\Decoder\AbstractDecoder,
+     *     d\AbstractDecoder,
      *     Generator,
      * }
      */
@@ -132,7 +132,7 @@ final class DecoderGenerator
 
             $arrayKey = $arrayKeys[array_rand($arrayKeys)];
 
-            /** @var d\Decoder\AbstractDecoder<array-key> $arrayKeyD */
+            /** @var d\AbstractDecoder<array-key> $arrayKeyD */
             $arrayKeyD = self::simpleDecoderByName($arrayKey);
             $arrayKeyG = Gen::arrKey($arrayKey);
 

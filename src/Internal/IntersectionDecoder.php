@@ -9,8 +9,8 @@ use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use function Klimick\Decode\invalids;
-use function Klimick\Decode\valid;
+use function Klimick\Decode\Decoder\invalids;
+use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template T of array

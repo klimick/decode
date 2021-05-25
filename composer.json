@@ -15,7 +15,8 @@
             "Klimick\\PsalmDecode\\": ["./psalm"]
         },
         "files": [
-            "decoders.php"
+            "decoders.php",
+            "constraints.php"
         ]
     },
     "autoload-dev": {
