@@ -7,22 +7,22 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Valid;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use function Klimick\Decode\valid;
 
 /**
  * @template T of object
- * @extends Decoder<T>
+ * @extends AbstractDecoder<T>
  * @psalm-immutable
  */
-final class ObjectDecoder extends Decoder
+final class ObjectDecoder extends AbstractDecoder
 {
     public ShapeDecoder $shape;
 
     /**
      * @param class-string<T> $objectClass
-     * @param array<array-key, Decoder<mixed>> $decoders
+     * @param array<array-key, AbstractDecoder<mixed>> $decoders
      */
     public function __construct(
         public string $objectClass,

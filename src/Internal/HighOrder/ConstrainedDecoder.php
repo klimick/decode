@@ -7,24 +7,24 @@ namespace Klimick\Decode\Internal\HighOrder;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Internal\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use Klimick\Decode\Valid;
 use function Klimick\Decode\invalids;
 use function Klimick\Decode\valid;
 
 /**
  * @template T
- * @extends Decoder<T>
+ * @extends AbstractDecoder<T>
  * @psalm-immutable
  */
-final class ConstrainedDecoder extends Decoder
+final class ConstrainedDecoder extends AbstractDecoder
 {
     /**
-     * @param Decoder $decoder
+     * @param AbstractDecoder $decoder
      * @param non-empty-list<ConstraintInterface> $constraints
      */
     public function __construct(
-        public Decoder $decoder,
+        public AbstractDecoder $decoder,
         public array $constraints
     ) { }
 

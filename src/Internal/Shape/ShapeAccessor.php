@@ -7,7 +7,7 @@ namespace Klimick\Decode\Internal\Shape;
 use Fp\Functional\Option\None;
 use Fp\Functional\Option\Option;
 use Fp\Functional\Option\Some;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use Klimick\Decode\Internal\HighOrder\AliasedDecoder;
 use Klimick\Decode\Internal\HighOrder\FromSelfDecoder;
 
@@ -20,7 +20,7 @@ final class ShapeAccessor
      * @return Option<mixed>
      * @psalm-pure
      */
-    public static function access(Decoder $decoder, int|string $key, array $shape): Option
+    public static function access(AbstractDecoder $decoder, int|string $key, array $shape): Option
     {
         if ($decoder instanceof AliasedDecoder) {
             return self::dotAccess(explode('.', $decoder->alias), $shape);

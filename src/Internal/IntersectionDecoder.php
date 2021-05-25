@@ -8,28 +8,28 @@ use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use function Klimick\Decode\invalids;
 use function Klimick\Decode\valid;
 
 /**
  * @template T of array
- * @extends Decoder<T>
+ * @extends AbstractDecoder<T>
  * @psalm-immutable
  */
-final class IntersectionDecoder extends Decoder
+final class IntersectionDecoder extends AbstractDecoder
 {
-    /** @var non-empty-list<Decoder<T>> $decoders */
+    /** @var non-empty-list<AbstractDecoder<T>> $decoders */
     public array $decoders;
 
     /**
-     * @param Decoder<T> $first
-     * @param Decoder<T> $second
-     * @param Decoder<T> ...$rest
+     * @param AbstractDecoder<T> $first
+     * @param AbstractDecoder<T> $second
+     * @param AbstractDecoder<T> ...$rest
      *
      * @no-named-arguments
      */
-    public function __construct(Decoder $first, Decoder $second, Decoder ...$rest)
+    public function __construct(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest)
     {
         $this->decoders = [$first, $second, ...$rest];
     }

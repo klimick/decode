@@ -6,18 +6,18 @@ namespace Klimick\Decode\Internal\HighOrder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 
 /**
  * @template T
  * @psalm-immutable
  */
-final class OptionalDecoder extends Decoder
+final class OptionalDecoder extends AbstractDecoder
 {
     /**
-     * @param Decoder<T> $decoder
+     * @param AbstractDecoder<T> $decoder
      */
-    public function __construct(public Decoder $decoder) { }
+    public function __construct(public AbstractDecoder $decoder) { }
 
     public function name(): string
     {

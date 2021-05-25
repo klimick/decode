@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
 use Psalm\Type;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 
 final class DecoderType
 {
@@ -20,7 +20,7 @@ final class DecoderType
                 : new Type\Atomic\TKeyedArray($properties)
         ]);
 
-        $decoder_atomic = new Type\Atomic\TGenericObject(Decoder::class, [$properties_atomic]);
+        $decoder_atomic = new Type\Atomic\TGenericObject(AbstractDecoder::class, [$properties_atomic]);
 
         return new Type\Union([$decoder_atomic]);
     }
@@ -28,7 +28,7 @@ final class DecoderType
     public static function createObject(string $class): Type\Union
     {
         return new Type\Union([
-            new Type\Atomic\TGenericObject(Decoder::class, [
+            new Type\Atomic\TGenericObject(AbstractDecoder::class, [
                 new Type\Union([
                     new Type\Atomic\TNamedObject($class),
                 ])
@@ -39,7 +39,7 @@ final class DecoderType
     public static function withTypeParameter(Type\Union $type_parameter): Type\Union
     {
         return new Type\Union([
-            new Type\Atomic\TGenericObject(Decoder::class, [$type_parameter]),
+            new Type\Atomic\TGenericObject(AbstractDecoder::class, [$type_parameter]),
         ]);
     }
 }

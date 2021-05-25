@@ -8,22 +8,22 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Typed as t;
 use Klimick\Decode\Valid;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use function Klimick\Decode\arr;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\valid;
 
 /**
  * @template A
- * @extends Decoder<list<A>>
+ * @extends AbstractDecoder<list<A>>
  * @psalm-immutable
  */
-final class ArrListDecoder extends Decoder
+final class ArrListDecoder extends AbstractDecoder
 {
     /**
-     * @param Decoder<A> $decoder
+     * @param AbstractDecoder<A> $decoder
      */
-    public function __construct(public Decoder $decoder) { }
+    public function __construct(public AbstractDecoder $decoder) { }
 
     public function name(): string
     {

@@ -6,15 +6,15 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\valid;
 
 /**
- * @extends Decoder<bool>
+ * @extends AbstractDecoder<bool>
  * @psalm-immutable
  */
-final class BoolDecoder extends Decoder
+final class BoolDecoder extends AbstractDecoder
 {
     public function name(): string
     {

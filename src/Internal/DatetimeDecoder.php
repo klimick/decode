@@ -10,16 +10,16 @@ use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Valid;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\string;
 use function Klimick\Decode\valid;
 
 /**
  * @psalm-immutable
- * @extends Decoder<DateTimeImmutable>
+ * @extends AbstractDecoder<DateTimeImmutable>
  */
-final class DatetimeDecoder extends Decoder
+final class DatetimeDecoder extends AbstractDecoder
 {
     public function __construct(
         public string $timezone = 'UTC',

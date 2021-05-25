@@ -25,12 +25,12 @@ final class ObjectDecoderFactory
     ) { }
 
     /**
-     * @psalm-param Decoder|pure-callable(): Decoder ...$decoders
-     * @return Decoder<TObjectClass>
+     * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder ...$decoders
+     * @return AbstractDecoder<TObjectClass>
      *
      * @see ObjectDecoderFactoryReturnTypeProvider
      */
-    public function __invoke(callable|Decoder ...$decoders): Decoder
+    public function __invoke(callable|AbstractDecoder ...$decoders): AbstractDecoder
     {
         return new ObjectDecoder($this->objectClass, ToDecoder::forAll($decoders), $this->partial);
     }

@@ -7,17 +7,17 @@ namespace Klimick\Decode\Test\Helper;
 use Closure;
 use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use function Klimick\Decode\decode;
 use function PHPUnit\Framework\assertInstanceOf;
 
 final class Check
 {
     /**
-     * @param Decoder<mixed> | callable(): Decoder<mixed> $decoderOrCallable
+     * @param AbstractDecoder<mixed> | callable(): AbstractDecoder<mixed> $decoderOrCallable
      * @return Closure(mixed): void
      */
-    public static function thatValidFor(callable|Decoder $decoderOrCallable): Closure
+    public static function thatValidFor(callable|AbstractDecoder $decoderOrCallable): Closure
     {
         $decoder = is_callable($decoderOrCallable)
             ? $decoderOrCallable()
@@ -30,10 +30,10 @@ final class Check
     }
 
     /**
-     * @param Decoder<mixed> | callable(): Decoder<mixed> $decoderOrCallable
+     * @param AbstractDecoder<mixed> | callable(): AbstractDecoder<mixed> $decoderOrCallable
      * @return Closure(mixed): void
      */
-    public static function thatInvalidFor(callable|Decoder $decoderOrCallable): Closure
+    public static function thatInvalidFor(callable|AbstractDecoder $decoderOrCallable): Closure
     {
         $decoder = is_callable($decoderOrCallable)
             ? $decoderOrCallable()

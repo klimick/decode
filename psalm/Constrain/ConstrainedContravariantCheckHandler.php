@@ -14,7 +14,7 @@ use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Klimick\Decode\Internal\Constraint\ConstraintInterface;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use Fp\Functional\Option\Option;
 use function Fp\Cast\asList;
 use function Fp\Evidence\proveOf;
@@ -24,7 +24,7 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
 {
     public static function getClassLikeNames(): array
     {
-        return [Decoder::class];
+        return [AbstractDecoder::class];
     }
 
     public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Type\Union

@@ -7,22 +7,22 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Valid;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use function Klimick\Decode\arrList;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\valid;
 
 /**
  * @template T
- * @extends Decoder<non-empty-list<T>>
+ * @extends AbstractDecoder<non-empty-list<T>>
  * @psalm-immutable
  */
-final class NonEmptyArrListDecoder extends Decoder
+final class NonEmptyArrListDecoder extends AbstractDecoder
 {
     /**
-     * @param Decoder<T> $decoder
+     * @param AbstractDecoder<T> $decoder
      */
-    public function __construct(public Decoder $decoder) { }
+    public function __construct(public AbstractDecoder $decoder) { }
 
     public function name(): string
     {

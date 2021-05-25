@@ -7,7 +7,7 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Valid;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use function Klimick\Decode\arr;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\valid;
@@ -15,18 +15,18 @@ use function Klimick\Decode\valid;
 /**
  * @template TKey of array-key
  * @template TVal
- * @extends Decoder<non-empty-array<TKey, TVal>>
+ * @extends AbstractDecoder<non-empty-array<TKey, TVal>>
  * @psalm-immutable
  */
-final class NonEmptyArrDecoder extends Decoder
+final class NonEmptyArrDecoder extends AbstractDecoder
 {
     /**
-     * @param Decoder<TKey> $keyDecoder
-     * @param Decoder<TVal> $valDecoder
+     * @param AbstractDecoder<TKey> $keyDecoder
+     * @param AbstractDecoder<TVal> $valDecoder
      */
     public function __construct(
-        public Decoder $keyDecoder,
-        public Decoder $valDecoder,
+        public AbstractDecoder $keyDecoder,
+        public AbstractDecoder $valDecoder,
     ) { }
 
     public function name(): string

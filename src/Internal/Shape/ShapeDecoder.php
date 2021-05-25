@@ -10,20 +10,20 @@ use Klimick\Decode\Error\UndefinedError;
 use Klimick\Decode\Internal\HighOrder\OptionalDecoder;
 use Klimick\Decode\Valid;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\invalids;
 use function Klimick\Decode\valid;
 
 /**
  * @template TVal
- * @extends Decoder<array<string, TVal>>
+ * @extends AbstractDecoder<array<string, TVal>>
  * @psalm-immutable
  */
-final class ShapeDecoder extends Decoder
+final class ShapeDecoder extends AbstractDecoder
 {
     /**
-     * @param array<array-key, Decoder<TVal>> $decoders
+     * @param array<array-key, AbstractDecoder<TVal>> $decoders
      */
     public function __construct(
         public array $decoders,
@@ -33,7 +33,7 @@ final class ShapeDecoder extends Decoder
     public function name(): string
     {
         $properties = implode(', ', array_map(
-            fn(int|string $property, Decoder $decoder) => "{$property}: {$decoder->name()}",
+            fn(int|string $property, AbstractDecoder $decoder) => "{$property}: {$decoder->name()}",
             array_keys($this->decoders),
             array_values($this->decoders),
         ));

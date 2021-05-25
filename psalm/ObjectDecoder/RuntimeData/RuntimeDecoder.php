@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Psalm\Type;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\RuntimeData;
 use Fp\Functional\Option\Option;
@@ -17,7 +17,7 @@ use function Fp\Evidence\proveTrue;
 final class RuntimeDecoder
 {
     /**
-     * @return Option<Decoder>
+     * @return Option<AbstractDecoder>
      */
     public static function instance(string $class_string): Option
     {

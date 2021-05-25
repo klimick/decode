@@ -13,7 +13,7 @@ use Klimick\PsalmDecode\Constrain\ConstrainedContravariantCheckHandler;
  * @template-covariant T
  * @psalm-immutable
  */
-abstract class Decoder
+abstract class AbstractDecoder
 {
     /**
      * @return non-empty-string
@@ -29,11 +29,11 @@ abstract class Decoder
      * @template ContravariantT
      *
      * @param non-empty-list<ConstraintInterface<ContravariantT>> $constraints
-     * @return Decoder<T>
+     * @return AbstractDecoder<T>
      *
      * @see ConstrainedContravariantCheckHandler Contravariant check happens via plugin
      */
-    public function constrained(array $constraints): Decoder
+    public function constrained(array $constraints): AbstractDecoder
     {
         return new ConstrainedDecoder($this, $constraints);
     }

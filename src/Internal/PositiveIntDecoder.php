@@ -6,15 +6,15 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder;
+use Klimick\Decode\AbstractDecoder;
 use function Klimick\Decode\invalid;
 use function Klimick\Decode\valid;
 
 /**
- * @extends Decoder<positive-int>
+ * @extends AbstractDecoder<positive-int>
  * @psalm-immutable
  */
-final class PositiveIntDecoder extends Decoder
+final class PositiveIntDecoder extends AbstractDecoder
 {
     public function name(): string
     {
