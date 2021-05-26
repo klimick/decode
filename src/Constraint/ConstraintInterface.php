@@ -14,6 +14,11 @@ use Klimick\Decode\Context;
 interface ConstraintInterface
 {
     /**
+     * @return non-empty-string
+     */
+    public function name(): string;
+
+    /**
      * @param T $value
      * @return Either<Invalid, Valid>
      */

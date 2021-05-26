@@ -8,8 +8,9 @@ use ReflectionClass;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\TypeError;
-use Klimick\Decode\Constraint\ConstraintError;
+use Klimick\Decode\Decoder\ConstraintsError;
 use Klimick\Decode\Decoder\UndefinedError;
+use Klimick\Decode\Constraint\ConstraintError;
 
 final class DefaultReporter
 {
@@ -25,8 +26,11 @@ final class DefaultReporter
         foreach ($invalid->errors as $error) {
             if ($error instanceof TypeError) {
                 $typeErrors[] = self::reportTypeError($error, $useShortClassNames);
-            } elseif ($error instanceof ConstraintError) {
-                $constraintErrors[] = self::reportConstraintError($error);
+            } elseif ($error instanceof ConstraintsError) {
+                $constraintErrors = [
+                    ...$constraintErrors,
+                    ...array_map(fn($e) => self::reportConstraintError($e), $error->errors),
+                ];
             } elseif ($error instanceof UndefinedError) {
                 $undefinedErrors[] = self::reportUndefinedError($error);
             }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\HighOrder;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Constraint\ConstraintError;
+use Fp\Functional\Either\Left;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
@@ -47,8 +47,10 @@ final class ConstrainedDecoder extends AbstractDecoder
                 $errors = [];
 
                 foreach ($this->constraints as $constraint) {
-                    if (!$constraint->check($context, $decoded->value)) {
-                        $errors[] = new ConstraintError($context, 'foo', []);
+                    $result = $constraint->check($context, $decoded->value);
+
+                    if ($result instanceof Left) {
+                        $errors = [...$errors, ...$result->get()->errors];
                     }
                 }
 
