@@ -153,7 +153,7 @@ final class ObjectVerifier
             $arg_locations = [];
 
             foreach ($event->getCallArgs() as $arg) {
-                $identifier = yield Option::of($arg->name);
+                $identifier = yield Option::fromNullable($arg->name);
                 $arg_locations[$identifier->name] = new CodeLocation($source, $arg);
             }
 

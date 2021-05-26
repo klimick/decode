@@ -23,15 +23,9 @@
         </InternalMethod>
     </issueHandlers>
     <plugins>
-        <pluginClass class="Fp\Psalm\PartialFunctionReturnTypeProvider"/>
-        <pluginClass class="Fp\Psalm\PartitionFunctionReturnTypeProvider"/>
-        <pluginClass class="Fp\Psalm\PluckFunctionReturnTypeProvider"/>
-        <pluginClass class="Fp\Psalm\OptionGetOrElseMethodReturnTypeProvider"/>
-        <pluginClass class="Fp\Psalm\ProveTrueExpressionAnalysis"/>
-
         <pluginClass class="Klimick\PsalmDecode\Plugin"/>
         <pluginClass class="Klimick\PsalmShowType\ShowTypePlugin"/>
-
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+        <pluginClass class="Fp\Psalm\FunctionalPlugin"/>
     </plugins>
 </psalm>

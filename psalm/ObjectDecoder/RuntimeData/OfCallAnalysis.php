@@ -20,7 +20,7 @@ use Psalm\StatementsSource;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
 use function Fp\Evidence\proveTrue;
-use function Klimick\Decode\decode;
+use function Klimick\Decode\Decoder\decode;
 
 final class OfCallAnalysis implements AfterExpressionAnalysisInterface
 {
@@ -43,7 +43,7 @@ final class OfCallAnalysis implements AfterExpressionAnalysisInterface
             $general_class = yield GetGeneralParentClass::for($class_string, $codebase);
             yield proveTrue(RuntimeData::class === $general_class);
 
-            $arg_type = yield Option::of($type_provider->getType($method_call->args[0]->value));
+            $arg_type = yield Option::fromNullable($type_provider->getType($method_call->args[0]->value));
 
             $value = LiteralKeyedArray::toPhpValue($arg_type)->getOrElse(
                 DecodeIssue::couldNotAnalyzeOfCall(new CodeLocation($source, $method_call))

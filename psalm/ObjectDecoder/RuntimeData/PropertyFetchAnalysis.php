@@ -28,7 +28,7 @@ final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface
             $provider = $source->getNodeTypeProvider();
 
             $class_string = yield Option
-                ::of($provider->getType($property_fetch->var))
+                ::fromNullable($provider->getType($property_fetch->var))
                 ->map(fn(Type\Union $type) => $type->getId());
 
             $properties = yield RuntimeDecoder::getProperties($class_string);

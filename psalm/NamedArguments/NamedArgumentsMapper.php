@@ -55,8 +55,8 @@ final class NamedArgumentsMapper
     ): Option
     {
         return Option::do(function() use ($named_arg, $provider, $codebase) {
-            $named_arg_type = yield Option::of($provider->getType($named_arg->value));
-            $arg_identifier = yield Option::of($named_arg->name);
+            $named_arg_type = yield Option::fromNullable($provider->getType($named_arg->value));
+            $arg_identifier = yield Option::fromNullable($named_arg->name);
 
             return [
                 'property' => yield proveString($arg_identifier->name),

@@ -7,6 +7,7 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
+use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\Decoder\invalid;
@@ -49,19 +50,25 @@ final class ArrDecoder extends AbstractDecoder
             $decodedK = $this->keyDecoder->decode($k, $context->append($this->keyDecoder->name(), $k, (string) $k));
             $decodedV = $this->valDecoder->decode($v, $context->append($this->valDecoder->name(), $k, (string) $k));
 
-            if ($decodedK instanceof Right && $decodedV instanceof Right) {
-                $val = $decodedV->get();
-                $key = $decodedK->get();
-
-                $decoded[$key->value] = $val->value;
-            }
-
             if ($decodedV instanceof Left) {
                 $errors = [...$errors, ...$decodedV->get()->errors];
             }
 
             if ($decodedK instanceof Left) {
                 $errors = [...$errors, ...$decodedK->get()->errors];
+            }
+
+            if ($decodedK instanceof Right && $decodedV instanceof Right) {
+                /** @var Right<Valid<TKey>> $rightK */
+                $rightK = $decodedK;
+
+                /** @var Right<Valid<TVal>> $rightV */
+                $rightV = $decodedV;
+
+                $val = $rightV->get();
+                $key = $rightK->get();
+
+                $decoded[$key->value] = $val->value;
             }
         }
 

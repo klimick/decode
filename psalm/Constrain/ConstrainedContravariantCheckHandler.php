@@ -112,7 +112,7 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
     private static function getConstraintsType(NodeTypeProvider $type_provider, Codebase $codebase, Node\Arg $arg): Option
     {
         return Option::do(function() use ($type_provider, $codebase, $arg) {
-            $type = yield Option::of($type_provider->getType($arg->value));
+            $type = yield Option::fromNullable($type_provider->getType($arg->value));
 
             $atomics = asList($type->getAtomicTypes());
             yield proveTrue(1 === count($atomics));

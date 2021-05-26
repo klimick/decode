@@ -50,7 +50,7 @@ final class ShapePropertiesExtractor
                 ($keyed_array instanceof Type\Atomic\TKeyedArray) => self::remapKeys($keyed_array)
             };
 
-            return yield Option::of($extracted_shape);
+            return yield Option::fromNullable($extracted_shape);
         });
     }
 

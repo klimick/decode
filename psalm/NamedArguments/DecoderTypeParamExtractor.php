@@ -109,7 +109,7 @@ final class DecoderTypeParamExtractor
      */
     private static function fromClosure(Type\Atomic\TClosure $closure): Option
     {
-        return Option::of($closure->return_type)
+        return Option::fromNullable($closure->return_type)
             ->flatMap(fn(Type\Union $return_type) => self::fromPlainDecoder($return_type));
     }
 
@@ -118,7 +118,7 @@ final class DecoderTypeParamExtractor
      */
     private static function fromCallable(Type\Atomic\TCallable $closure): Option
     {
-        return Option::of($closure->return_type)
+        return Option::fromNullable($closure->return_type)
             ->flatMap(fn(Type\Union $return_type) => self::fromPlainDecoder($return_type));
     }
 
@@ -136,7 +136,7 @@ final class DecoderTypeParamExtractor
             $class_storage = yield Option::try(fn() => $codebase->classlike_storage_provider->get($class));
             $method_storage = yield at($class_storage->methods, $method);
 
-            return yield Option::of($method_storage->return_type);
+            return yield Option::fromNullable($method_storage->return_type);
         });
     }
 
@@ -149,10 +149,7 @@ final class DecoderTypeParamExtractor
         string $function_id,
     ): Option
     {
-        return Option::try(
-            fn() => $codebase->functions
-                ->getStorage(null, $function_id)
-                ->return_type
-        );
+        return Option::try(fn() => $codebase->functions->getStorage(null, $function_id))
+            ->flatMap(fn($storage) => Option::fromNullable($storage->return_type));
     }
 }

@@ -13,13 +13,13 @@ final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterfa
 {
     public static function getFunctionIds(): array
     {
-        return ['klimick\decode\shape', 'klimick\decode\partialshape'];
+        return ['klimick\decode\decoder\shape', 'klimick\decode\decoder\partialshape'];
     }
 
     public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
     {
         $source = $event->getStatementsSource();
-        $is_partial_shape = 'klimick\decode\partialshape' === $event->getFunctionId();
+        $is_partial_shape = 'klimick\decode\decoder\partialshape' === $event->getFunctionId();
 
         $mapped = NamedArgumentsMapper::map(
             call_args: $event->getCallArgs(),

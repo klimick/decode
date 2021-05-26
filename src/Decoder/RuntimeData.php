@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Decoder;
 
-use Fp\Functional\Either\Right;
 use JsonSerializable;
 use OutOfRangeException;
 use RuntimeException;
@@ -23,13 +22,10 @@ abstract class RuntimeData implements JsonSerializable
 
     final public static function of(array $args): static
     {
-        $decoded = decode($args, static::definition());
-
-        if ($decoded instanceof Right) {
-            return $decoded->get()->value;
-        }
-
-        throw new RuntimeException('Could not create RuntimeData. Check psalm issues.');
+        return decode($args, static::definition())
+            ->map(fn(Valid $v) => $v->value)
+            ->mapLeft(fn() => throw new RuntimeException('Could not create RuntimeData. Check psalm issues.'))
+            ->get();
     }
 
     public function __get(string $name)

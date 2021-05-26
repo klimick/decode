@@ -29,7 +29,7 @@
     },
     "require": {
         "php": "^8.0",
-        "whsv26/functional": "^1.0"
+        "whsv26/functional": "^2.0"
     },
     "require-dev": {
         "vimeo/psalm": "^4.7",

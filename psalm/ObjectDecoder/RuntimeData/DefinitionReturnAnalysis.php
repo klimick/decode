@@ -39,15 +39,7 @@ final class DefinitionReturnAnalysis implements AfterStatementAnalysisInterface
 
             $return_stmt = yield proveOf($event->getStmt(), Node\Stmt\Return_::class);
 
-            $object_decoder_factory_call = yield proveOf($return_stmt->expr, Node\Expr\FuncCall::class);
-            $object_decoder_call = yield proveOf($object_decoder_factory_call->name, Node\Expr\FuncCall::class);
-
-            yield proveOf($object_decoder_call->name, Node\Name::class)
-                ->map(fn(Node\Name $name): mixed => $name->getAttribute('resolvedName'))
-                ->flatMap(fn(mixed $resolved_name) => proveString($resolved_name))
-                ->flatMap(fn(string $resolved_name) => proveTrue($resolved_name === 'Klimick\Decode\object'));
-
-            $return_decoder_type = yield Option::of($provider->getType($return_stmt));
+            $return_decoder_type = yield Option::fromNullable($provider->getType($return_stmt));
             $expected_decoder_type = DecoderType::createObject($self_class);
 
             if (!UnionTypeComparator::isContainedBy($codebase, $return_decoder_type, $expected_decoder_type)) {

@@ -15,7 +15,7 @@ final class OptionalReturnTypeProvider implements FunctionReturnTypeProviderInte
 {
     public static function getFunctionIds(): array
     {
-        return ['klimick\decode\optional'];
+        return ['klimick\decode\decoder\optional'];
     }
 
     public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
@@ -28,7 +28,7 @@ final class OptionalReturnTypeProvider implements FunctionReturnTypeProviderInte
             $call_args = $event->getCallArgs();
             yield proveTrue(1 === count($call_args));
 
-            $type = yield Option::of($provider->getType($call_args[0]->value))
+            $type = yield Option::fromNullable($provider->getType($call_args[0]->value))
                 ->flatMap(fn($type) => DecoderTypeParamExtractor::extract($type, $codebase));
 
             $optional_type = clone $type;
