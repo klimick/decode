@@ -49,6 +49,7 @@ function cast(mixed $data, callable|AbstractDecoder $decoder): mixed
     $decoded = decode($data, $decoder);
 
     if ($decoded instanceof Right) {
+        /** @var Right<Valid<T>> $decoded  */
         return $decoded->get()->value;
     }
 
@@ -63,7 +64,6 @@ function cast(mixed $data, callable|AbstractDecoder $decoder): mixed
  */
 function invalids(array $errors): Either
 {
-    /** @psalm-suppress ImpureMethodCall */
     return Either::left(new Invalid($errors));
 }
 
