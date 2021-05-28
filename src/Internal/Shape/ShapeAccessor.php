@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Shape;
 
-use Fp\Functional\Option\None;
 use Fp\Functional\Option\Option;
-use Fp\Functional\Option\Some;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Internal\HighOrder\AliasedDecoder;
 use Klimick\Decode\Internal\HighOrder\FromSelfDecoder;
@@ -22,19 +20,12 @@ final class ShapeAccessor
      */
     public static function access(AbstractDecoder $decoder, int|string $key, array $shape): Option
     {
-        if ($decoder instanceof AliasedDecoder) {
-            return self::dotAccess(explode('.', $decoder->alias), $shape);
-        }
-
-        if ($decoder instanceof FromSelfDecoder) {
-            return new Some($shape);
-        }
-
-        if (array_key_exists($key, $shape)) {
-            return new Some($shape[$key]);
-        }
-
-        return new None();
+        return match (true) {
+            $decoder instanceof AliasedDecoder => self::dotAccess(explode('.', $decoder->alias), $shape),
+            $decoder instanceof FromSelfDecoder => Option::some($shape),
+            array_key_exists($key, $shape) => Option::some($shape[$key]),
+            default => Option::none(),
+        };
     }
 
     /**
@@ -46,19 +37,16 @@ final class ShapeAccessor
         $key = $path[0];
         $rest = array_slice($path, offset: 1);
 
-        if (empty($rest)) {
-            /** @psalm-suppress MixedAssignment */
-            $value = $shape[$key] ?? null;
+        if (array_key_exists($key, $shape)) {
+            if (empty($rest)) {
+                return Option::some($shape[$key]);
+            }
 
-            return null !== $value
-                ? new Some($value)
-                : new None();
+            if (is_array($shape[$key])) {
+                return self::dotAccess($rest, $shape[$key]);
+            }
         }
 
-        if (array_key_exists($key, $shape) && is_array($shape[$key])) {
-            return self::dotAccess($rest, $shape[$key]);
-        }
-
-        return new None();
+        return Option::none();
     }
 }
