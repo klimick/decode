@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Internal\Constraint;
+namespace Klimick\Decode\Internal\Constraint\String;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
@@ -14,26 +14,26 @@ use function Klimick\Decode\Constraint\invalid;
  * @implements ConstraintInterface<string>
  * @psalm-immutable
  */
-final class MaxLengthConstraint implements ConstraintInterface
+final class MinLengthConstraint implements ConstraintInterface
 {
     /**
-     * @param positive-int $maxLength
+     * @param positive-int $minLength
      */
-    public function __construct(public int $maxLength) { }
+    public function __construct(public int $minLength) { }
 
     public function name(): string
     {
-        return 'MAX_LENGTH';
+        return 'MIN_LENGTH';
     }
 
     public function check(Context $context, mixed $value): Either
     {
-        if (mb_strlen($value) <= $this->maxLength) {
+        if (mb_strlen($value) >= $this->minLength) {
             return valid();
         }
 
         return invalid($context, $this, [
-            'expected' => $this->maxLength,
+            'expected' => $this->minLength,
             'actual' => mb_strlen($value),
         ]);
     }

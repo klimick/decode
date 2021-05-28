@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Internal\Constraint;
+namespace Klimick\Decode\Internal\Constraint\Collection;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
@@ -11,34 +11,32 @@ use function Klimick\Decode\Constraint\invalid;
 use function Klimick\Decode\Constraint\valid;
 
 /**
- * @implements ConstraintInterface<numeric>
+ * @implements ConstraintInterface<list>
  * @psalm-immutable
  */
-final class InRangeConstraint implements ConstraintInterface
+final class MinSizeConstraint implements ConstraintInterface
 {
     /**
-     * @param numeric $from
-     * @param numeric $to
+     * @param positive-int $minSize
      */
-    public function __construct(
-        public mixed $from,
-        public mixed $to,
-    ) { }
+    public function __construct(public int $minSize) { }
 
     public function name(): string
     {
-        return 'IN_RANGE';
+        return 'MIN_SIZE';
     }
 
     public function check(Context $context, mixed $value): Either
     {
-        if ($this->from <= $value && $value <= $this->to) {
+        $actualSize = count($value);
+
+        if ($actualSize >= $this->minSize) {
             return valid();
         }
 
         return invalid($context, $this, [
-            'from' => $this->from,
-            'to' => $this->to,
+            'expected' => $this->minSize,
+            'actual' => $actualSize,
         ]);
     }
 }

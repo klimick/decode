@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Internal\Constraint;
+namespace Klimick\Decode\Internal\Constraint\Collection;
 
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
-use Klimick\Decode\Constraint\ConstraintInterface;
+use Fp\Functional\Either\Right;
 use Klimick\Decode\Context;
+use Klimick\Decode\Constraint\ConstraintInterface;
+use Klimick\Decode\Constraint\Invalid;
 use function Klimick\Decode\Constraint\invalids;
 use function Klimick\Decode\Constraint\valid;
 
@@ -16,7 +18,7 @@ use function Klimick\Decode\Constraint\valid;
  * @implements ConstraintInterface<list<TVal>>
  * @psalm-immutable
  */
-final class ForAll implements ConstraintInterface
+final class ExistsConstraint implements ConstraintInterface
 {
     /**
      * @param non-empty-list<ConstraintInterface<TVal>> $constraints
@@ -25,7 +27,7 @@ final class ForAll implements ConstraintInterface
 
     public function name(): string
     {
-        return 'FOR_ALL';
+        return 'EXISTS';
     }
 
     public function check(Context $context, mixed $value): Either
@@ -36,9 +38,12 @@ final class ForAll implements ConstraintInterface
             foreach ($this->constraints as $constraint) {
                 $result = $constraint->check($context->append($constraint->name(), $v, (string) $k), $v);
 
-                if ($result instanceof Left) {
-                    $errors = [...$errors, ...$result->get()->errors];
+                if ($result instanceof Right) {
+                    return valid();
                 }
+
+                /** @var Left<Invalid> $result */
+                $errors = [...$errors, ...$result->get()->errors];
             }
         }
 

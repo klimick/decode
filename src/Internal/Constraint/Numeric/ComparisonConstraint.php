@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Internal\Constraint;
+namespace Klimick\Decode\Internal\Constraint\Numeric;
 
 use Closure;
 use Fp\Functional\Either\Either;

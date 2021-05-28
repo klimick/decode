@@ -17,6 +17,7 @@ use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Fp\Functional\Option\Option;
 use function Fp\Cast\asList;
+use function Fp\Collection\map;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
@@ -117,12 +118,38 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
             $atomics = asList($type->getAtomicTypes());
             yield proveTrue(1 === count($atomics));
 
-            return yield match (true) {
+            $type = yield match (true) {
                 $atomics[0] instanceof Type\Atomic\TKeyedArray => self::getTypeFromKeyedArray($atomics[0], $codebase),
                 $atomics[0] instanceof Type\Atomic\TNonEmptyList => self::getTypeFromNonEmptyList($atomics[0]),
                 default => Option::none(),
             };
+
+            return self::literalTypeToNonLiteralType($type);
         });
+    }
+
+    private static function literalTypeToNonLiteralType(Type\Union $type): Type\Union
+    {
+        $non_literal_atomics = array_values(
+            map($type->getAtomicTypes(), fn(Type\Atomic $a) => self::literalAtomicToNonLiteralAtomic($a))
+        );
+
+        return new Type\Union($non_literal_atomics);
+    }
+
+    private static function literalAtomicToNonLiteralAtomic(Type\Atomic $a): Type\Atomic
+    {
+        return match (true) {
+            $a instanceof Type\Atomic\TLiteralString,
+                $a instanceof Type\Atomic\TLiteralClassString => new Type\Atomic\TString(),
+            $a instanceof Type\Atomic\TLiteralInt => new Type\Atomic\TInt(),
+            $a instanceof Type\Atomic\TLiteralFloat => new Type\Atomic\TFloat(),
+            $a instanceof Type\Atomic\TKeyedArray => new Type\Atomic\TNonEmptyArray([
+                self::literalTypeToNonLiteralType($a->getGenericKeyType()),
+                self::literalTypeToNonLiteralType($a->getGenericValueType()),
+            ]),
+            default => $a,
+        };
     }
 
     /**
