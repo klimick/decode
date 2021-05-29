@@ -8,6 +8,7 @@ use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
+use Klimick\Decode\ContextEntry;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\ConstraintsError;
 use Klimick\Decode\Decoder\Valid;
@@ -39,7 +40,7 @@ final class ConstrainedDecoder extends AbstractDecoder
     {
         return $this->decoder
             ->decode($value, $context)
-            ->flatMap(function(Valid $decoded) use ($context) {
+            ->flatMap(function(Valid $decoded) {
                 if (null === $decoded->value) {
                     return valid($decoded->value);
                 }
@@ -47,6 +48,10 @@ final class ConstrainedDecoder extends AbstractDecoder
                 $errors = [];
 
                 foreach ($this->constraints as $constraint) {
+                    $context = new Context([
+                        new ContextEntry($constraint->name(), $decoded->value)
+                    ]);
+
                     $result = $constraint->check($context, $decoded->value);
 
                     if ($result instanceof Left) {
