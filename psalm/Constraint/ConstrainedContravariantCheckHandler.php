@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Constrain;
+namespace Klimick\PsalmDecode\Constraint;
 
 use Klimick\PsalmDecode\DecodeIssue;
 use PhpParser\Node;
+use Psalm\CodeLocation;
+use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Psalm\IssueBuffer;
 use Psalm\Type;
-use Psalm\Codebase;
 use Psalm\NodeTypeProvider;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
-use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Fp\Functional\Option\Option;
@@ -35,13 +35,19 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
             $codebase = $source->getCodebase();
             $type_provider = $source->getNodeTypeProvider();
 
-            $constraints_type = yield self::getArgFromConstrainedMethod($event)
-                ->flatMap(fn($arg) => self::getConstraintsType($type_provider, $codebase, $arg));
+            $args = yield self::getArgFromConstrainedMethod($event);
 
+            $constraint_types = yield self::getConstraintTypes($args, $type_provider);
             $decoder_type_parameter = yield self::getDecoderTypeParameter($event);
 
-            if (!UnionTypeComparator::isContainedBy($codebase, $decoder_type_parameter, $constraints_type)) {
-                $issue = DecodeIssue::incompatibleConstraints($constraints_type, $decoder_type_parameter, $event->getCodeLocation());
+            foreach ($constraint_types as $idx => $constraint_type) {
+                if (UnionTypeComparator::isContainedBy($codebase, $decoder_type_parameter, $constraint_type)) {
+                    continue;
+                }
+
+                $code_location = new CodeLocation($source, $args[$idx]);
+                $issue = DecodeIssue::incompatibleConstraints($constraint_type, $decoder_type_parameter, $code_location);
+
                 IssueBuffer::accepts($issue, $source->getSuppressedIssues());
             }
         });
@@ -50,7 +56,7 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
     }
 
     /**
-     * @return Option<Node\Arg>
+     * @return Option<non-empty-list<Node\Arg>>
      */
     private static function getArgFromConstrainedMethod(MethodReturnTypeProviderEvent $event): Option
     {
@@ -58,9 +64,9 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
             yield proveTrue('constrained' === $event->getMethodNameLowercase());
 
             $call_args = $event->getCallArgs();
-            yield proveTrue(1 === count($call_args));
+            yield proveTrue(count($call_args) >= 1);
 
-            return $call_args[0];
+            return $call_args;
         });
     }
 
@@ -82,49 +88,22 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
     }
 
     /**
-     * @return Option<Type\Union>
+     * @param non-empty-list<Node\Arg> $args
+     * @return Option<non-empty-list<Type\Union>>
      */
-    private static function getTypeFromKeyedArray(Type\Atomic\TKeyedArray $keyed_array, Codebase $codebase): Option
+    private static function getConstraintTypes(array $args, NodeTypeProvider $type_provider): Option
     {
-        return Option::do(function() use ($keyed_array, $codebase) {
-            yield proveTrue($keyed_array->is_list);
-
+        return Option::do(function() use ($args, $type_provider) {
             $types = [];
 
-            foreach ($keyed_array->properties as $type) {
-                $types[] = yield self::getTypeFromConstraintInterface($type);
+            foreach ($args as $arg) {
+                $constraint_type = yield Option::fromNullable($type_provider->getType($arg->value));
+                $constraint_type_param = yield self::getTypeFromConstraintInterface($constraint_type);
+
+                $types[] = self::literalTypeToNonLiteralType($constraint_type_param);
             }
 
-            return Type::combineUnionTypeArray($types, $codebase);
-        });
-    }
-
-    /**
-     * @return Option<Type\Union>
-     */
-    private static function getTypeFromNonEmptyList(Type\Atomic\TNonEmptyList $non_empty_list): Option
-    {
-        return self::getTypeFromConstraintInterface($non_empty_list->type_param);
-    }
-
-    /**
-     * @return Option<Type\Union>
-     */
-    private static function getConstraintsType(NodeTypeProvider $type_provider, Codebase $codebase, Node\Arg $arg): Option
-    {
-        return Option::do(function() use ($type_provider, $codebase, $arg) {
-            $type = yield Option::fromNullable($type_provider->getType($arg->value));
-
-            $atomics = asList($type->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            $type = yield match (true) {
-                $atomics[0] instanceof Type\Atomic\TKeyedArray => self::getTypeFromKeyedArray($atomics[0], $codebase),
-                $atomics[0] instanceof Type\Atomic\TNonEmptyList => self::getTypeFromNonEmptyList($atomics[0]),
-                default => Option::none(),
-            };
-
-            return self::literalTypeToNonLiteralType($type);
+            return $types;
         });
     }
 

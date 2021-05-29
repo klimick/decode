@@ -18,9 +18,8 @@ final class DecodeIssue extends CodeIssue
     {
         return new self(
             message: implode(' ', [
-                "Given constraints of type",
-                "non-empty-list<ConstraintInterface<{$constraints_type->getId()}>>",
-                "is not compatible with DecoderInterface<{$decoder_type_parameter->getId()}>.",
+                "Value of type {$decoder_type_parameter->getId()}",
+                "cannot be checked with constraints of type {$constraints_type->getId()}",
             ]),
             code_location: $code_location,
         );

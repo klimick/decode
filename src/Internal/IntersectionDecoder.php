@@ -50,18 +50,16 @@ final class IntersectionDecoder extends AbstractDecoder
             if ($result->isLeft()) {
                 $errors = [...$errors, ...$result->get()->errors];
             } else {
-                /** @var Right<Valid<T>> $right */
-                $right = $result;
-
-                $decoded[] = $right
-                    ->map(fn($v) => $v->value)
-                    ->get();
+                /** @var Right<Valid<T>> $result */
+                $decoded = array_merge($decoded, $result->get()->value);
             }
         }
 
+        /** @var T $decoded */
+
         return match (true) {
             !empty($errors) => invalids($errors),
-            !empty($decoded) => valid(array_merge(...$decoded)),
+            !empty($decoded) => valid($decoded),
         };
     }
 }

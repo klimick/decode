@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode;
 
-use Klimick\PsalmDecode\Constrain\ConstrainedContravariantCheckHandler;
+use Klimick\PsalmDecode\Constraint\ConstrainedContravariantCheckHandler;
 use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\AfterMethodAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionCallAnalysis;

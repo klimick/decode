@@ -12,7 +12,7 @@ use function Klimick\Decode\Constraint\valid;
 
 /**
  * @template T
- * @implements ConstraintInterface<list<T>>
+ * @implements ConstraintInterface<array<array-key, T>>
  * @psalm-immutable
  */
 final class InCollectionConstraint implements ConstraintInterface

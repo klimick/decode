@@ -201,25 +201,29 @@ function matchesRegex(string $regex): ConstraintInterface
 /**
  * @template T
  * @psalm-pure
+ * @no-named-arguments
  *
- * @param non-empty-list<ConstraintInterface<T>> $constraints
- * @return ConstraintInterface<list<T>>
+ * @param ConstraintInterface<T> $first
+ * @param ConstraintInterface<T> ...$rest
+ * @return ConstraintInterface<array<array-key, T>>
  */
-function forall(array $constraints): ConstraintInterface
+function forall(ConstraintInterface $first, ConstraintInterface ...$rest): ConstraintInterface
 {
-    return new C\Collection\ForallConstraint($constraints);
+    return new C\Collection\ForallConstraint([$first, ...$rest]);
 }
 
 /**
  * @template T
  * @psalm-pure
+ * @no-named-arguments
  *
- * @param non-empty-list<ConstraintInterface<T>> $constraints
- * @return ConstraintInterface<list<T>>
+ * @param ConstraintInterface<T> $first
+ * @param ConstraintInterface<T> ...$rest
+ * @return ConstraintInterface<array<array-key, T>>
  */
-function exists(array $constraints): ConstraintInterface
+function exists(ConstraintInterface $first, ConstraintInterface ...$rest): ConstraintInterface
 {
-    return new C\Collection\ExistsConstraint($constraints);
+    return new C\Collection\ExistsConstraint([$first, ...$rest]);
 }
 
 /**
@@ -227,7 +231,7 @@ function exists(array $constraints): ConstraintInterface
  * @psalm-pure
  *
  * @param T $value
- * @return ConstraintInterface<list<T>>
+ * @return ConstraintInterface<array<array-key, T>>
  */
 function inCollection(mixed $value): ConstraintInterface
 {
@@ -238,7 +242,7 @@ function inCollection(mixed $value): ConstraintInterface
  * @psalm-pure
  *
  * @param positive-int $is
- * @return ConstraintInterface<list>
+ * @return ConstraintInterface<array<array-key, mixed>>
  */
 function maxSize(int $is): ConstraintInterface
 {
@@ -249,7 +253,7 @@ function maxSize(int $is): ConstraintInterface
  * @psalm-pure
  *
  * @param positive-int $is
- * @return ConstraintInterface<list>
+ * @return ConstraintInterface<array<array-key, mixed>>
  */
 function minSize(int $is): ConstraintInterface
 {
