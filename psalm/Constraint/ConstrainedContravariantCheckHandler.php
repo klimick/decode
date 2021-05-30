@@ -6,9 +6,11 @@ namespace Klimick\PsalmDecode\Constraint;
 
 use Klimick\PsalmDecode\DecodeIssue;
 use PhpParser\Node;
+use Psalm\Codebase;
 use Psalm\CodeLocation;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Psalm\IssueBuffer;
+use Psalm\StatementsSource;
 use Psalm\Type;
 use Psalm\NodeTypeProvider;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
@@ -28,6 +30,18 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
         return [AbstractDecoder::class];
     }
 
+    private static function withoutUndefined(Type\Union $type): Type\Union
+    {
+        if ($type->possibly_undefined) {
+            $without_undefined = clone $type;
+            $without_undefined->possibly_undefined = false;
+
+            return $without_undefined;
+        }
+
+        return $type;
+    }
+
     public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Type\Union
     {
         Option::do(function() use ($event) {
@@ -40,16 +54,13 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
             $constraint_types = yield self::getConstraintTypes($args, $type_provider);
             $decoder_type_parameter = yield self::getDecoderTypeParameter($event);
 
-            foreach ($constraint_types as $idx => $constraint_type) {
-                if (UnionTypeComparator::isContainedBy($codebase, $decoder_type_parameter, $constraint_type)) {
-                    continue;
-                }
-
-                $code_location = new CodeLocation($source, $args[$idx]);
-                $issue = DecodeIssue::incompatibleConstraints($constraint_type, $decoder_type_parameter, $code_location);
-
-                IssueBuffer::accepts($issue, $source->getSuppressedIssues());
-            }
+            self::contravariantCheck(
+                codebase: $codebase,
+                source: $source,
+                call_args: $args,
+                constraint_types: $constraint_types,
+                decoder_type_parameter: self::withoutUndefined($decoder_type_parameter),
+            );
         });
 
         return null;
@@ -142,5 +153,32 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
 
             return $type_parameters[0];
         });
+    }
+
+    /**
+     * @param Codebase $codebase
+     * @param StatementsSource $source
+     * @param non-empty-list<Node\Arg> $call_args
+     * @param non-empty-list<Type\Union> $constraint_types
+     * @param Type\Union $decoder_type_parameter
+     */
+    private static function contravariantCheck(
+        Codebase $codebase,
+        StatementsSource $source,
+        array $call_args,
+        array $constraint_types,
+        Type\Union $decoder_type_parameter,
+    ): void
+    {
+        foreach ($constraint_types as $idx => $constraint_type) {
+            if (UnionTypeComparator::isContainedBy($codebase, $decoder_type_parameter, $constraint_type)) {
+                continue;
+            }
+
+            $code_location = new CodeLocation($source, $call_args[$idx]);
+            $issue = DecodeIssue::incompatibleConstraints($constraint_type, $decoder_type_parameter, $code_location);
+
+            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+        }
     }
 }

@@ -5,38 +5,114 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
 use Fp\Functional\Option\Option;
-use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
+use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\HighOrder\Brand\AliasedBrand;
+use Klimick\Decode\HighOrder\Brand\ConstrainedBrand;
+use Klimick\Decode\HighOrder\Brand\DefaultBrand;
+use Klimick\Decode\HighOrder\Brand\FromSelfBrand;
+use Klimick\Decode\HighOrder\Brand\OptionalBrand;
+use Klimick\PsalmDecode\DecodeIssue;
+use PhpParser\Node\Expr\MethodCall;
+use Psalm\CodeLocation;
+use Psalm\IssueBuffer;
+use Psalm\Plugin\EventHandler\AfterMethodCallAnalysisInterface;
+use Psalm\Plugin\EventHandler\Event\AfterMethodCallAnalysisEvent;
 use Psalm\Type;
-use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
-use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
+use function Fp\Cast\asList;
+use function Fp\Collection\map;
+use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
-final class OptionalReturnTypeProvider implements FunctionReturnTypeProviderInterface
+final class OptionalReturnTypeProvider implements AfterMethodCallAnalysisInterface
 {
-    public static function getFunctionIds(): array
+    private const METHODS_TO_BRANDS = [
+        self::METHOD_OPTIONAL => OptionalBrand::class,
+        self::METHOD_CONSTRAINED => ConstrainedBrand::class,
+        self::METHOD_ALIASED => AliasedBrand::class,
+        self::METHOD_DEFAULT => DefaultBrand::class,
+        self::METHOD_FROM_SELF => FromSelfBrand::class,
+    ];
+
+    private const METHOD_OPTIONAL = 'optional';
+    private const METHOD_CONSTRAINED = 'constrained';
+    private const METHOD_ALIASED = 'aliased';
+    private const METHOD_DEFAULT = 'default';
+    private const METHOD_FROM_SELF = 'fromself';
+
+    public static function getClassLikeNames(): array
     {
-        return ['klimick\decode\decoder\optional'];
+        return [AbstractDecoder::class];
     }
 
-    public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
+    public static function afterMethodCallAnalysis(AfterMethodCallAnalysisEvent $event): void
     {
-        $return_type = Option::do(function() use ($event) {
+        Option::do(function() use ($event) {
             $source = $event->getStatementsSource();
-            $provider = $source->getNodeTypeProvider();
-            $codebase = $source->getCodebase();
+            $type_provider = $source->getNodeTypeProvider();
 
-            $call_args = $event->getCallArgs();
-            yield proveTrue(1 === count($call_args));
+            $method_id = explode('::', $event->getAppearingMethodId());
 
-            $type = yield Option::fromNullable($provider->getType($call_args[0]->value))
-                ->flatMap(fn($type) => DecoderTypeParamExtractor::extract($type, $codebase));
+            yield proveTrue(2 === count($method_id));
+            [$class_name, $method_name] = $method_id;
 
-            $optional_type = clone $type;
-            $optional_type->possibly_undefined = true;
+            yield proveTrue($class_name === AbstractDecoder::class);
+            yield proveTrue(in_array($method_name, array_keys(self::METHODS_TO_BRANDS), true));
 
-            return DecoderType::withTypeParameter($optional_type);
+            $method_call = yield proveOf($event->getExpr(), MethodCall::class);
+            $current_type = yield Option::fromNullable($type_provider->getType($method_call->var));
+
+            $code_location = new CodeLocation($event->getStatementsSource(), $method_call->name);
+
+            $return_type = yield Option::fromNullable($current_type)
+                ->flatMap(fn($decoder_type) => self::simplifyToAtomic($decoder_type))
+                ->map(fn($decoder_atomic) => self::withBrand($code_location, $method_name, $decoder_atomic))
+                ->map(fn($branded_decoder_atomic) => new Type\Union([$branded_decoder_atomic]));
+
+            $event->setReturnTypeCandidate($return_type);
         });
+    }
 
-        return $return_type->get();
+    /**
+     * @return Option<Type\Atomic\TGenericObject>
+     */
+    private static function simplifyToAtomic(Type\Union $decoder_type): Option
+    {
+        return Option::do(function() use ($decoder_type) {
+            $atomics = asList($decoder_type->getAtomicTypes());
+            yield proveTrue(1 === count($atomics));
+
+            $decoder_atomic = yield proveOf($atomics[0], Type\Atomic\TGenericObject::class);
+            yield proveTrue($decoder_atomic->value === AbstractDecoder::class);
+            yield proveTrue(1 === count($decoder_atomic->type_params));
+
+            return $decoder_atomic;
+        });
+    }
+
+    /**
+     * @psalm-param OptionalReturnTypeProvider::METHOD_* $method_name
+     */
+    private static function withBrand(CodeLocation $code_location, string $method_name, Type\Atomic\TGenericObject $atomic): Type\Atomic\TGenericObject
+    {
+        $with_brand = clone $atomic;
+        $current_brands = map(asList($atomic->getIntersectionTypes() ?? []), fn(Type\Atomic $a) => $a->getId());
+        $brand = self::METHODS_TO_BRANDS[$method_name];
+
+        if (self::hasBrandContradiction($brand, $current_brands)) {
+            IssueBuffer::accepts(DecodeIssue::usingDefaultAndOptionalHasNoSense($code_location));
+        }
+
+        in_array($brand, $current_brands, true)
+            ? IssueBuffer::accepts(DecodeIssue::brandAlreadyDefined($method_name, $code_location))
+            : $with_brand->addIntersectionType(new Type\Atomic\TNamedObject($brand));
+
+        return $with_brand;
+    }
+
+    private static function hasBrandContradiction(string $brand, array $current_brands): bool
+    {
+        return
+            ($brand === DefaultBrand::class && in_array(OptionalBrand::class, $current_brands, true)) ||
+            ($brand === OptionalBrand::class && in_array(DefaultBrand::class, $current_brands, true));
     }
 }

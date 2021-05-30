@@ -6,8 +6,7 @@ namespace Klimick\Decode\Internal\Shape;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Internal\HighOrder\AliasedDecoder;
-use Klimick\Decode\Internal\HighOrder\FromSelfDecoder;
+use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
 
 /**
  * @psalm-immutable
@@ -20,12 +19,25 @@ final class ShapeAccessor
      */
     public static function access(AbstractDecoder $decoder, int|string $key, array $shape): Option
     {
-        return match (true) {
-            $decoder instanceof AliasedDecoder => self::dotAccess(explode('.', $decoder->alias), $shape),
-            $decoder instanceof FromSelfDecoder => Option::some($shape),
-            array_key_exists($key, $shape) => Option::some($shape[$key]),
-            default => Option::none(),
-        };
+        if ($decoder instanceof HighOrderDecoder) {
+            if ($decoder->isDefault() && !array_key_exists($key, $shape)) {
+                return Option::some($decoder->asDefault()->default);
+            }
+
+            if ($decoder->isAliased()) {
+                return self::dotAccess(explode('.', $decoder->asAliased()->alias), $shape);
+            }
+
+            if ($decoder->isFromSelf()) {
+                return Option::some($shape);
+            }
+        }
+
+        if (array_key_exists($key, $shape)) {
+            return Option::some($shape[$key]);
+        }
+
+        return Option::none();
     }
 
     /**

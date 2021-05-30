@@ -7,29 +7,29 @@ namespace Klimick\Decode\Internal\HighOrder;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template T
  * @extends HighOrderDecoder<T>
  * @psalm-immutable
  */
-final class AliasedDecoder extends HighOrderDecoder
+final class DefaultDecoder extends HighOrderDecoder
 {
     /**
-     * @param non-empty-string $alias
      * @param AbstractDecoder<T> $decoder
      */
-    public function __construct(public string $alias, AbstractDecoder $decoder)
+    public function __construct(public mixed $default, AbstractDecoder $decoder)
     {
         parent::__construct($decoder);
     }
 
-    public function isAliased(): bool
+    public function isDefault(): bool
     {
         return true;
     }
 
-    public function asAliased(): ?AliasedDecoder
+    public function asDefault(): ?DefaultDecoder
     {
         return $this;
     }
@@ -41,6 +41,8 @@ final class AliasedDecoder extends HighOrderDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
-        return $this->decoder->decode($value, $context);
+        return $this->decoder
+            ->decode($value, $context)
+            ->orElse(fn() => valid($this->default));
     }
 }

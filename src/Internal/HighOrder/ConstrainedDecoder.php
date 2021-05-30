@@ -17,19 +17,29 @@ use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template T
- * @extends AbstractDecoder<T>
+ * @extends HighOrderDecoder<T>
  * @psalm-immutable
  */
-final class ConstrainedDecoder extends AbstractDecoder
+final class ConstrainedDecoder extends HighOrderDecoder
 {
     /**
      * @param AbstractDecoder $decoder
      * @param non-empty-list<ConstraintInterface> $constraints
      */
-    public function __construct(
-        public AbstractDecoder $decoder,
-        public array $constraints
-    ) { }
+    public function __construct(public array $constraints, AbstractDecoder $decoder)
+    {
+        parent::__construct($decoder);
+    }
+
+    public function isConstrained(): bool
+    {
+        return true;
+    }
+
+    public function asConstrained(): ?ConstrainedDecoder
+    {
+        return $this;
+    }
 
     public function name(): string
     {

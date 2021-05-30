@@ -10,6 +10,22 @@ use Psalm\Type;
 
 final class DecodeIssue extends CodeIssue
 {
+    public static function brandAlreadyDefined(string $brand, CodeLocation $code_location): self
+    {
+        return new self(
+            message: "Decoder cannot be '{$brand}' multiple times.",
+            code_location: $code_location,
+        );
+    }
+
+    public static function usingDefaultAndOptionalHasNoSense(CodeLocation $code_location): self
+    {
+        return new self(
+            message: 'Using AbstractDecoder::default and AbstractDecoder::optional at the same time has no sense.',
+            code_location: $code_location,
+        );
+    }
+
     public static function incompatibleConstraints(
         Type\Union $constraints_type,
         Type\Union $decoder_type_parameter,

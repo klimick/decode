@@ -8,8 +8,6 @@ use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Internal\Shape\ShapeAccessor;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\Decoder\aliased;
-use function Klimick\Decode\Decoder\fromSelf;
 use function Klimick\Decode\Decoder\mixed;
 use function PHPUnit\Framework\assertEquals;
 
@@ -56,24 +54,31 @@ final class ShapeAccessorTest extends TestCase
         ];
 
         yield 'aliased field does not exist' => [
-            'decoder' => aliased($anyDecoder, 'some_field.path'),
+            'decoder' => $anyDecoder->aliased('some_field.path'),
             'field' => $anyField,
             'shape' => [],
             'expected' => Option::none(),
         ];
 
         yield 'aliased field exists' => [
-            'decoder' => aliased($anyDecoder, 'some_field.path'),
+            'decoder' => $anyDecoder->aliased('some_field.path'),
             'field' => $anyField,
             'shape' => ['some_field' => ['path' => 'val']],
             'expected' => Option::some('val'),
         ];
 
         yield 'from self' => [
-            'decoder' => fromSelf($anyDecoder),
+            'decoder' => $anyDecoder->fromSelf(),
             'field' => $anyField,
             'shape' => ['val' => 10],
             'expected' => Option::some(['val' => 10]),
+        ];
+
+        yield 'with default' => [
+            'decoder' => $anyDecoder->default(10),
+            'field' => $anyField,
+            'shape' => [],
+            'expected' => Option::some(10),
         ];
     }
 }

@@ -7,7 +7,7 @@ namespace Klimick\Decode\Internal\Shape;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Left;
 use Klimick\Decode\Decoder\UndefinedError;
-use Klimick\Decode\Internal\HighOrder\OptionalDecoder;
+use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
@@ -33,7 +33,13 @@ final class ShapeDecoder extends AbstractDecoder
     public function name(): string
     {
         $properties = implode(', ', array_map(
-            fn(int|string $property, AbstractDecoder $decoder) => "{$property}: {$decoder->name()}",
+            function(int|string $property, AbstractDecoder $decoder) {
+                if ($decoder instanceof HighOrderDecoder && $decoder->isOptional()) {
+                    return "{$property}?: {$decoder->name()}";
+                }
+
+                return "{$property}?: {$decoder->name()}";
+            },
             array_keys($this->decoders),
             array_values($this->decoders),
         ));
@@ -54,11 +60,11 @@ final class ShapeDecoder extends AbstractDecoder
         foreach ($this->decoders as $key => $decoder) {
             /** @var mixed $fromShape */
             $fromShape = ShapeAccessor::access($decoder, $key, $value)->getOrElse(
-                new UndefinedError($context->append($decoder->name(), null, (string) $key))
+                fn() => new UndefinedError($context->append($decoder->name(), null, (string) $key))
             );
 
             if ($fromShape instanceof UndefinedError) {
-                if (!$this->partial && !($decoder instanceof OptionalDecoder)) {
+                if (!$this->partial || ($decoder instanceof HighOrderDecoder && !$decoder->isOptional())) {
                     $errors[] = $fromShape;
                 }
 
