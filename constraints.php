@@ -44,6 +44,18 @@ function invalids(array $errors): Either
 }
 
 /**
+ * @template T
+ * @psalm-pure
+ *
+ * @param T $to
+ * @return ConstraintInterface<T>
+ */
+function equal(mixed $to): ConstraintInterface
+{
+    return new C\Generic\EqualConstraint($to);
+}
+
+/**
  * @psalm-pure
  *
  * @param numeric $than
@@ -95,20 +107,6 @@ function lessOrEqual(mixed $to): ConstraintInterface
 {
     return new C\Numeric\ComparisonConstraint(
         type: C\Numeric\ComparisonConstraint::OP_LESS_OR_EQUAL,
-        value: $to,
-    );
-}
-
-/**
- * @psalm-pure
- *
- * @param numeric $to
- * @return ConstraintInterface<numeric>
- */
-function equal(mixed $to): ConstraintInterface
-{
-    return new C\Numeric\ComparisonConstraint(
-        type: C\Numeric\ComparisonConstraint::OP_EQUAL,
         value: $to,
     );
 }

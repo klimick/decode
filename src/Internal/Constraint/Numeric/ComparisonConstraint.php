@@ -17,7 +17,6 @@ use function Klimick\Decode\Constraint\valid;
  */
 final class ComparisonConstraint implements ConstraintInterface
 {
-    public const OP_EQUAL = 'EQUAL';
     public const OP_LESS = 'LESS';
     public const OP_GREATER = 'GREATER';
     public const OP_LESS_OR_EQUAL = 'LESS_OR_EQUAL';
@@ -55,7 +54,6 @@ final class ComparisonConstraint implements ConstraintInterface
         return match ($type) {
             self::OP_LESS => fn(mixed $a, mixed $b) => $a < $b,
             self::OP_GREATER => fn(mixed $a, mixed $b) => $a > $b,
-            self::OP_EQUAL => fn(mixed $a, mixed $b) => $a === $b,
             self::OP_LESS_OR_EQUAL => fn(mixed $a, mixed $b) => $a <= $b,
             self::OP_GREATER_OR_EQUAL => fn(mixed $a, mixed $b) => $a >= $b,
         };
