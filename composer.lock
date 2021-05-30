@@ -149,16 +149,16 @@
         },
         {
             "name": "whsv26/functional",
-            "version": "v2.0.1",
+            "version": "v2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/whsv26/functional.git",
-                "reference": "8cba1d54d50f6c3a117c26e264bbca5ed89d1dd4"
+                "reference": "b46cfb2a4906c50494175c470135b49de9ae9972"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/whsv26/functional/zipball/8cba1d54d50f6c3a117c26e264bbca5ed89d1dd4",
-                "reference": "8cba1d54d50f6c3a117c26e264bbca5ed89d1dd4",
+                "url": "https://api.github.com/repos/whsv26/functional/zipball/b46cfb2a4906c50494175c470135b49de9ae9972",
+                "reference": "b46cfb2a4906c50494175c470135b49de9ae9972",
                 "shasum": ""
             },
             "require": {
@@ -170,7 +170,9 @@
                 "klimick/psalm-show-type": "^1.0",
                 "lstrojny/functional-php": "^1.17",
                 "nikic/php-parser": "^4.10",
+                "php-coveralls/php-coveralls": "^2.4",
                 "phpunit/phpunit": "^9",
+                "rregeer/phpunit-coverage-check": "^0.3.1",
                 "symfony/process": "^5.2",
                 "vimeo/psalm": "^4.7"
             },
@@ -193,6 +195,7 @@
                     "src/Fp/Functions/Cast/AsNonEmptyArray.php",
                     "src/Fp/Functions/Cast/AsNonEmptyList.php",
                     "src/Fp/Functions/Collection/At.php",
+                    "src/Fp/Functions/Collection/ButLast.php",
                     "src/Fp/Functions/Collection/Every.php",
                     "src/Fp/Functions/Collection/Exists.php",
                     "src/Fp/Functions/Collection/Filter.php",
@@ -235,6 +238,9 @@
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
             "authors": [
                 {
                     "name": "whsv26",
@@ -244,9 +250,9 @@
             "description": "PHP Functional Programming library",
             "support": {
                 "issues": "https://github.com/whsv26/functional/issues",
-                "source": "https://github.com/whsv26/functional/tree/v2.0.1"
+                "source": "https://github.com/whsv26/functional/tree/v2.0.2"
             },
-            "time": "2021-05-26T16:45:25+00:00"
+            "time": "2021-05-29T16:30:34+00:00"
         }
     ],
     "packages-dev": [
