@@ -8,7 +8,6 @@ use Closure;
 use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Right;
-use Klimick\Decode\Decoder\ObjectDecoderFactory;
 use Klimick\Decode\Decoder\ErrorInterface;
 use Klimick\Decode\Internal;
 use Klimick\Decode\Context;
@@ -88,7 +87,6 @@ function invalid(Context $context): Either
  */
 function valid(mixed $value): Either
 {
-    /** @psalm-suppress ImpureMethodCall */
     return Either::right(new Valid($value));
 }
 

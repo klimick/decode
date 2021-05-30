@@ -15,7 +15,6 @@ use Fp\Functional\Either\Either;
  */
 function valid(): Either
 {
-    /** @psalm-suppress ImpureMethodCall */
     return Either::right(new Valid());
 }
 
@@ -39,7 +38,6 @@ function invalid(Context $context, ConstraintInterface $constraint, array $paylo
  */
 function invalids(array $errors): Either
 {
-    /** @psalm-suppress ImpureMethodCall */
     return Either::left(new Invalid($errors));
 }
 
