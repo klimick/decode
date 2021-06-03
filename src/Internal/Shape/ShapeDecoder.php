@@ -38,7 +38,7 @@ final class ShapeDecoder extends AbstractDecoder
                     return "{$property}?: {$decoder->name()}";
                 }
 
-                return "{$property}?: {$decoder->name()}";
+                return "{$property}: {$decoder->name()}";
             },
             array_keys($this->decoders),
             array_values($this->decoders),
