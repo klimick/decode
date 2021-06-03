@@ -10,6 +10,17 @@ use Psalm\Type;
 
 final class DecodeIssue extends CodeIssue
 {
+    public static function invalidFromArgument(CodeLocation $code_location): self
+    {
+        return new self(
+            message: implode(' ', [
+                'Invalid argument for AbstractDecoder::from.',
+                'Argument must be non-empty-string literal with "$." prefix or just "$"',
+            ]),
+            code_location: $code_location,
+        );
+    }
+
     public static function brandAlreadyDefined(string $brand, CodeLocation $code_location): self
     {
         return new self(

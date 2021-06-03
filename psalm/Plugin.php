@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode;
 
 use Klimick\PsalmDecode\HighOrder\ConstrainedContravariantCheckHandler;
+use Klimick\PsalmDecode\HighOrder\FromArgumentAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\AfterMethodAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionCallAnalysis;
@@ -34,10 +35,11 @@ final class Plugin implements PluginEntryPointInterface
         $register(PropertyFetchAnalysis::class);
         $register(OfCallAnalysis::class);
 
-        $register(IntersectionReturnTypeProvider::class);
-        $register(DecoderMethodsAnalysis::class);
         $register(ShapeReturnTypeProvider::class);
+        $register(IntersectionReturnTypeProvider::class);
 
+        $register(DecoderMethodsAnalysis::class);
         $register(ConstrainedContravariantCheckHandler::class);
+        $register(FromArgumentAnalysis::class);
     }
 }
