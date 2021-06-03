@@ -13,7 +13,7 @@ use Klimick\Decode\Decoder\AbstractDecoder;
  * @extends HighOrderDecoder<T>
  * @psalm-immutable
  */
-final class AliasedDecoder extends HighOrderDecoder
+final class FromDecoder extends HighOrderDecoder
 {
     /**
      * @param non-empty-string $alias
@@ -24,12 +24,12 @@ final class AliasedDecoder extends HighOrderDecoder
         parent::__construct($decoder);
     }
 
-    public function isAliased(): bool
+    public function isFrom(): bool
     {
         return true;
     }
 
-    public function asAliased(): ?AliasedDecoder
+    public function asFrom(): ?FromDecoder
     {
         return $this;
     }

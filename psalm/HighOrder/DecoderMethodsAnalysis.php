@@ -6,10 +6,9 @@ namespace Klimick\PsalmDecode\HighOrder;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\HighOrder\Brand\AliasedBrand;
+use Klimick\Decode\HighOrder\Brand\FromBrand;
 use Klimick\Decode\HighOrder\Brand\ConstrainedBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
-use Klimick\Decode\HighOrder\Brand\FromSelfBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
 use Klimick\PsalmDecode\DecodeIssue;
 use PhpParser\Node\Expr\MethodCall;
@@ -28,16 +27,14 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
     private const METHODS_TO_BRANDS = [
         self::METHOD_OPTIONAL => OptionalBrand::class,
         self::METHOD_CONSTRAINED => ConstrainedBrand::class,
-        self::METHOD_ALIASED => AliasedBrand::class,
+        self::METHOD_FROM => FromBrand::class,
         self::METHOD_DEFAULT => DefaultBrand::class,
-        self::METHOD_FROM_SELF => FromSelfBrand::class,
     ];
 
     private const METHOD_OPTIONAL = 'optional';
     private const METHOD_CONSTRAINED = 'constrained';
-    private const METHOD_ALIASED = 'aliased';
+    private const METHOD_FROM = 'from';
     private const METHOD_DEFAULT = 'default';
-    private const METHOD_FROM_SELF = 'fromself';
 
     public static function getClassLikeNames(): array
     {

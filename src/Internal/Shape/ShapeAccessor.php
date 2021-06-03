@@ -24,12 +24,12 @@ final class ShapeAccessor
                 return Option::some($decoder->asDefault()->default);
             }
 
-            if ($decoder->isAliased()) {
-                return self::dotAccess(explode('.', $decoder->asAliased()->alias), $shape);
-            }
+            if ($decoder->isFrom()) {
+                $path = explode('.', preg_replace('/^\$\.(.+)/', '$1', $decoder->asFrom()->alias));
 
-            if ($decoder->isFromSelf()) {
-                return Option::some($shape);
+                return $path !== ['$']
+                    ? self::dotAccess($path, $shape)
+                    : Option::some($shape);
             }
         }
 

@@ -4,6 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\HighOrder\Brand;
 
-interface FromSelfBrand
+interface FromBrand
 {
 }

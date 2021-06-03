@@ -7,10 +7,9 @@ namespace Klimick\Decode\Internal\HighOrder;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\HighOrder\Brand\AliasedBrand;
+use Klimick\Decode\HighOrder\Brand\FromBrand;
 use Klimick\Decode\HighOrder\Brand\ConstrainedBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
-use Klimick\Decode\HighOrder\Brand\FromSelfBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
 
 /**
@@ -19,7 +18,7 @@ use Klimick\Decode\HighOrder\Brand\OptionalBrand;
  * @psalm-immutable
  */
 abstract class HighOrderDecoder extends AbstractDecoder
-    implements OptionalBrand, ConstrainedBrand, FromSelfBrand, AliasedBrand, DefaultBrand
+    implements OptionalBrand, ConstrainedBrand, FromBrand, DefaultBrand
 {
     /**
      * @param AbstractDecoder<T> $decoder
@@ -82,43 +81,22 @@ abstract class HighOrderDecoder extends AbstractDecoder
 
     /**
      * @internal
-     * @psalm-assert-if-true AliasedDecoder $this->asAliased()
+     * @psalm-assert-if-true FromDecoder $this->asFrom()
      */
-    public function isAliased(): bool
+    public function isFrom(): bool
     {
         return $this->decoder instanceof HighOrderDecoder
-            ? $this->decoder->isAliased()
+            ? $this->decoder->isFrom()
             : false;
     }
 
     /**
      * @internal
      */
-    public function asAliased(): ?AliasedDecoder
+    public function asFrom(): ?FromDecoder
     {
         return $this->decoder instanceof HighOrderDecoder
-            ? $this->decoder->asAliased()
-            : null;
-    }
-
-    /**
-     * @internal
-     * @psalm-assert-if-true FromSelfDecoder $this->asFromSelf()
-     */
-    public function isFromSelf(): bool
-    {
-        return $this->decoder instanceof HighOrderDecoder
-            ? $this->decoder->isFromSelf()
-            : false;
-    }
-
-    /**
-     * @internal
-     */
-    public function asFromSelf(): ?FromSelfDecoder
-    {
-        return $this->decoder instanceof HighOrderDecoder
-            ? $this->decoder->asFromSelf()
+            ? $this->decoder->asFrom()
             : null;
     }
 
