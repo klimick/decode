@@ -23,7 +23,7 @@ use function Fp\Collection\map;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
-final class OptionalReturnTypeProvider implements AfterMethodCallAnalysisInterface
+final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
 {
     private const METHODS_TO_BRANDS = [
         self::METHOD_OPTIONAL => OptionalBrand::class,
@@ -66,6 +66,7 @@ final class OptionalReturnTypeProvider implements AfterMethodCallAnalysisInterfa
             $return_type = yield Option::fromNullable($current_type)
                 ->flatMap(fn($decoder_type) => self::simplifyToAtomic($decoder_type))
                 ->map(fn($decoder_atomic) => self::withBrand($code_location, $method_name, $decoder_atomic))
+                ->map(fn($branded_decoder_atomic) => self::possiblyUndefinedIfHasOptionalBrand($branded_decoder_atomic))
                 ->map(fn($branded_decoder_atomic) => new Type\Union([$branded_decoder_atomic]));
 
             $event->setReturnTypeCandidate($return_type);
@@ -90,7 +91,7 @@ final class OptionalReturnTypeProvider implements AfterMethodCallAnalysisInterfa
     }
 
     /**
-     * @psalm-param OptionalReturnTypeProvider::METHOD_* $method_name
+     * @psalm-param DecoderMethodsAnalysis::METHOD_* $method_name
      */
     private static function withBrand(CodeLocation $code_location, string $method_name, Type\Atomic\TGenericObject $atomic): Type\Atomic\TGenericObject
     {
@@ -107,6 +108,18 @@ final class OptionalReturnTypeProvider implements AfterMethodCallAnalysisInterfa
             : $with_brand->addIntersectionType(new Type\Atomic\TNamedObject($brand));
 
         return $with_brand;
+    }
+
+    private static function possiblyUndefinedIfHasOptionalBrand(Type\Atomic\TGenericObject $atomic): Type\Atomic\TGenericObject
+    {
+        if (array_key_exists(OptionalBrand::class, $atomic->extra_types ?? [])) {
+            $cloned = clone $atomic;
+            $cloned->type_params[0]->possibly_undefined = true;
+
+            return $cloned;
+        }
+
+        return $atomic;
     }
 
     private static function hasBrandContradiction(string $brand, array $current_brands): bool
