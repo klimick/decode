@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Constraint;
+namespace Klimick\PsalmDecode\HighOrder;
 
 use Klimick\PsalmDecode\DecodeIssue;
 use PhpParser\Node;

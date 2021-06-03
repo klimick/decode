@@ -12,7 +12,7 @@ use Klimick\Decode\Internal\HighOrder\FromSelfDecoder;
 use Klimick\Decode\Internal\HighOrder\OptionalDecoder;
 use Klimick\Decode\Internal\HighOrder\ConstrainedDecoder;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\PsalmDecode\Constraint\ConstrainedContravariantCheckHandler;
+use Klimick\PsalmDecode\HighOrder\ConstrainedContravariantCheckHandler;
 
 /**
  * @template-covariant T

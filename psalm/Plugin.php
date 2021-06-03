@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode;
 
-use Klimick\PsalmDecode\Constraint\ConstrainedContravariantCheckHandler;
+use Klimick\PsalmDecode\HighOrder\ConstrainedContravariantCheckHandler;
 use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\AfterMethodAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionCallAnalysis;
@@ -12,7 +12,7 @@ use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionReturnAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\OfCallAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\PropertyFetchAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\IntersectionReturnTypeProvider;
-use Klimick\PsalmDecode\ShapeDecoder\DecoderMethodsAnalysis;
+use Klimick\PsalmDecode\HighOrder\DecoderMethodsAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
