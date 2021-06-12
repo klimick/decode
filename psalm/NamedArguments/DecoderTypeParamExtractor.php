@@ -87,21 +87,24 @@ final class DecoderTypeParamExtractor
         Codebase $codebase,
     ): Option
     {
-        return Option::do(function() use ($callable, $codebase) {
-            yield proveTrue($callable->is_list && 2 === count($callable->properties));
+        return Option
+            ::do(function() use ($callable, $codebase) {
+                yield proveTrue($callable->is_list && 2 === count($callable->properties));
 
-            $properties = flatMap(
-                $callable->properties,
-                fn(Type\Union $t) => asList($t->getAtomicTypes()),
-            );
+                $properties = flatMap(
+                    $callable->properties,
+                    fn(Type\Union $t) => asList($t->getAtomicTypes()),
+                );
 
-            $class = yield firstOf($properties, Type\Atomic\TLiteralClassString::class, invariant: true);
-            $method = yield firstOf($properties, Type\Atomic\TLiteralString::class, invariant: true);
+                $class = yield firstOf($properties, Type\Atomic\TLiteralClassString::class, invariant: true);
+                $method = yield firstOf($properties, Type\Atomic\TLiteralString::class, invariant: true);
 
-            return yield self::fromStringCallable(
-                new Type\Atomic\TLiteralString("{$class->value}::$method->value"), $codebase
-            );
-        });
+                return yield self::fromStringCallable(
+                    new Type\Atomic\TLiteralString("{$class->value}::$method->value"), $codebase
+                );
+            })
+            // if it's not callable array, then just return it's type
+            ->orElse(fn() => Option::some(new Type\Union([$callable])));
     }
 
     /**

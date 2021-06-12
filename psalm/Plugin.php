@@ -15,6 +15,7 @@ use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\PropertyFetchAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\IntersectionReturnTypeProvider;
 use Klimick\PsalmDecode\HighOrder\DecoderMethodsAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
+use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
 use SimpleXMLElement;
@@ -37,6 +38,7 @@ final class Plugin implements PluginEntryPointInterface
 
         $register(ShapeReturnTypeProvider::class);
         $register(IntersectionReturnTypeProvider::class);
+        $register(TupleReturnTypeProvider::class);
 
         $register(DecoderMethodsAnalysis::class);
         $register(ConstrainedContravariantCheckHandler::class);
