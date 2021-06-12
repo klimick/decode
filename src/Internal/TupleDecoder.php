@@ -8,13 +8,13 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\Invalid;
-use Klimick\Decode\Decoder\TypeError;
 use Klimick\Decode\Decoder\Valid;
 use function array_map;
 use function array_values;
-use function Fp\Evidence\proveTrue;
 use function implode;
 use function is_array;
+use function Klimick\Decode\Decoder\invalid;
+use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\valid;
 
 /**
@@ -22,7 +22,7 @@ use function Klimick\Decode\Decoder\valid;
  * @extends AbstractDecoder<list<T>>
  * @psalm-immutable
  */
-class TupleDecoder extends AbstractDecoder
+final class TupleDecoder extends AbstractDecoder
 {
     /**
      * @var list<AbstractDecoder<T>>
@@ -57,35 +57,39 @@ class TupleDecoder extends AbstractDecoder
      */
     public function decode(mixed $value, Context $context): Either
     {
-        /**
-         * @var callable(): Invalid $toInvalid
-         */
-        $toInvalid = fn(): Invalid => new Invalid([
-            new TypeError($context),
-        ]);
+        if (!is_array($value)) {
+            return invalid($context);
+        }
 
-        /**
-         * @psalm-suppress ImpureMethodCall
-         */
-        return Either::do(function() use ($value, $context, $toInvalid) {
-            yield proveTrue(is_array($value))->toRight(left: $toInvalid);
-            $valuesAsList = array_values($value);
+        $errors = [];
+        $decodingResults = [];
+        $valuesAsList = array_values($value);
 
-            yield proveTrue(count($valuesAsList) === count($this->innerDecoders))->toRight(left: $toInvalid);
+        if (count($valuesAsList) !== count($this->innerDecoders)) {
+            return invalid($context);
+        }
 
-            $decodingResults = [];
+        /** @psalm-suppress MixedAssignment */
+        foreach ($valuesAsList as $idx => $valueToDecode) {
+            $maybeDecoded = $this->innerDecoders[$idx]
+                ->decode($valueToDecode, $context)
+                ->get();
 
-            /** @psalm-suppress MixedAssignment */
-            foreach ($valuesAsList as $idx => $valueToDecode) {
-                $decoder = $this->innerDecoders[$idx];
-
-                $decodingResults[] = yield $decoder->decode($valueToDecode, $context);
+            if ($maybeDecoded instanceof Valid) {
+                $decodingResults[] = $maybeDecoded->value;
+            } else {
+                /**
+                 * @var $maybeDecoded Invalid
+                 * @ignore-var
+                 */
+                $errors = [...$errors, ...$maybeDecoded->errors];
             }
+        }
 
-            return yield valid(array_map(
-                fn(Valid $valid) => $valid->value,
-                $decodingResults
-            ));
-        });
+        if (0 !== count($errors)) {
+            return invalids($errors);
+        }
+
+        return valid($decodingResults);
     }
 }
