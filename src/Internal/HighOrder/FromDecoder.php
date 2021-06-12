@@ -10,19 +10,29 @@ use Klimick\Decode\Decoder\AbstractDecoder;
 
 /**
  * @template T
- * @extends AbstractDecoder<T>
+ * @extends HighOrderDecoder<T>
  * @psalm-immutable
  */
-final class AliasedDecoder extends AbstractDecoder
+final class FromDecoder extends HighOrderDecoder
 {
     /**
      * @param non-empty-string $alias
      * @param AbstractDecoder<T> $decoder
      */
-    public function __construct(
-        public string $alias,
-        public AbstractDecoder $decoder,
-    ) { }
+    public function __construct(public string $alias, AbstractDecoder $decoder)
+    {
+        parent::__construct($decoder);
+    }
+
+    public function isFrom(): bool
+    {
+        return true;
+    }
+
+    public function asFrom(): ?FromDecoder
+    {
+        return $this;
+    }
 
     public function name(): string
     {

@@ -10,6 +10,33 @@ use Psalm\Type;
 
 final class DecodeIssue extends CodeIssue
 {
+    public static function invalidFromArgument(CodeLocation $code_location): self
+    {
+        return new self(
+            message: implode(' ', [
+                'Invalid argument for AbstractDecoder::from.',
+                'Argument must be non-empty-string literal with "$." prefix or just "$"',
+            ]),
+            code_location: $code_location,
+        );
+    }
+
+    public static function brandAlreadyDefined(string $brand, CodeLocation $code_location): self
+    {
+        return new self(
+            message: "Decoder cannot be '{$brand}' multiple times.",
+            code_location: $code_location,
+        );
+    }
+
+    public static function usingDefaultAndOptionalHasNoSense(CodeLocation $code_location): self
+    {
+        return new self(
+            message: 'Using AbstractDecoder::default and AbstractDecoder::optional at the same time has no sense.',
+            code_location: $code_location,
+        );
+    }
+
     public static function incompatibleConstraints(
         Type\Union $constraints_type,
         Type\Union $decoder_type_parameter,
@@ -18,9 +45,8 @@ final class DecodeIssue extends CodeIssue
     {
         return new self(
             message: implode(' ', [
-                "Given constraints of type",
-                "non-empty-list<ConstraintInterface<{$constraints_type->getId()}>>",
-                "is not compatible with DecoderInterface<{$decoder_type_parameter->getId()}>.",
+                "Value of type {$decoder_type_parameter->getId()}",
+                "cannot be checked with constraints of type {$constraints_type->getId()}",
             ]),
             code_location: $code_location,
         );

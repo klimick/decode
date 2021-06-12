@@ -13,7 +13,7 @@ final class ErisFacade extends Facade
 {
     /**
      * @var array{
-     *     method: array{eris-repeat?: array{int}, eris-ratio?: array{int}}
+     *     method?: array{eris-repeat?: array{int}, eris-ratio?: array{int}}
      * }
      */
     private array $options = [];

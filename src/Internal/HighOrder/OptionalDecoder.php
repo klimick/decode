@@ -4,28 +4,30 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\HighOrder;
 
-use Fp\Functional\Either\Either;
-use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 
 /**
  * @template T
+ * @extends HighOrderDecoder<T>
  * @psalm-immutable
  */
-final class OptionalDecoder extends AbstractDecoder
+final class OptionalDecoder extends HighOrderDecoder
 {
     /**
      * @param AbstractDecoder<T> $decoder
      */
-    public function __construct(public AbstractDecoder $decoder) { }
-
-    public function name(): string
+    public function __construct(AbstractDecoder $decoder)
     {
-        return $this->decoder->name();
+        parent::__construct($decoder);
     }
 
-    public function decode(mixed $value, Context $context): Either
+    public function isOptional(): bool
     {
-        return $this->decoder->decode($value, $context);
+        return true;
+    }
+
+    public function asOptional(): ?OptionalDecoder
+    {
+        return $this;
     }
 }

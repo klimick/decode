@@ -8,7 +8,6 @@ use Closure;
 use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Either\Right;
-use Klimick\Decode\Decoder\ObjectDecoderFactory;
 use Klimick\Decode\Decoder\ErrorInterface;
 use Klimick\Decode\Internal;
 use Klimick\Decode\Context;
@@ -88,7 +87,6 @@ function invalid(Context $context): Either
  */
 function valid(mixed $value): Either
 {
-    /** @psalm-suppress ImpureMethodCall */
     return Either::right(new Valid($value));
 }
 
@@ -420,41 +418,4 @@ function intersection(callable|AbstractDecoder $first, callable|AbstractDecoder 
         Internal\ToDecoder::for($second),
         ...$restDecoders,
     );
-}
-
-/**
- * @template T
- * @psalm-pure
- *
- * @psalm-param ((pure-callable(): AbstractDecoder<T>)| (AbstractDecoder<T>)) $decoder
- * @return AbstractDecoder<T>
- */
-function optional(callable|AbstractDecoder $decoder): AbstractDecoder
-{
-    return new Internal\HighOrder\OptionalDecoder(Internal\ToDecoder::for($decoder));
-}
-
-/**
- * @template T
- * @psalm-pure
- *
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $decoder
- * @param non-empty-string $alias
- * @return AbstractDecoder<T>
- */
-function aliased(callable|AbstractDecoder $decoder, string $alias): AbstractDecoder
-{
-    return new Internal\HighOrder\AliasedDecoder($alias, Internal\ToDecoder::for($decoder));
-}
-
-/**
- * @template T
- * @psalm-pure
- *
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $decoder
- * @return AbstractDecoder<T>
- */
-function fromSelf(callable|AbstractDecoder $decoder): AbstractDecoder
-{
-    return new Internal\HighOrder\FromSelfDecoder(Internal\ToDecoder::for($decoder));
 }

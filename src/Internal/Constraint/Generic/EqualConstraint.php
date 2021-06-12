@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Internal\Constraint\Collection;
+namespace Klimick\Decode\Internal\Constraint\Generic;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
@@ -12,25 +12,25 @@ use function Klimick\Decode\Constraint\valid;
 
 /**
  * @template T
- * @implements ConstraintInterface<array<array-key, T>>
+ * @implements ConstraintInterface<T>
  * @psalm-immutable
  */
-final class InCollectionConstraint implements ConstraintInterface
+final class EqualConstraint implements ConstraintInterface
 {
     /**
-     * @param T $item
+     * @param T $equalTo
      */
-    public function __construct(public mixed $item) { }
+    public function __construct(public mixed $equalTo) { }
 
     public function name(): string
     {
-        return 'IN_COLLECTION';
+        return 'EQUAL';
     }
 
     public function check(Context $context, mixed $value): Either
     {
-        return !in_array($this->item, $value, strict: true)
-            ? invalid($context, $this, ['notInCollection' => $this->item])
+        return $value !== $this->equalTo
+            ? invalid($context, $this, ['expected' => $this->equalTo])
             : valid();
     }
 }

@@ -15,7 +15,7 @@ use function Klimick\Decode\Constraint\valid;
 
 /**
  * @template TVal
- * @implements ConstraintInterface<list<TVal>>
+ * @implements ConstraintInterface<array<array-key, TVal>>
  * @psalm-immutable
  */
 final class ExistsConstraint implements ConstraintInterface

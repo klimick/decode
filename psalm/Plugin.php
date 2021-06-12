@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode;
 
-use Klimick\PsalmDecode\Constrain\ConstrainedContravariantCheckHandler;
+use Klimick\PsalmDecode\HighOrder\ConstrainedContravariantCheckHandler;
+use Klimick\PsalmDecode\HighOrder\FromArgumentAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\AfterMethodAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionCallAnalysis;
@@ -12,7 +13,7 @@ use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\DefinitionReturnAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\OfCallAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\PropertyFetchAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\IntersectionReturnTypeProvider;
-use Klimick\PsalmDecode\ShapeDecoder\OptionalReturnTypeProvider;
+use Klimick\PsalmDecode\HighOrder\DecoderMethodsAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
@@ -34,10 +35,11 @@ final class Plugin implements PluginEntryPointInterface
         $register(PropertyFetchAnalysis::class);
         $register(OfCallAnalysis::class);
 
-        $register(IntersectionReturnTypeProvider::class);
-        $register(OptionalReturnTypeProvider::class);
         $register(ShapeReturnTypeProvider::class);
+        $register(IntersectionReturnTypeProvider::class);
 
+        $register(DecoderMethodsAnalysis::class);
         $register(ConstrainedContravariantCheckHandler::class);
+        $register(FromArgumentAnalysis::class);
     }
 }
