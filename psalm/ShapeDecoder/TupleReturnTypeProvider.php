@@ -9,6 +9,7 @@ use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
 use Psalm\Type;
+use function Fp\Evidence\proveNonEmptyList;
 
 final class TupleReturnTypeProvider implements FunctionReturnTypeProviderInterface
 {
@@ -21,11 +22,7 @@ final class TupleReturnTypeProvider implements FunctionReturnTypeProviderInterfa
     {
         $inferred = Option
             ::do(static function() use ($event) {
-                $args = $event->getCallArgs();
-
-                if ([] === $args) {
-                    return null;
-                }
+                $args = yield proveNonEmptyList($event->getCallArgs());
 
                 $types = [];
                 $source = $event->getStatementsSource();
