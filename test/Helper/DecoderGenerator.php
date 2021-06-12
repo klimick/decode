@@ -7,6 +7,9 @@ namespace Klimick\Decode\Test\Helper;
 use Eris\Generator;
 use Klimick\Decode\Decoder as d;
 
+/**
+ * @psalm-type SimpleDecoders = value-of<self::SIMPLE_DECODERS>
+ */
 final class DecoderGenerator
 {
     public const DECODERS = [
@@ -41,6 +44,9 @@ final class DecoderGenerator
         'mixed',
     ];
 
+    /**
+     * @param SimpleDecoders $name
+     */
     private static function simpleDecoderByName(string $name): d\AbstractDecoder
     {
         return match ($name) {
@@ -57,6 +63,9 @@ final class DecoderGenerator
         };
     }
 
+    /**
+     * @param SimpleDecoders $name
+     */
     private static function simpleGenByName(string $name): Generator
     {
         return match ($name) {
