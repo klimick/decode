@@ -425,12 +425,14 @@ function intersection(callable|AbstractDecoder $first, callable|AbstractDecoder 
  * @psalm-pure
  * @no-named-arguments
  *
- * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder ...$decoders
+ * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder $first
+ * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder ...$rest
  * @return AbstractDecoder<list<mixed>>
  */
-function tuple(callable|AbstractDecoder ...$decoders): AbstractDecoder
+function tuple(callable|AbstractDecoder $first, callable|AbstractDecoder ...$rest): AbstractDecoder
 {
     return new Internal\TupleDecoder(
-        ...array_values(Internal\ToDecoder::forAll($decoders))
+        Internal\ToDecoder::for($first),
+        ...array_values(Internal\ToDecoder::forAll($rest))
     );
 }
