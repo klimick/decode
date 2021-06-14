@@ -14,7 +14,9 @@ use Klimick\Decode\Context;
 use Klimick\Decode\ContextEntry;
 use Klimick\PsalmDecode\ShapeDecoder\PartialShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
+use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
 use RuntimeException;
+use function array_values;
 
 /**
  * @template T
@@ -417,5 +419,23 @@ function intersection(callable|AbstractDecoder $first, callable|AbstractDecoder 
         Internal\ToDecoder::for($first),
         Internal\ToDecoder::for($second),
         ...$restDecoders,
+    );
+}
+
+/**
+ * @psalm-pure
+ * @no-named-arguments
+ *
+ * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder $first
+ * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder ...$rest
+ * @return AbstractDecoder<list<mixed>>
+ *
+ * @see TupleReturnTypeProvider
+ */
+function tuple(callable|AbstractDecoder $first, callable|AbstractDecoder ...$rest): AbstractDecoder
+{
+    return new Internal\TupleDecoder(
+        Internal\ToDecoder::for($first),
+        ...array_values(Internal\ToDecoder::forAll($rest))
     );
 }

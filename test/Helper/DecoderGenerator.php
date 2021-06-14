@@ -7,6 +7,9 @@ namespace Klimick\Decode\Test\Helper;
 use Eris\Generator;
 use Klimick\Decode\Decoder as d;
 
+/**
+ * @psalm-type SimpleDecoders = value-of<self::SIMPLE_DECODERS>
+ */
 final class DecoderGenerator
 {
     public const DECODERS = [
@@ -25,6 +28,7 @@ final class DecoderGenerator
         'array',
         'non-empty-array',
         'shape',
+        'tuple',
     ];
 
     public const SIMPLE_DECODERS = [
@@ -40,6 +44,9 @@ final class DecoderGenerator
         'mixed',
     ];
 
+    /**
+     * @param SimpleDecoders $name
+     */
     private static function simpleDecoderByName(string $name): d\AbstractDecoder
     {
         return match ($name) {
@@ -56,6 +63,9 @@ final class DecoderGenerator
         };
     }
 
+    /**
+     * @param SimpleDecoders $name
+     */
     private static function simpleGenByName(string $name): Generator
     {
         return match ($name) {
@@ -141,6 +151,25 @@ final class DecoderGenerator
             return 'non-empty-array' === $decoderName
                 ? [d\nonEmptyArr($arrayKeyD, $arrayItemD), Gen::nonEmptyArr($arrayKeyG, $arrayItemG)]
                 : [d\arr($arrayKeyD, $arrayItemD), Gen::arr($arrayKeyG, $arrayItemG)];
+        }
+
+        if ('tuple' === $decoderName) {
+            $tupleLength = random_int(1, 5);
+
+            $tupleDecoders = [];
+            $tupleGenerators = [];
+
+            for ($i = 0; $i < $tupleLength; $i++) {
+                [$decoder, $generator] = DecoderGenerator::generate();
+
+                $tupleDecoders[] = $decoder;
+                $tupleGenerators[] = $generator;
+            }
+
+            return [
+                d\tuple(...$tupleDecoders),
+                new Generator\AssociativeArrayGenerator($tupleGenerators),
+            ];
         }
 
         return [
