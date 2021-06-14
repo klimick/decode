@@ -25,12 +25,12 @@ final class RecursionDecoder extends AbstractDecoder
     /**
      * @param Closure(): AbstractDecoder<T> $type
      */
-    public function __construct(public Closure $type) {}
+    public function __construct(private Closure $type) {}
 
     /**
      * @return AbstractDecoder<T>
      */
-    private function type(): AbstractDecoder
+    public function type(): AbstractDecoder
     {
         if (null === $this->cache) {
             $this->cache = ($this->type)();
