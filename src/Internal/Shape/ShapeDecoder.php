@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\Shape;
 
 use Fp\Functional\Either\Either;
-use Fp\Functional\Either\Left;
 use Klimick\Decode\Decoder\UndefinedError;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
-use Klimick\Decode\Decoder\Valid;
+use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\Decoder\invalid;
@@ -48,6 +47,11 @@ final class ShapeDecoder extends AbstractDecoder
 
     }
 
+    private function isOptional(AbstractDecoder $decoder): bool
+    {
+        return $this->partial || $decoder instanceof HighOrderDecoder && $decoder->isOptional();
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         if (!is_array($value)) {
@@ -58,33 +62,33 @@ final class ShapeDecoder extends AbstractDecoder
         $shape = [];
 
         foreach ($this->decoders as $key => $decoder) {
-            /** @var mixed $fromShape */
-            $fromShape = ShapeAccessor::access($decoder, $key, $value)->getOrElse(
-                fn() => new UndefinedError($context->append($decoder->name(), null, (string) $key))
-            );
+            /** @psalm-suppress MixedAssignment */
+            $fromShape = ShapeAccessor::access($decoder, $key, $value)
+                ->getOrElse(fn() => new UndefinedError(
+                    $context->append(
+                        name: $decoder->name(),
+                        actual: null,
+                        key: (string) $key,
+                    )
+                ));
 
             if ($fromShape instanceof UndefinedError) {
-                if (!$this->partial || ($decoder instanceof HighOrderDecoder && !$decoder->isOptional())) {
+                if (!$this->isOptional($decoder)) {
                     $errors[] = $fromShape;
                 }
 
                 continue;
             }
 
-            $result = $decoder->decode(
-                value: $fromShape,
-                context: $context->append($decoder->name(), $fromShape, (string) $key),
-            );
+            $result = $decoder
+                ->decode($fromShape, $context->append($decoder->name(), $fromShape, (string) $key))
+                ->get();
 
-            if ($result instanceof Left) {
-                $errors = [...$errors, ...$result->get()->errors];
-                continue;
+            if ($result instanceof Invalid) {
+                $errors = [...$errors, ...$result->errors];
+            } else {
+                $shape[(string) $key] = $result->value;
             }
-
-            /** @var Valid<TVal> $valid */
-            $valid = $result->get();
-
-            $shape[(string) $key] = $valid->value;
         }
 
         return match (true) {

@@ -149,16 +149,16 @@
         },
         {
             "name": "whsv26/functional",
-            "version": "v2.0.2",
+            "version": "v2.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/whsv26/functional.git",
-                "reference": "b46cfb2a4906c50494175c470135b49de9ae9972"
+                "reference": "a3320fcf4fe5c1c34b1f164c1b4dc0a1694941d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/whsv26/functional/zipball/b46cfb2a4906c50494175c470135b49de9ae9972",
-                "reference": "b46cfb2a4906c50494175c470135b49de9ae9972",
+                "url": "https://api.github.com/repos/whsv26/functional/zipball/a3320fcf4fe5c1c34b1f164c1b4dc0a1694941d2",
+                "reference": "a3320fcf4fe5c1c34b1f164c1b4dc0a1694941d2",
                 "shasum": ""
             },
             "require": {
@@ -167,6 +167,7 @@
                 "php": "^8.0"
             },
             "require-dev": {
+                "haydenpierce/class-finder": "^0.4.3",
                 "klimick/psalm-show-type": "^1.0",
                 "lstrojny/functional-php": "^1.17",
                 "nikic/php-parser": "^4.10",
@@ -232,6 +233,7 @@
                     "src/Fp/Functions/Reflection/GetNamedTypes.php",
                     "src/Fp/Functions/Reflection/GetReflectionClass.php",
                     "src/Fp/Functions/Reflection/GetReflectionProperty.php",
+                    "src/Fp/Functions/String/RegExpMatch.php",
                     "src/Fp/Functions/Id.php",
                     "src/Fp/Functions/Of.php",
                     "src/Fp/Functions/Unit.php"
@@ -250,9 +252,9 @@
             "description": "PHP Functional Programming library",
             "support": {
                 "issues": "https://github.com/whsv26/functional/issues",
-                "source": "https://github.com/whsv26/functional/tree/v2.0.2"
+                "source": "https://github.com/whsv26/functional/tree/v2.0.3"
             },
-            "time": "2021-05-29T16:30:34+00:00"
+            "time": "2021-06-09T20:14:01+00:00"
         }
     ],
     "packages-dev": [

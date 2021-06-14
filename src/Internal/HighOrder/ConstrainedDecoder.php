@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\HighOrder;
 
 use Fp\Functional\Either\Either;
-use Fp\Functional\Either\Left;
+use Klimick\Decode\Constraint\Invalid;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use Klimick\Decode\ContextEntry;
@@ -62,10 +62,12 @@ final class ConstrainedDecoder extends HighOrderDecoder
                         new ContextEntry($constraint->name(), $decoded->value)
                     ]);
 
-                    $result = $constraint->check($context, $decoded->value);
+                    $result = $constraint
+                        ->check($context, $decoded->value)
+                        ->get();
 
-                    if ($result instanceof Left) {
-                        $errors = [...$errors, ...$result->get()->errors];
+                    if ($result instanceof Invalid) {
+                        $errors = [...$errors, ...$result->errors];
                     }
                 }
 

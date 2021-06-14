@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Typed as t;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\Decoder\arr;
+use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\valid;
 
@@ -32,7 +32,7 @@ final class ArrListDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
-        return arr(t::int, $this->decoder)
+        return arr(int(), $this->decoder)
             ->decode($value, $context)
             ->flatMap(function(Valid $valid) use ($context) {
                 $count = count($valid->value);

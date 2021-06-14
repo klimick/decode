@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\Constraint\Collection;
 
 use Fp\Functional\Either\Either;
-use Fp\Functional\Either\Left;
-use Fp\Functional\Either\Right;
 use Klimick\Decode\Context;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Constraint\Invalid;
+use Klimick\Decode\Constraint\Valid;
 use function Klimick\Decode\Constraint\invalids;
 use function Klimick\Decode\Constraint\valid;
 
@@ -36,14 +34,15 @@ final class ExistsConstraint implements ConstraintInterface
 
         foreach ($value as $k => $v) {
             foreach ($this->constraints as $constraint) {
-                $result = $constraint->check($context->append($constraint->name(), $v, (string) $k), $v);
+                $result = $constraint
+                    ->check($context->append($constraint->name(), $v, (string) $k), $v)
+                    ->get();
 
-                if ($result instanceof Right) {
+                if ($result instanceof Valid) {
                     return valid();
                 }
 
-                /** @var Left<Invalid> $result */
-                $errors = [...$errors, ...$result->get()->errors];
+                $errors = [...$errors, ...$result->errors];
             }
         }
 

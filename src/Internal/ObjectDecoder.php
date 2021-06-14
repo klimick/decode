@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
@@ -28,8 +27,7 @@ final class ObjectDecoder extends AbstractDecoder
         public string $objectClass,
         public array $decoders,
         public bool $partial = false,
-    )
-    {
+    ) {
         $this->shape = new ShapeDecoder($decoders, $partial);
     }
 
@@ -42,9 +40,9 @@ final class ObjectDecoder extends AbstractDecoder
     {
         return $this->shape
             ->decode($value, $context)
-            ->flatMap(function(Valid $valid) {
+            ->flatMap(function($validShape) {
                 /** @psalm-suppress MixedMethodCall */
-                $instance = new ($this->objectClass)(...$valid->value);
+                $instance = new ($this->objectClass)(...$validShape->value);
 
                 return valid($instance);
             });

@@ -7,7 +7,7 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Decoder\Valid;
+use Klimick\Decode\Decoder\Invalid;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\mixed;
@@ -60,16 +60,16 @@ final class TupleDecoder extends AbstractDecoder
                 $decoded = [];
                 $errors = [];
 
-                /** @psalm-suppress MixedAssignment */
+                /** @psalm-var mixed $v */
                 foreach ($list as $k => $v) {
                     $result = $this->decoders[$k]
                         ->decode($v, $context->append($this->decoders[$k]->name(), $v, (string) $k))
                         ->get();
 
-                    if ($result instanceof Valid) {
-                        $decoded[] = $result->value;
-                    } else {
+                    if ($result instanceof Invalid) {
                         $errors = [...$errors, ...$result->errors];
+                    } else {
+                        $decoded[] = $result->value;
                     }
                 }
 

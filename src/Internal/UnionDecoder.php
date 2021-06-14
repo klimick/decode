@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
-use Fp\Functional\Either\Right;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Invalid;
+use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use function Klimick\Decode\Decoder\valid;
 use function Klimick\Decode\Decoder\invalids;
 
 /**
@@ -43,16 +43,15 @@ final class UnionDecoder extends AbstractDecoder
         $errors = [];
 
         foreach ($this->decoders as $decoder) {
-            $result = $decoder->decode($value, $context->append($decoder->name(), $value));
+            $result = $decoder
+                ->decode($value, $context->append($decoder->name(), $value))
+                ->get();
 
-            if ($result instanceof Right) {
-                return $result;
+            if ($result instanceof Valid) {
+                return valid($result->value);
             }
 
-            /** @var Invalid $invalid */
-            $invalid = $result->get();
-
-            $errors = [...$errors, ...$invalid->errors];
+            $errors = [...$errors, ...$result->errors];
         }
 
         return invalids($errors);

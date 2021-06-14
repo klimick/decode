@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
-use Fp\Functional\Either\Right;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Valid;
+use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\valid;
@@ -45,13 +44,14 @@ final class IntersectionDecoder extends AbstractDecoder
         $errors = [];
 
         foreach ($this->decoders as $decoder) {
-            $result = $decoder->decode($value, $context->append($decoder->name(), $value));
+            $result = $decoder
+                ->decode($value, $context->append($decoder->name(), $value))
+                ->get();
 
-            if ($result->isLeft()) {
-                $errors = [...$errors, ...$result->get()->errors];
+            if ($result instanceof Invalid) {
+                $errors = [...$errors, ...$result->errors];
             } else {
-                /** @var Right<Valid<T>> $result */
-                $decoded = array_merge($decoded, $result->get()->value);
+                $decoded = array_merge($decoded, $result->value);
             }
         }
 

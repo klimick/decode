@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\Constraint\Collection;
 
 use Fp\Functional\Either\Either;
-use Fp\Functional\Either\Left;
+use Klimick\Decode\Constraint\Invalid;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use function Klimick\Decode\Constraint\invalids;
@@ -34,10 +34,12 @@ final class ForallConstraint implements ConstraintInterface
 
         foreach ($value as $k => $v) {
             foreach ($this->constraints as $constraint) {
-                $result = $constraint->check($context->append($constraint->name(), $v, (string) $k), $v);
+                $result = $constraint
+                    ->check($context->append($constraint->name(), $v, (string) $k), $v)
+                    ->get();
 
-                if ($result instanceof Left) {
-                    $errors = [...$errors, ...$result->get()->errors];
+                if ($result instanceof Invalid) {
+                    $errors = [...$errors, ...$result->errors];
                 }
             }
         }

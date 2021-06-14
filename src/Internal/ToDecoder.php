@@ -29,14 +29,6 @@ final class ToDecoder
      */
     public static function forAll(array $decoders): array
     {
-        $_decoders = [];
-
-        foreach ($decoders as $prop => $decoderOrCallable) {
-            $_decoders[$prop] = is_callable($decoderOrCallable)
-                ? $decoderOrCallable()
-                : $decoderOrCallable;
-        }
-
-        return $_decoders;
+        return array_map([self::class, 'for'], $decoders);
     }
 }

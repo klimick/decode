@@ -6,7 +6,6 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\Decoder\arr;
 use function Klimick\Decode\Decoder\invalid;
@@ -38,10 +37,8 @@ final class NonEmptyArrDecoder extends AbstractDecoder
     {
         return arr($this->keyDecoder, $this->valDecoder)
             ->decode($value, $context)
-            ->flatMap(
-                fn(Valid $valid) => !empty($valid->value)
-                    ? valid($valid->value)
-                    : invalid($context)
-            );
+            ->flatMap(fn($valid) => 0 !== count($valid->value)
+                ? valid($valid->value)
+                : invalid($context));
     }
 }

@@ -54,7 +54,7 @@ final class ShapeAccessorTest extends TestCase
         ];
 
         yield 'aliased field does not exist' => [
-            'decoder' => $anyDecoder->from('some_field.path'),
+            'decoder' => $anyDecoder->from('$.some_field.path'),
             'field' => $anyField,
             'shape' => [],
             'expected' => Option::none(),
