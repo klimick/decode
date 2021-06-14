@@ -6,6 +6,7 @@ namespace Klimick\PsalmDecode\ShapeDecoder;
 
 use Fp\Functional\Option\Option;
 use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
+use Klimick\PsalmDecode\Psalm;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
 use Psalm\Type;
@@ -29,7 +30,7 @@ final class TupleReturnTypeProvider implements FunctionReturnTypeProviderInterfa
             $types = [];
 
             foreach ($args as $arg) {
-                $type = yield Option::fromNullable($type_provider->getType($arg->value));
+                $type = yield Psalm::getType($type_provider, $arg->value);
                 $types[] = yield DecoderTypeParamExtractor::extract($type, $source->getCodebase());
             }
 

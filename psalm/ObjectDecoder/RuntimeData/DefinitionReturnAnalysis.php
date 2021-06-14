@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
+use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Psalm\IssueBuffer;
 use Psalm\CodeLocation;
@@ -39,7 +40,7 @@ final class DefinitionReturnAnalysis implements AfterStatementAnalysisInterface
 
             $return_stmt = yield proveOf($event->getStmt(), Node\Stmt\Return_::class);
 
-            $return_decoder_type = yield Option::fromNullable($provider->getType($return_stmt));
+            $return_decoder_type = yield Psalm::getType($provider, $return_stmt);
             $expected_decoder_type = DecoderType::createObject($self_class);
 
             if (!UnionTypeComparator::isContainedBy($codebase, $return_decoder_type, $expected_decoder_type)) {

@@ -11,6 +11,7 @@ use Klimick\Decode\HighOrder\Brand\ConstrainedBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
 use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
@@ -56,7 +57,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
             yield proveTrue(in_array($method_name, array_keys(self::METHODS_TO_BRANDS), true));
 
             $method_call = yield proveOf($event->getExpr(), MethodCall::class);
-            $current_type = yield Option::fromNullable($type_provider->getType($method_call->var));
+            $current_type = yield Psalm::getType($type_provider, $method_call->var);
 
             $code_location = new CodeLocation($event->getStatementsSource(), $method_call->name);
 

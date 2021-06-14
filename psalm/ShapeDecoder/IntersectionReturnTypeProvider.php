@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
+use Klimick\PsalmDecode\Psalm;
 use Psalm\Type;
 use Psalm\IssueBuffer;
 use Psalm\Internal\Analyzer\StatementsAnalyzer;
@@ -32,7 +33,7 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
             $collisions = [];
 
             foreach ($event->getCallArgs() as $arg) {
-                $arg_type = yield Option::fromNullable($provider->getType($arg->value));
+                $arg_type = yield Psalm::getType($provider, $arg->value);
 
                 $decoder_type_param = yield DecoderTypeParamExtractor::extract($arg_type, $codebase);
                 $shape_type = yield ShapePropertiesExtractor::fromDecoderTypeParam($decoder_type_param);

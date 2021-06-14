@@ -8,6 +8,7 @@ use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Report\DefaultReporter;
 use Klimick\Decode\Report\ErrorReport;
 use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\RuntimeData;
@@ -43,7 +44,7 @@ final class OfCallAnalysis implements AfterExpressionAnalysisInterface
             $general_class = yield GetGeneralParentClass::for($class_string, $codebase);
             yield proveTrue(RuntimeData::class === $general_class);
 
-            $arg_type = yield Option::fromNullable($type_provider->getType($method_call->args[0]->value));
+            $arg_type = yield Psalm::getType($type_provider, $method_call->args[0]->value);
 
             $value = LiteralKeyedArray::toPhpValue($arg_type)->getOrElse(
                 DecodeIssue::couldNotAnalyzeOfCall(new CodeLocation($source, $method_call))

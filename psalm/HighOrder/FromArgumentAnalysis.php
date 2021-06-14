@@ -7,6 +7,7 @@ namespace Klimick\PsalmDecode\HighOrder;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
@@ -38,7 +39,7 @@ final class FromArgumentAnalysis implements AfterMethodCallAnalysisInterface
 
             yield proveTrue(1 === count($method_call->args));
 
-            $type = yield Option::fromNullable($type_provider->getType($method_call->args[0]->value));
+            $type = yield Psalm::getType($type_provider, $method_call->args[0]->value);
 
             $atomics = asList($type->getAtomicTypes());
             yield proveTrue(1 === count($atomics));

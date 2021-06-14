@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\NamedArguments;
 
+use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Psalm\Type;
 use Psalm\Codebase;
@@ -55,7 +56,7 @@ final class NamedArgumentsMapper
     ): Option
     {
         return Option::do(function() use ($named_arg, $provider, $codebase) {
-            $named_arg_type = yield Option::fromNullable($provider->getType($named_arg->value));
+            $named_arg_type = yield Psalm::getType($provider, $named_arg->value);
             $arg_identifier = yield Option::fromNullable($named_arg->name);
 
             return [

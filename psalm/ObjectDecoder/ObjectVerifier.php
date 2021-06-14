@@ -77,7 +77,7 @@ final class ObjectVerifier
             $codebase = $source->getCodebase();
 
             $params = asList($event->getTemplateTypeParameters() ?? []);
-            proveTrue(2 === count($params));
+            yield proveTrue(2 === count($params));
 
             $object_class_type_param = yield first($params);
             $partial_type_param = yield second($params);

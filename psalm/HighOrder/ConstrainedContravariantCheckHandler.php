@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\HighOrder;
 
 use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Psalm\Codebase;
 use Psalm\CodeLocation;
@@ -108,7 +109,7 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
             $types = [];
 
             foreach ($args as $arg) {
-                $constraint_type = yield Option::fromNullable($type_provider->getType($arg->value));
+                $constraint_type = yield Psalm::getType($type_provider, $arg->value);
                 $constraint_type_param = yield self::getTypeFromConstraintInterface($constraint_type);
 
                 $types[] = self::literalTypeToNonLiteralType($constraint_type_param);
