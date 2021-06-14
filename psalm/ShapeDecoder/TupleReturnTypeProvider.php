@@ -20,22 +20,27 @@ final class TupleReturnTypeProvider implements FunctionReturnTypeProviderInterfa
 
     public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
     {
-        $inferred = Option
-            ::do(static function() use ($event) {
-                $args = yield proveNonEmptyList($event->getCallArgs());
+        $inferred = Option::do(static function() use ($event) {
+            $args = yield proveNonEmptyList($event->getCallArgs());
 
-                $types = [];
-                $source = $event->getStatementsSource();
+            $source = $event->getStatementsSource();
+            $type_provider = $source->getNodeTypeProvider();
 
-                foreach ($args as $arg) {
-                    $arg_type = yield Option::fromNullable($source->getNodeTypeProvider()->getType($arg->value));
-                    $types[] = yield DecoderTypeParamExtractor::extract($arg_type, $source->getCodebase());
-                }
+            $types = [];
 
-                return new Type\Atomic\TKeyedArray($types);
-            })
-            ->get() ?? DecoderType::createEmptyArray();
+            foreach ($args as $arg) {
+                $type = yield Option::fromNullable($type_provider->getType($arg->value));
+                $types[] = yield DecoderTypeParamExtractor::extract($type, $source->getCodebase());
+            }
 
-        return new Type\Union([$inferred]);
+            $tuple = new Type\Atomic\TKeyedArray($types);
+            $tuple->is_list = true;
+
+            return DecoderType::withTypeParameter(
+                new Type\Union([$tuple])
+            );
+        });
+
+        return $inferred->get();
     }
 }
