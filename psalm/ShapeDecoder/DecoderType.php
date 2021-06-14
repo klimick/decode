@@ -16,7 +16,7 @@ final class DecoderType
     {
         $properties_atomic = new Type\Union([
             empty($properties)
-                ? self::createEmptyArray()
+                ? new Type\Atomic\TArray([Type::getEmpty(), Type::getEmpty()])
                 : new Type\Atomic\TKeyedArray($properties)
         ]);
 
@@ -41,10 +41,5 @@ final class DecoderType
         return new Type\Union([
             new Type\Atomic\TGenericObject(AbstractDecoder::class, [$type_parameter]),
         ]);
-    }
-
-    public static function createEmptyArray(): Type\Atomic\TArray
-    {
-        return new Type\Atomic\TArray([Type::getEmpty(), Type::getEmpty()]);
     }
 }

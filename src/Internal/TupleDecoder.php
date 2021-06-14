@@ -7,14 +7,11 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\Valid;
-use function array_map;
-use function array_values;
-use function implode;
-use function is_array;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\invalids;
+use function Klimick\Decode\Decoder\mixed;
+use function Klimick\Decode\Decoder\nonEmptyArrList;
 use function Klimick\Decode\Decoder\valid;
 
 /**
@@ -25,9 +22,9 @@ use function Klimick\Decode\Decoder\valid;
 final class TupleDecoder extends AbstractDecoder
 {
     /**
-     * @var list<AbstractDecoder<T>>
+     * @var non-empty-list<AbstractDecoder<T>>
      */
-    public array $innerDecoders;
+    public array $decoders;
 
     /**
      * @param AbstractDecoder<T> $first
@@ -37,59 +34,46 @@ final class TupleDecoder extends AbstractDecoder
      */
     public function __construct(AbstractDecoder $first, AbstractDecoder ...$rest)
     {
-        $this->innerDecoders = [$first, ...$rest];
+        $this->decoders = [$first, ...$rest];
     }
 
     public function name(): string
     {
-        $description = implode(', ', array_map(
-            fn(AbstractDecoder $inner) => $inner->name(),
-            $this->innerDecoders,
+        $types = implode(', ', array_map(
+            fn(AbstractDecoder $decoder) => $decoder->name(),
+            $this->decoders,
         ));
 
-        return "array{{$description}}";
+        return "array{{$types}}";
     }
 
-    /**
-     * @param mixed $value
-     * @param Context $context
-     * @return Either<Invalid, Valid<list<T>>>
-     */
     public function decode(mixed $value, Context $context): Either
     {
-        if (!is_array($value)) {
-            return invalid($context);
-        }
+        return nonEmptyArrList(mixed())
+            ->decode($value, $context)
+            ->map(fn($valid) => $valid->value)
+            ->flatMap(function($list) use ($context) {
+                if (count($list) !== count($this->decoders)) {
+                    return invalid($context);
+                }
 
-        $errors = [];
-        $decodingResults = [];
-        $valuesAsList = array_values($value);
+                $decoded = [];
+                $errors = [];
 
-        if (count($valuesAsList) !== count($this->innerDecoders)) {
-            return invalid($context);
-        }
+                /** @psalm-suppress MixedAssignment */
+                foreach ($list as $k => $v) {
+                    $result = $this->decoders[$k]
+                        ->decode($v, $context->append($this->decoders[$k]->name(), $v, (string) $k))
+                        ->get();
 
-        /** @psalm-suppress MixedAssignment */
-        foreach ($valuesAsList as $idx => $valueToDecode) {
-            $maybeDecoded = $this->innerDecoders[$idx]
-                ->decode($valueToDecode, $context)
-                ->get();
+                    if ($result instanceof Valid) {
+                        $decoded[] = $result->value;
+                    } else {
+                        $errors = [...$errors, ...$result->errors];
+                    }
+                }
 
-            if ($maybeDecoded instanceof Valid) {
-                $decodingResults[] = $maybeDecoded->value;
-            } else {
-                /**
-                 * @var $maybeDecoded Invalid
-                 * @ignore-var
-                 */
-                $errors = [...$errors, ...$maybeDecoded->errors];
-            }
-        }
-
-        if (0 !== count($errors)) {
-            return invalids($errors);
-        }
-
-        return valid($decodingResults);
+                return 0 !== count($errors) ? invalids($errors) : valid($decoded);
+            });
     }
 }
