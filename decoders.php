@@ -7,7 +7,7 @@ namespace Klimick\Decode\Decoder;
 use Closure;
 use DateTimeImmutable;
 use Fp\Functional\Either\Either;
-use Fp\Functional\Either\Right;
+use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\ErrorInterface;
 use Klimick\Decode\Internal;
 use Klimick\Decode\Context;
@@ -15,7 +15,6 @@ use Klimick\Decode\ContextEntry;
 use Klimick\PsalmDecode\ShapeDecoder\PartialShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
-use RuntimeException;
 
 /**
  * @template T
@@ -38,18 +37,15 @@ function decode(mixed $data, AbstractDecoder $decoder): Either
  * @psalm-pure
  *
  * @psalm-param AbstractDecoder<T> $decoder
- * @psalm-return T
+ * @psalm-return Option<T>
  */
-function cast(mixed $data, AbstractDecoder $decoder): mixed
+function cast(mixed $data, AbstractDecoder $decoder): Option
 {
-    $decoded = decode($data, $decoder);
+    $decoded = decode($data, $decoder)->get();
 
-    if ($decoded instanceof Right) {
-        /** @var Right<Valid<T>> $decoded  */
-        return $decoded->get()->value;
-    }
-
-    throw new RuntimeException("Cannot cast given value to {$decoder->name()}");
+    return $decoded instanceof Invalid
+        ? Option::none()
+        : Option::some($decoded->value);
 }
 
 /**
