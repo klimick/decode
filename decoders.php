@@ -294,6 +294,18 @@ function nonEmptyArr(AbstractDecoder $keyDecoder, AbstractDecoder $valDecoder): 
 }
 
 /**
+ * @template T
+ * @psalm-pure
+ *
+ * @param AbstractDecoder<T> $decoder
+ * @return AbstractDecoder<T>
+ */
+function fromJson(AbstractDecoder $decoder): AbstractDecoder
+{
+    return new Internal\FromJsonDecoder($decoder);
+}
+
+/**
  * @psalm-pure
  *
  * @psalm-param AbstractDecoder ...$decoders
