@@ -94,7 +94,7 @@ final class ShapeDecoder extends AbstractDecoder
         return match (true) {
             (!empty($errors)) => invalids($errors),
             (!empty($shape)) => valid($shape),
-            ($this->partial && empty($shape)) => valid([]),
+            ($this->partial) => valid([]),
         };
 
     }

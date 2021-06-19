@@ -16,19 +16,16 @@ use Klimick\PsalmDecode\ShapeDecoder\PartialShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
 use RuntimeException;
-use function array_values;
 
 /**
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $decoder
+ * @psalm-param AbstractDecoder<T> $decoder
  * @psalm-return Either<Invalid, Valid<T>>
  */
-function decode(mixed $data, callable|AbstractDecoder $decoder): Either
+function decode(mixed $data, AbstractDecoder $decoder): Either
 {
-    $decoder = Internal\ToDecoder::for($decoder);
-
     $context = new Context([
         new ContextEntry($decoder->name(), $data),
     ]);
@@ -40,13 +37,11 @@ function decode(mixed $data, callable|AbstractDecoder $decoder): Either
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $decoder
+ * @psalm-param AbstractDecoder<T> $decoder
  * @psalm-return T
  */
-function cast(mixed $data, callable|AbstractDecoder $decoder): mixed
+function cast(mixed $data, AbstractDecoder $decoder): mixed
 {
-    $decoder = Internal\ToDecoder::for($decoder);
-
     $decoded = decode($data, $decoder);
 
     if ($decoded instanceof Right) {
@@ -252,28 +247,24 @@ function literal(mixed $head, mixed ...$tail): AbstractDecoder
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $decoder
+ * @psalm-param AbstractDecoder<T> $decoder
  * @return AbstractDecoder<list<T>>
  */
-function arrList(callable|AbstractDecoder $decoder): AbstractDecoder
+function arrList(AbstractDecoder $decoder): AbstractDecoder
 {
-    return new Internal\ArrListDecoder(
-        decoder: Internal\ToDecoder::for($decoder)
-    );
+    return new Internal\ArrListDecoder($decoder);
 }
 
 /**
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $decoder
+ * @psalm-param AbstractDecoder<T> $decoder
  * @return AbstractDecoder<non-empty-list<T>>
  */
-function nonEmptyArrList(callable|AbstractDecoder $decoder): AbstractDecoder
+function nonEmptyArrList(AbstractDecoder $decoder): AbstractDecoder
 {
-    return new Internal\NonEmptyArrListDecoder(
-        decoder: Internal\ToDecoder::for($decoder)
-    );
+    return new Internal\NonEmptyArrListDecoder($decoder);
 }
 
 /**
@@ -281,17 +272,14 @@ function nonEmptyArrList(callable|AbstractDecoder $decoder): AbstractDecoder
  * @template V
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<K>|pure-callable(): AbstractDecoder<K> $keyDecoder
- * @psalm-param AbstractDecoder<V>|pure-callable(): AbstractDecoder<V> $valDecoder
+ * @psalm-param AbstractDecoder<K> $keyDecoder
+ * @psalm-param AbstractDecoder<V> $valDecoder
  *
  * @return AbstractDecoder<array<K, V>>
  */
-function arr(callable|AbstractDecoder $keyDecoder, callable|AbstractDecoder $valDecoder): AbstractDecoder
+function arr(AbstractDecoder $keyDecoder, AbstractDecoder $valDecoder): AbstractDecoder
 {
-    return new Internal\ArrDecoder(
-        keyDecoder: Internal\ToDecoder::for($keyDecoder),
-        valDecoder: Internal\ToDecoder::for($valDecoder),
-    );
+    return new Internal\ArrDecoder($keyDecoder, $valDecoder);
 }
 
 /**
@@ -299,49 +287,41 @@ function arr(callable|AbstractDecoder $keyDecoder, callable|AbstractDecoder $val
  * @template V
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<K>|pure-callable(): AbstractDecoder<K> $keyDecoder
- * @psalm-param AbstractDecoder<V>|pure-callable(): AbstractDecoder<V> $valDecoder
+ * @psalm-param AbstractDecoder<K> $keyDecoder
+ * @psalm-param AbstractDecoder<V> $valDecoder
  *
  * @return AbstractDecoder<non-empty-array<K, V>>
  */
-function nonEmptyArr(callable|AbstractDecoder $keyDecoder, callable|AbstractDecoder $valDecoder): AbstractDecoder
+function nonEmptyArr(AbstractDecoder $keyDecoder, AbstractDecoder $valDecoder): AbstractDecoder
 {
-    return new Internal\NonEmptyArrDecoder(
-        keyDecoder: Internal\ToDecoder::for($keyDecoder),
-        valDecoder: Internal\ToDecoder::for($valDecoder),
-    );
+    return new Internal\NonEmptyArrDecoder($keyDecoder, $valDecoder);
 }
 
 /**
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder ...$decoders
+ * @psalm-param AbstractDecoder ...$decoders
  * @return AbstractDecoder<array<string, mixed>>
  *
  * @see ShapeReturnTypeProvider
  */
-function shape(callable|AbstractDecoder ...$decoders): AbstractDecoder
+function shape(AbstractDecoder ...$decoders): AbstractDecoder
 {
-    return new Internal\Shape\ShapeDecoder(
-        decoders: Internal\ToDecoder::forAll($decoders)
-    );
+    return new Internal\Shape\ShapeDecoder($decoders);
 }
 
 /**
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> ...$decoders
+ * @psalm-param AbstractDecoder<T> ...$decoders
  * @return AbstractDecoder<array<string, T>>
  *
  * @see PartialShapeReturnTypeProvider
  */
-function partialShape(callable|AbstractDecoder ...$decoders): AbstractDecoder
+function partialShape(AbstractDecoder ...$decoders): AbstractDecoder
 {
-    return new Internal\Shape\ShapeDecoder(
-        decoders: Internal\ToDecoder::forAll($decoders),
-        partial: true,
-    );
+    return new Internal\Shape\ShapeDecoder($decoders, partial: true);
 }
 
 /**
@@ -385,20 +365,14 @@ function rec(callable $type): AbstractDecoder
  * @psalm-pure
  * @no-named-arguments
  *
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $first
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $second
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> ...$rest
+ * @psalm-param AbstractDecoder<T> $first
+ * @psalm-param AbstractDecoder<T> $second
+ * @psalm-param AbstractDecoder<T> ...$rest
  * @return AbstractDecoder<T>
  */
-function union(callable|AbstractDecoder $first, callable|AbstractDecoder $second, callable|AbstractDecoder ...$rest): AbstractDecoder
+function union(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest): AbstractDecoder
 {
-    $restDecoders = array_values(Internal\ToDecoder::forAll($rest));
-
-    return new Internal\UnionDecoder(
-        Internal\ToDecoder::for($first),
-        Internal\ToDecoder::for($second),
-        ...$restDecoders,
-    );
+    return new Internal\UnionDecoder($first, $second, ...array_values($rest));
 }
 
 /**
@@ -406,36 +380,27 @@ function union(callable|AbstractDecoder $first, callable|AbstractDecoder $second
  * @psalm-pure
  * @no-named-arguments
  *
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $first
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> $second
- * @psalm-param AbstractDecoder<T>|pure-callable(): AbstractDecoder<T> ...$rest
+ * @psalm-param AbstractDecoder<T> $first
+ * @psalm-param AbstractDecoder<T> $second
+ * @psalm-param AbstractDecoder<T> ...$rest
  * @return AbstractDecoder<T>
  */
-function intersection(callable|AbstractDecoder $first, callable|AbstractDecoder $second, callable|AbstractDecoder ...$rest): AbstractDecoder
+function intersection(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest): AbstractDecoder
 {
-    $restDecoders = array_values(Internal\ToDecoder::forAll($rest));
-
-    return new Internal\IntersectionDecoder(
-        Internal\ToDecoder::for($first),
-        Internal\ToDecoder::for($second),
-        ...$restDecoders,
-    );
+    return new Internal\IntersectionDecoder($first, $second, ...array_values($rest));
 }
 
 /**
  * @psalm-pure
  * @no-named-arguments
  *
- * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder $first
- * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder ...$rest
+ * @psalm-param AbstractDecoder $first
+ * @psalm-param AbstractDecoder ...$rest
  * @return AbstractDecoder<list<mixed>>
  *
  * @see TupleReturnTypeProvider
  */
-function tuple(callable|AbstractDecoder $first, callable|AbstractDecoder ...$rest): AbstractDecoder
+function tuple(AbstractDecoder $first, AbstractDecoder ...$rest): AbstractDecoder
 {
-    return new Internal\TupleDecoder(
-        Internal\ToDecoder::for($first),
-        ...array_values(Internal\ToDecoder::forAll($rest))
-    );
+    return new Internal\TupleDecoder($first, ...array_values($rest));
 }

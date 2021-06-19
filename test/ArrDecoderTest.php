@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test;
 
-use Klimick\Decode\Typed as t;
 use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\DecoderGenerator;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Decoder\arr;
+use function Klimick\Decode\Decoder\arrKey;
+use function Klimick\Decode\Decoder\int;
+use function Klimick\Decode\Decoder\mixed;
+use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class ArrDecoderTest extends TestCase
@@ -28,7 +31,7 @@ final class ArrDecoderTest extends TestCase
         forAll($arrGen)
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(arr(t::int, $arrItemDecoder))
+                Check::thatValidFor(arr(int(), $arrItemDecoder))
             );
     }
 
@@ -44,7 +47,7 @@ final class ArrDecoderTest extends TestCase
         forAll($arrGen)
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(arr(t::string, $arrItemDecoder))
+                Check::thatValidFor(arr(string(), $arrItemDecoder))
             );
     }
 
@@ -53,7 +56,7 @@ final class ArrDecoderTest extends TestCase
         forAll(Gen::mixed())
             ->when(fn(mixed $v) => !is_array($v))
             ->then(
-                Check::thatInvalidFor(arr(t::arrKey, t::mixed))
+                Check::thatInvalidFor(arr(arrKey(), mixed()))
             );
     }
 }

@@ -46,7 +46,6 @@ final class ObjectVerifier
             $actual_shape = yield NamedArgumentsMapper::map(
                 call_args: $event->getCallArgs(),
                 provider: $source->getNodeTypeProvider(),
-                codebase: $source->getCodebase(),
             );
 
             $call_info = yield self::extractCallInfo($event);

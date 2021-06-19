@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Klimick\Decode\Internal\ObjectDecoder;
-use Klimick\Decode\Internal\ToDecoder;
 use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
 
 /**
@@ -25,13 +24,13 @@ final class ObjectDecoderFactory
     ) { }
 
     /**
-     * @psalm-param AbstractDecoder|pure-callable(): AbstractDecoder ...$decoders
+     * @psalm-param AbstractDecoder ...$decoders
      * @return AbstractDecoder<TObjectClass>
      *
      * @see ObjectDecoderFactoryReturnTypeProvider
      */
-    public function __invoke(callable|AbstractDecoder ...$decoders): AbstractDecoder
+    public function __invoke(AbstractDecoder ...$decoders): AbstractDecoder
     {
-        return new ObjectDecoder($this->objectClass, ToDecoder::forAll($decoders), $this->partial);
+        return new ObjectDecoder($this->objectClass, $decoders, $this->partial);
     }
 }

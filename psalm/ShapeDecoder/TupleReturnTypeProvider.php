@@ -31,7 +31,7 @@ final class TupleReturnTypeProvider implements FunctionReturnTypeProviderInterfa
 
             foreach ($args as $arg) {
                 $type = yield Psalm::getType($type_provider, $arg->value);
-                $types[] = yield DecoderTypeParamExtractor::extract($type, $source->getCodebase());
+                $types[] = yield DecoderTypeParamExtractor::extract($type);
             }
 
             $tuple = new Type\Atomic\TKeyedArray($types);

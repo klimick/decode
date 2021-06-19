@@ -24,7 +24,6 @@ final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterfa
         $mapped = NamedArgumentsMapper::map(
             call_args: $event->getCallArgs(),
             provider: $source->getNodeTypeProvider(),
-            codebase: $source->getCodebase(),
             partial: $is_partial_shape,
         );
 

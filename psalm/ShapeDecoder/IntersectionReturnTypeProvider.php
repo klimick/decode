@@ -27,7 +27,6 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
         $type = Option::do(function() use ($event) {
             $source = yield proveOf($event->getStatementsSource(), StatementsAnalyzer::class);
             $provider = $source->getNodeTypeProvider();
-            $codebase = $source->getCodebase();
 
             $properties = [];
             $collisions = [];
@@ -35,7 +34,7 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
             foreach ($event->getCallArgs() as $arg) {
                 $arg_type = yield Psalm::getType($provider, $arg->value);
 
-                $decoder_type_param = yield DecoderTypeParamExtractor::extract($arg_type, $codebase);
+                $decoder_type_param = yield DecoderTypeParamExtractor::extract($arg_type);
                 $shape_type = yield ShapePropertiesExtractor::fromDecoderTypeParam($decoder_type_param);
 
                 foreach ($shape_type as $property => $type) {
