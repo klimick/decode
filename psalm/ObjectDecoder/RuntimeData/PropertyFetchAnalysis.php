@@ -6,16 +6,15 @@ namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Fp\Functional\Option\Option;
 
+use Klimick\PsalmDecode\DecodeIssue;
 use PhpParser\Node;
+use Psalm\CodeLocation;
 use Psalm\Type;
 use Psalm\IssueBuffer;
-use Psalm\Internal\Analyzer\IssueData;
 use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
-use function Fp\Collection\filter;
 use function Fp\Evidence\proveOf;
-use function Fp\Evidence\proveTrue;
 
 final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface
 {
@@ -34,24 +33,14 @@ final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface
             $properties = yield RuntimeDecoder::getProperties($class_string);
             $identifier = yield proveOf($property_fetch->name, Node\Identifier::class);
 
-            yield proveTrue(array_key_exists($identifier->name, $properties));
-            $provider->setType($property_fetch, $properties[$identifier->name]);
-
-            self::removeKnownMixedPropertyFetch($source, $property_fetch);
+            if (array_key_exists($identifier->name, $properties)) {
+                $provider->setType($property_fetch, $properties[$identifier->name]);
+            } else {
+                $issue = DecodeIssue::undefinedPropertyFetch(new CodeLocation($source, $property_fetch), $class_string, $identifier->name);
+                IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+            }
         });
 
         return $analysis->get();
-    }
-
-    private static function removeKnownMixedPropertyFetch(StatementsAnalyzer $source, Node\Expr\PropertyFetch $fetch): void
-    {
-        $mixed_property_fetches = filter(
-            IssueBuffer::getIssuesDataForFile($source->getFilePath()),
-            fn(IssueData $i) => 'MixedPropertyFetch' === $i->type && $i->from === $fetch->getStartFilePos(),
-        );
-
-        foreach ($mixed_property_fetches as $issue) {
-            IssueBuffer::remove($source->getFilePath(), 'MixedPropertyFetch', $issue->from);
-        }
     }
 }

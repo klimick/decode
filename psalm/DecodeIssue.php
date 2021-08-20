@@ -10,6 +10,14 @@ use Psalm\Type;
 
 final class DecodeIssue extends CodeIssue
 {
+    public static function undefinedPropertyFetch(CodeLocation $code_location, string $runtime_data_class, string $property_id): self
+    {
+        return new self(
+            message: "Property '{$property_id}' is not present in '{$runtime_data_class}' instance",
+            code_location: $code_location,
+        );
+    }
+
     public static function invalidFromArgument(CodeLocation $code_location): self
     {
         return new self(
