@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\HighOrder;
 
-use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Issue\HighOrder\IncompatibleConstraintIssue;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Psalm\Codebase;
@@ -177,7 +177,7 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
             }
 
             $code_location = new CodeLocation($source, $call_args[$idx]);
-            $issue = DecodeIssue::incompatibleConstraints($constraint_type, $decoder_type_parameter, $code_location);
+            $issue = new IncompatibleConstraintIssue($constraint_type, $decoder_type_parameter, $code_location);
 
             IssueBuffer::accepts($issue, $source->getSuppressedIssues());
         }
