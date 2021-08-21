@@ -10,7 +10,7 @@ use Klimick\Decode\HighOrder\Brand\FromBrand;
 use Klimick\Decode\HighOrder\Brand\ConstrainedBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
-use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Issue\HighOrder\BrandAlreadyDefinedIssue;
 use Klimick\PsalmDecode\Issue\HighOrder\OptionalCallContradictionIssue;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node\Expr\MethodCall;
@@ -110,7 +110,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
         }
 
         if (in_array($brand, $current_brands, true)) {
-            $issue = DecodeIssue::brandAlreadyDefined($method_name, $code_location);
+            $issue = new BrandAlreadyDefinedIssue($method_name, $code_location);
             IssueBuffer::accepts($issue, $source->getSuppressedIssues());
         }
 
