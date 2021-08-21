@@ -6,7 +6,6 @@ namespace Klimick\PsalmDecode;
 
 use Psalm\CodeLocation;
 use Psalm\Issue\CodeIssue;
-use Psalm\Type;
 
 final class DecodeIssue extends CodeIssue
 {
@@ -43,16 +42,12 @@ final class DecodeIssue extends CodeIssue
         );
     }
 
-    public static function invalidRuntimeDataDefinition(
-        Type\Union $expected_decoder_type,
-        Type\Union $return_decoder_type,
-        CodeLocation $code_location,
-    ): self
+    public static function invalidRuntimeDataDefinition(CodeLocation $code_location): self
     {
         return new self(
-            message: implode('', [
-                "The declared return type '{$expected_decoder_type->getId()}' is incorrect, ",
-                "got '{$return_decoder_type->getId()}'",
+            message: implode(' ', [
+                'RuntimeData::properties must return AbstractDecoder<array{...}>.',
+                'Use shape(...) or partialShape(...).',
             ]),
             code_location: $code_location,
         );

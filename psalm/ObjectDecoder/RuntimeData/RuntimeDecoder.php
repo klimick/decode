@@ -6,8 +6,8 @@ namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Psalm\Type;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Decoder\RuntimeData;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Fp\Functional\Option\Option;
 use function Fp\Cast\asList;
 use function Fp\Collection\firstOf;
@@ -24,7 +24,7 @@ final class RuntimeDecoder
         return Option::do(function() use ($class_string) {
             yield proveTrue(is_a($class_string, RuntimeData::class, true));
 
-            return yield Option::try(fn() => $class_string::definition());
+            return yield Option::try(fn() => $class_string::type());
         });
     }
 
@@ -37,8 +37,8 @@ final class RuntimeDecoder
         return Option::do(function() use ($class_string) {
             $decoder = yield self::instance($class_string);
 
-            $shape_type = yield proveOf($decoder, ObjectDecoder::class)
-                ->map(fn($object_decoder) => $object_decoder->shape->name())
+            $shape_type = yield proveOf($decoder, ShapeDecoder::class)
+                ->map(fn($object_decoder) => $object_decoder->name())
                 ->flatMap(fn($type) => Option::try(fn() => Type::parseString($type)));
 
             $atomics = asList($shape_type->getAtomicTypes());

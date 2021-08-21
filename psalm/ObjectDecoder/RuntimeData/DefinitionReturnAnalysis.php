@@ -4,30 +4,34 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
+use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
 use Psalm\IssueBuffer;
 use Psalm\CodeLocation;
-use Psalm\Internal\Type\Comparator\UnionTypeComparator;
-use Psalm\Plugin\EventHandler\AfterStatementAnalysisInterface;
-use Psalm\Plugin\EventHandler\Event\AfterStatementAnalysisEvent;
+use Psalm\Plugin\EventHandler\AfterFunctionLikeAnalysisInterface;
+use Psalm\Plugin\EventHandler\Event\AfterFunctionLikeAnalysisEvent;
 use Klimick\Decode\Decoder\RuntimeData;
 use Klimick\PsalmDecode\DecodeIssue;
 use Klimick\PsalmDecode\ObjectDecoder\GetGeneralParentClass;
-use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use Fp\Functional\Option\Option;
+use Psalm\Type;
+use function Fp\Cast\asList;
+use function Fp\Collection\first;
+use function Fp\Collection\firstOf;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
 use function Fp\Evidence\proveTrue;
 
-final class DefinitionReturnAnalysis implements AfterStatementAnalysisInterface
+final class DefinitionReturnAnalysis implements AfterFunctionLikeAnalysisInterface
 {
-    public static function afterStatementAnalysis(AfterStatementAnalysisEvent $event): ?bool
+    public static function afterStatementAnalysis(AfterFunctionLikeAnalysisEvent $event): ?bool
     {
         $analysis = Option::do(function() use ($event) {
             $context = $event->getContext();
             $source = $event->getStatementsSource();
-            $provider = $source->getNodeTypeProvider();
+            $provider = $event->getNodeTypeProvider();
             $codebase = $source->getCodebase();
 
             $self_class = yield proveString($context->self);
@@ -36,24 +40,47 @@ final class DefinitionReturnAnalysis implements AfterStatementAnalysisInterface
             yield proveTrue(RuntimeData::class === $general_class);
 
             $calling_method_id = yield proveString($context->calling_method_id);
-            yield proveTrue(str_contains($calling_method_id, '::definition'));
+            yield proveTrue(str_contains($calling_method_id, '::properties'));
 
-            $return_stmt = yield proveOf($event->getStmt(), Node\Stmt\Return_::class);
+            $class_method = yield proveOf($event->getStmt(), Node\Stmt\ClassMethod::class);
 
-            $return_decoder_type = yield Psalm::getType($provider, $return_stmt);
-            $expected_decoder_type = DecoderType::createObject($self_class);
+            $visitor = new ReturnTypeFinder();
+            $traverser = new NodeTraverser();
+            $traverser->addVisitor($visitor);
+            $traverser->traverse($class_method->stmts ?? []);
 
-            if (!UnionTypeComparator::isContainedBy($codebase, $return_decoder_type, $expected_decoder_type)) {
-                $issue = DecodeIssue::invalidRuntimeDataDefinition(
-                    $expected_decoder_type,
-                    $return_decoder_type,
-                    new CodeLocation($source, $return_stmt),
-                );
+            $return_stmt = yield $visitor->getReturn();
+
+            $is_return_type_valid = Psalm::getType($provider, $return_stmt)
+                ->filter(fn($return_type) => self::isReturnTypeValid($return_type))
+                ->map(fn() => true)
+                ->getOrElse(false);
+
+            if (!$is_return_type_valid) {
+                $code_location = new CodeLocation($source, $return_stmt);
+                $issue = DecodeIssue::invalidRuntimeDataDefinition($code_location);
 
                 IssueBuffer::accepts($issue);
             }
         });
 
         return $analysis->get();
+    }
+
+    private static function isReturnTypeValid(Type\Union $return_type): bool
+    {
+        $isValid = Option::do(function() use ($return_type) {
+            $atomics = asList($return_type->getAtomicTypes());
+            yield proveTrue(1 === count($atomics));
+
+            $decoder = yield firstOf($atomics, Type\Atomic\TGenericObject::class)
+                ->filter(fn($atomic) => AbstractDecoder::class === $atomic->value)
+                ->flatMap(fn($atomic) => first($atomic->type_params))
+                ->flatMap(fn($union) => Psalm::asSingleAtomic($union));
+
+            return $decoder instanceof Type\Atomic\TKeyedArray;
+        });
+
+        return $isValid->getOrElse(false);
     }
 }

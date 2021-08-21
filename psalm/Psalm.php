@@ -8,6 +8,8 @@ use PhpParser\Node;
 use Psalm\Type;
 use Fp\Functional\Option\Option;
 use Psalm\NodeTypeProvider;
+use function Fp\Cast\asList;
+use function Fp\Evidence\proveTrue;
 
 final class Psalm
 {
@@ -20,5 +22,18 @@ final class Psalm
     ): Option
     {
         return Option::fromNullable($type_provider->getType($node));
+    }
+
+    /**
+     * @return Option<Type\Atomic>
+     */
+    public static function asSingleAtomic(Type\Union $union): Option
+    {
+        return Option::do(function() use ($union) {
+            $atomics = asList($union->getAtomicTypes());
+            yield proveTrue(1 === count($atomics));
+
+            return $atomics[0];
+        });
     }
 }

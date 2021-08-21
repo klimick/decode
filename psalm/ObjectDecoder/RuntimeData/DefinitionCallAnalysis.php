@@ -24,7 +24,7 @@ final class DefinitionCallAnalysis implements AfterExpressionAnalysisInterface
             $method_call = yield proveOf($event->getExpr(), Node\Expr\StaticCall::class);
             $method_identifier = yield proveOf($method_call->name, Node\Identifier::class);
 
-            yield proveTrue('definition' === $method_identifier->name);
+            yield proveTrue('type' === $method_identifier->name);
 
             $class_node = yield proveOf($method_call->class, Node\Name::class);
             $class_name = yield proveString($class_node->getAttribute('resolvedName'));
