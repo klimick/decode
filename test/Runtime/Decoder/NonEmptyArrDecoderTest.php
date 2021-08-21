@@ -2,36 +2,35 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Test;
+namespace Klimick\Decode\Test\Runtime\Decoder;
 
 use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\DecoderGenerator;
 use Klimick\Decode\Test\Helper\Gen;
+use Klimick\Decode\Test\Helper\Predicate;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\Decoder\arr;
 use function Klimick\Decode\Decoder\arrKey;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\mixed;
+use function Klimick\Decode\Decoder\nonEmptyArr;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Test\Helper\forAll;
 
-final class ArrDecoderTest extends TestCase
+final class NonEmptyArrDecoderTest extends TestCase
 {
     public function testValidForAllArraysWithIntKey(): void
     {
         [$arrItemDecoder, $arrItemGen] = DecoderGenerator::generate();
 
         $arrGen = Gen::oneOf(
-            Gen::arr(Gen::int(), $arrItemGen),
             Gen::nonEmptyArr(Gen::int(), $arrItemGen),
-            Gen::arrList($arrItemGen),
             Gen::nonEmptyArrList($arrItemGen),
         );
 
         forAll($arrGen)
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(arr(int(), $arrItemDecoder))
+                Check::thatValidFor(nonEmptyArr(int(), $arrItemDecoder))
             );
     }
 
@@ -39,24 +38,19 @@ final class ArrDecoderTest extends TestCase
     {
         [$arrItemDecoder, $arrItemGen] = DecoderGenerator::generate();
 
-        $arrGen = Gen::oneOf(
-            Gen::arr(Gen::arrKey('string'), $arrItemGen),
-            Gen::nonEmptyArr(Gen::arrKey('string'), $arrItemGen),
-        );
-
-        forAll($arrGen)
+        forAll(Gen::nonEmptyArr(Gen::arrKey('string'), $arrItemGen))
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(arr(string(), $arrItemDecoder))
+                Check::thatValidFor(nonEmptyArr(string(), $arrItemDecoder))
             );
     }
 
-    public function testInvalidForAllNotArrays(): void
+    public function testInvalidForAllNotNonEmptyArrays(): void
     {
         forAll(Gen::mixed())
-            ->when(fn(mixed $v) => !is_array($v))
+            ->when(fn(mixed $v) => !Predicate::isNonEmptyArray($v))
             ->then(
-                Check::thatInvalidFor(arr(arrKey(), mixed()))
+                Check::thatInvalidFor(nonEmptyArr(arrKey(), mixed()))
             );
     }
 }

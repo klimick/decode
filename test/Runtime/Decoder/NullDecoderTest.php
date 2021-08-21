@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Test;
+namespace Klimick\Decode\Test\Runtime\Decoder;
 
 use Fp\Functional\Either\Right;
 use Klimick\Decode\Test\Helper\Check;
