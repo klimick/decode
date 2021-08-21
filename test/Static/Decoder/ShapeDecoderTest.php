@@ -62,7 +62,7 @@ final class ShapeDecoderTest
     public function testWithOptionalPropertyWithDefaultValue(): void
     {
         /** @psalm-suppress OptionalCallContradictionIssue */
-        $shape = shape(
+        $_shape = shape(
             name: string(),
             age: int()->default(42)->optional(),
             address: shape(
@@ -70,8 +70,19 @@ final class ShapeDecoderTest
                 postcode: int(),
             ),
         );
+    }
 
-        self::assertTypeShapeWithOptional(cast(anyValue(), $shape));
+    public function testWithAliasedProperty(): void
+    {
+        /** @psalm-suppress InvalidPropertyAliasIssue */
+        $_shape = shape(
+            name: string(),
+            age: int()->from('person_age'),
+            address: shape(
+                street: string(),
+                postcode: int(),
+            ),
+        );
     }
 
     /**

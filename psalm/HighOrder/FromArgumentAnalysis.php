@@ -6,7 +6,7 @@ namespace Klimick\PsalmDecode\HighOrder;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Issue\HighOrder\InvalidPropertyAliasIssue;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\CodeLocation;
@@ -49,8 +49,8 @@ final class FromArgumentAnalysis implements AfterMethodCallAnalysisInterface
                 ->get();
 
             if (!self::isValidArgument($literal_string)) {
-                $issue = DecodeIssue::invalidFromArgument(new CodeLocation($source, $method_call->name));
-                IssueBuffer::accepts($issue);
+                $issue = new InvalidPropertyAliasIssue(new CodeLocation($source, $method_call->name));
+                IssueBuffer::accepts($issue, $source->getSuppressedIssues());
             }
         });
     }
