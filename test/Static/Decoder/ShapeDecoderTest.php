@@ -20,6 +20,14 @@ use function Klimick\Decode\Test\Helper\anyValue;
  *         postcode: int,
  *     }
  * }
+ * @psalm-type WithPartialExpectedShapeType = array{
+ *     name: string,
+ *     age?: int,
+ *     address: array{
+ *         street: string,
+ *         postcode: int,
+ *     }
+ * }
  */
 final class ShapeDecoderTest
 {
@@ -34,14 +42,49 @@ final class ShapeDecoderTest
             ),
         );
 
-        $decoded = cast(anyValue(), $shape);
-        self::assertTypeShape($decoded);
+        self::assertTypeShape(cast(anyValue(), $shape));
+    }
+
+    public function testWithOptionalProperty(): void
+    {
+        $shape = shape(
+            name: string(),
+            age: int()->optional(),
+            address: shape(
+                street: string(),
+                postcode: int(),
+            ),
+        );
+
+        self::assertTypeShapeWithOptional(cast(anyValue(), $shape));
+    }
+
+    public function testWithOptionalPropertyWithDefaultValue(): void
+    {
+        /** @psalm-suppress OptionalCallContradictionIssue */
+        $shape = shape(
+            name: string(),
+            age: int()->default(42)->optional(),
+            address: shape(
+                street: string(),
+                postcode: int(),
+            ),
+        );
+
+        self::assertTypeShapeWithOptional(cast(anyValue(), $shape));
     }
 
     /**
      * @param Option<ExpectedShapeType> $_param
      */
     private static function assertTypeShape(Option $_param): void
+    {
+    }
+
+    /**
+     * @param Option<WithPartialExpectedShapeType> $_param
+     */
+    private static function assertTypeShapeWithOptional(Option $_param): void
     {
     }
 }

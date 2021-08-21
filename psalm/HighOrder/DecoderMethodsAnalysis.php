@@ -11,12 +11,14 @@ use Klimick\Decode\HighOrder\Brand\ConstrainedBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
 use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Issue\HighOrder\OptionalCallContradictionIssue;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\AfterMethodCallAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterMethodCallAnalysisEvent;
+use Psalm\StatementsSource;
 use Psalm\Type;
 use function Fp\Cast\asList;
 use function Fp\Collection\map;
@@ -63,7 +65,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
 
             $return_type = yield Option::fromNullable($current_type)
                 ->flatMap(fn($decoder_type) => self::simplifyToAtomic($decoder_type))
-                ->map(fn($decoder_atomic) => self::withBrand($code_location, $method_name, $decoder_atomic))
+                ->map(fn($decoder_atomic) => self::withBrand($source, $code_location, $decoder_atomic, $method_name))
                 ->map(fn($branded_decoder_atomic) => self::possiblyUndefinedIfHasOptionalBrand($branded_decoder_atomic))
                 ->map(fn($branded_decoder_atomic) => new Type\Union([$branded_decoder_atomic]));
 
@@ -91,19 +93,31 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
     /**
      * @psalm-param DecoderMethodsAnalysis::METHOD_* $method_name
      */
-    private static function withBrand(CodeLocation $code_location, string $method_name, Type\Atomic\TGenericObject $atomic): Type\Atomic\TGenericObject
+    private static function withBrand(
+        StatementsSource $source,
+        CodeLocation $code_location,
+        Type\Atomic\TGenericObject $atomic,
+        string $method_name,
+    ): Type\Atomic\TGenericObject
     {
         $with_brand = clone $atomic;
         $current_brands = map(asList($atomic->getIntersectionTypes() ?? []), fn(Type\Atomic $a) => $a->getId());
         $brand = self::METHODS_TO_BRANDS[$method_name];
 
         if (self::hasBrandContradiction($brand, $current_brands)) {
-            IssueBuffer::accepts(DecodeIssue::usingDefaultAndOptionalHasNoSense($code_location));
+            $issue = new OptionalCallContradictionIssue($code_location);
+            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
         }
 
-        in_array($brand, $current_brands, true)
-            ? IssueBuffer::accepts(DecodeIssue::brandAlreadyDefined($method_name, $code_location))
-            : $with_brand->addIntersectionType(new Type\Atomic\TNamedObject($brand));
+        if (in_array($brand, $current_brands, true)) {
+            $issue = DecodeIssue::brandAlreadyDefined($method_name, $code_location);
+            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+        }
+
+        $brand_type = new Type\Atomic\TNamedObject($brand);
+        $brand_type->from_docblock = true;
+
+        $with_brand->addIntersectionType($brand_type);
 
         return $with_brand;
     }
