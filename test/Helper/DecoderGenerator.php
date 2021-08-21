@@ -90,7 +90,7 @@ final class DecoderGenerator
      */
     public static function generate(int $level = 1): array
     {
-        $decoderName = $level <= 2
+        $decoderName = $level < 2
             ? self::DECODERS[array_rand(self::DECODERS)]
             : self::SIMPLE_DECODERS[array_rand(self::SIMPLE_DECODERS)];
 
