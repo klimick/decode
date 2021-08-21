@@ -7,10 +7,8 @@ namespace Klimick\Decode\Test\Static\Decoder;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Test\Static\Decoder\Fixtures\PartialPerson;
 use Klimick\Decode\Test\Static\Decoder\Fixtures\Person;
-use function Klimick\Decode\Decoder\bool;
 use function Klimick\Decode\Decoder\cast;
-use function Klimick\Decode\Decoder\arr;
-use function Klimick\Decode\Decoder\object;
+use function Klimick\Decode\Decoder\partialObject;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Test\Helper\anyValue;
@@ -19,27 +17,45 @@ final class PartialObjectDecoderTest
 {
     public function test(): void
     {
-        $decoded = cast(anyValue(), object(PartialPerson::class)(
+        $decoded = cast(anyValue(), partialObject(PartialPerson::class)(
             name: string(),
             age: int(),
         ));
 
-        self::assertTypePerson($decoded);
+        self::assertTypePartialPerson($decoded);
     }
 
     public function testMisspellPropertyName(): void
     {
-        // /** @psalm-suppress DecodeIssue */
-        // $_decoded = cast(anyValue(), object(PartialPerson::class)(
-        //     misspelled_name: string(),
-        //     age: int(),
-        // ));
+        /** @psalm-suppress RequiredObjectPropertyMissingIssue, NonexistentPropertyObjectPropertyIssue */
+        $_decoded = cast(anyValue(), partialObject(PartialPerson::class)(
+            misspelled_name: string(),
+            age: int(),
+        ));
+    }
+
+    public function testInvalidDecoderForProperty(): void
+    {
+        /** @psalm-suppress InvalidDecoderForPropertyIssue */
+        $_decoded = cast(anyValue(), partialObject(PartialPerson::class)(
+            name: string(),
+            age: string(),
+        ));
+    }
+
+    public function testInvalidPartialObject(): void
+    {
+        /** @psalm-suppress NotPartialPropertyIssue */
+        $_decoded = cast(anyValue(), partialObject(Person::class)(
+            name: string(),
+            age: int(),
+        ));
     }
 
     /**
      * @param Option<PartialPerson> $_param
      */
-    private static function assertTypePerson(Option $_param): void
+    private static function assertTypePartialPerson(Option $_param): void
     {
     }
 }

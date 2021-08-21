@@ -68,56 +68,6 @@ final class DecodeIssue extends CodeIssue
         );
     }
 
-    public static function invalidPropertyDecoder(
-        string $property,
-        Type\Union $actual_type,
-        Type\Union $expected_type,
-        CodeLocation $code_location,
-    ): self
-    {
-        $actual_type_decoder_type_param = $actual_type->possibly_undefined
-            ? "possibly-undefined|{$actual_type->getId()}>"
-            : $actual_type->getId();
-
-        return new self(
-            message: implode(' ', [
-                "Invalid decoder for property '{$property}'.",
-                "Expected: DecoderInterface<{$expected_type->getId()}>.",
-                "Actual: DecoderInterface<{$actual_type_decoder_type_param}>.",
-            ]),
-            code_location: $code_location,
-        );
-    }
-
-    /**
-     * @param non-empty-list<string> $missing_properties
-     */
-    public static function requiredPropertiesMissed(array $missing_properties, CodeLocation $code_location): self
-    {
-        $names = implode(', ', $missing_properties);
-
-        return new DecodeIssue(
-            message: "Required decoders for properties missed: {$names}",
-            code_location: $code_location,
-        );
-    }
-
-    public static function nonexistentProperty(string $property, CodeLocation $code_location): self
-    {
-        return new DecodeIssue(
-            message: "Property '{$property}' does not exist.",
-            code_location: $code_location,
-        );
-    }
-
-    public static function notPartialProperty(string $property, CodeLocation $code_location): self
-    {
-        return new DecodeIssue(
-            message: "Property '{$property}' must be nullable in source class.",
-            code_location: $code_location,
-        );
-    }
-
     /**
      * @param non-empty-list<string> $properties
      */

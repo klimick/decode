@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder;
 
+use Klimick\PsalmDecode\Issue\Object\InvalidDecoderForPropertyIssue;
+use Klimick\PsalmDecode\Issue\Object\NonexistentPropertyObjectPropertyIssue;
+use Klimick\PsalmDecode\Issue\Object\RequiredObjectPropertyMissingIssue;
+use Psalm\StatementsSource;
 use Psalm\Type;
 use Psalm\Codebase;
 use Psalm\IssueBuffer;
 use Psalm\CodeLocation;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
-use Klimick\PsalmDecode\DecodeIssue;
 
 final class ObjectPropertiesValidator
 {
@@ -20,6 +23,7 @@ final class ObjectPropertiesValidator
      */
     public static function checkPropertyTypes(
         Codebase $codebase,
+        StatementsSource $source,
         CodeLocation $method_code_location,
         array $arg_code_locations,
         array $expected_shape,
@@ -35,14 +39,14 @@ final class ObjectPropertiesValidator
                 continue;
             }
 
-            $issue = DecodeIssue::invalidPropertyDecoder(
+            $issue = new InvalidDecoderForPropertyIssue(
                 property: $property,
                 actual_type: $actual_shape[$property],
                 expected_type: $type,
                 code_location: $arg_code_locations[$property] ?? $method_code_location,
             );
 
-            IssueBuffer::accepts($issue);
+            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
         }
     }
 
@@ -55,6 +59,7 @@ final class ObjectPropertiesValidator
         array $actual_shape,
         array $expected_shape,
         array $arg_code_locations,
+        StatementsSource $source,
         CodeLocation $method_code_location,
     ): void
     {
@@ -63,12 +68,12 @@ final class ObjectPropertiesValidator
                 continue;
             }
 
-            $issue = DecodeIssue::nonexistentProperty(
+            $issue = new NonexistentPropertyObjectPropertyIssue(
                 property: $property,
                 code_location: $arg_code_locations[$property] ?? $method_code_location,
             );
 
-            IssueBuffer::accepts($issue);
+            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
         }
     }
 
@@ -77,6 +82,7 @@ final class ObjectPropertiesValidator
      * @param array<string, Type\Union> $actual_shape
      */
     public static function checkMissingProperties(
+        StatementsSource $source,
         CodeLocation $method_code_location,
         array $expected_shape,
         array $actual_shape,
@@ -91,12 +97,12 @@ final class ObjectPropertiesValidator
         }
 
         if (!empty($missing_properties)) {
-            $issue = DecodeIssue::requiredPropertiesMissed(
+            $issue = new RequiredObjectPropertyMissingIssue(
                 missing_properties: $missing_properties,
                 code_location: $method_code_location
             );
 
-            IssueBuffer::accepts($issue);
+            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
         }
     }
 }

@@ -6,9 +6,7 @@ namespace Klimick\Decode\Test\Static\Decoder;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Test\Static\Decoder\Fixtures\Person;
-use function Klimick\Decode\Decoder\bool;
 use function Klimick\Decode\Decoder\cast;
-use function Klimick\Decode\Decoder\arr;
 use function Klimick\Decode\Decoder\object;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Decoder\int;
@@ -28,11 +26,20 @@ final class ObjectDecoderTest
 
     public function testMisspellPropertyName(): void
     {
-        // /** @psalm-suppress DecodeIssue */
-        // $_decoded = cast(anyValue(), object(Person::class)(
-        //     misspelled_name: string(),
-        //     age: int(),
-        // ));
+         /** @psalm-suppress RequiredObjectPropertyMissingIssue, NonexistentPropertyObjectPropertyIssue */
+         $_decoded = cast(anyValue(), object(Person::class)(
+             misspelled_name: string(),
+             age: int(),
+         ));
+    }
+
+    public function testInvalidDecoderForProperty(): void
+    {
+        /** @psalm-suppress InvalidDecoderForPropertyIssue */
+        $_decoded = cast(anyValue(), object(Person::class)(
+            name: string(),
+            age: string(),
+        ));
     }
 
     /**

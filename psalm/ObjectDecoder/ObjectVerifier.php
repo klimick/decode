@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder;
 
+use Klimick\PsalmDecode\Issue\Object\NotPartialPropertyIssue;
 use Psalm\Type;
 use Psalm\Codebase;
 use Psalm\IssueBuffer;
@@ -12,7 +13,6 @@ use Psalm\StatementsSource;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Internal\Type\TypeExpander;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
-use Klimick\PsalmDecode\DecodeIssue;
 use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use Klimick\PsalmDecode\ShapeDecoder\ShapePropertiesExtractor;
 use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
@@ -52,6 +52,7 @@ final class ObjectVerifier
 
             self::compareSideBySide(
                 codebase: $codebase,
+                source: $source,
                 actual_decoder_type: $actual_shape,
                 expected_decoder_type: $call_info['expected_shape'],
                 method_code_location: $call_info['call_location'],
@@ -86,7 +87,7 @@ final class ObjectVerifier
             $arg_locations = yield self::extractArgLocations($event, $source);
 
             $call_location = $event->getCodeLocation();
-            $decoder_type = self::inferDecoderType($codebase, $class_storage, $call_location, $arg_locations, $is_partial);
+            $decoder_type = self::inferDecoderType($codebase, $source, $class_storage, $call_location, $arg_locations, $is_partial);
 
             return [
                 'call_location' => $call_location,
@@ -101,6 +102,7 @@ final class ObjectVerifier
      */
     private static function inferDecoderType(
         Codebase $codebase,
+        StatementsSource $source,
         ClassLikeStorage $class_storage,
         CodeLocation $call_location,
         array $arg_locations,
@@ -113,12 +115,12 @@ final class ObjectVerifier
             $shape[$property] = self::expandType($codebase, $class_storage, $storage->type ?? Type::getMixed());
 
             if ($partial && !$shape[$property]->isNullable()) {
-                $issue = DecodeIssue::notPartialProperty(
+                $issue = new NotPartialPropertyIssue(
                     property: $property,
                     code_location: $arg_locations[$property] ?? $call_location,
                 );
 
-                IssueBuffer::accepts($issue);
+                IssueBuffer::accepts($issue, $source->getSuppressedIssues());
             }
         }
 
@@ -199,19 +201,20 @@ final class ObjectVerifier
      */
     private static function compareSideBySide(
         Codebase $codebase,
+        StatementsSource $source,
         Type\Union $actual_decoder_type,
         Type\Union $expected_decoder_type,
         CodeLocation $method_code_location,
         array $arg_code_locations,
     ): void
     {
-        Option::do(function() use ($actual_decoder_type, $expected_decoder_type, $method_code_location, $arg_code_locations, $codebase) {
+        Option::do(function() use ($actual_decoder_type, $expected_decoder_type, $method_code_location, $arg_code_locations, $codebase, $source) {
             $actual_shape = yield ShapePropertiesExtractor::fromDecoder($actual_decoder_type);
             $expected_shape = yield ShapePropertiesExtractor::fromDecoder($expected_decoder_type);
 
-            ObjectPropertiesValidator::checkPropertyTypes($codebase, $method_code_location, $arg_code_locations, $expected_shape, $actual_shape);
-            ObjectPropertiesValidator::checkNonexistentProperties($actual_shape, $expected_shape, $arg_code_locations, $method_code_location);
-            ObjectPropertiesValidator::checkMissingProperties($method_code_location, $expected_shape, $actual_shape);
+            ObjectPropertiesValidator::checkPropertyTypes($codebase, $source, $method_code_location, $arg_code_locations, $expected_shape, $actual_shape);
+            ObjectPropertiesValidator::checkNonexistentProperties($actual_shape, $expected_shape, $arg_code_locations, $source, $method_code_location);
+            ObjectPropertiesValidator::checkMissingProperties($source, $method_code_location, $expected_shape, $actual_shape);
         });
     }
 }
