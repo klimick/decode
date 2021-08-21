@@ -149,16 +149,16 @@
         },
         {
             "name": "whsv26/functional",
-            "version": "v2.0.3",
+            "version": "v2.2.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/whsv26/functional.git",
-                "reference": "a3320fcf4fe5c1c34b1f164c1b4dc0a1694941d2"
+                "reference": "fa3f36d239798da14122c053b44eccf0ee2bc229"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/whsv26/functional/zipball/a3320fcf4fe5c1c34b1f164c1b4dc0a1694941d2",
-                "reference": "a3320fcf4fe5c1c34b1f164c1b4dc0a1694941d2",
+                "url": "https://api.github.com/repos/whsv26/functional/zipball/fa3f36d239798da14122c053b44eccf0ee2bc229",
+                "reference": "fa3f36d239798da14122c053b44eccf0ee2bc229",
                 "shasum": ""
             },
             "require": {
@@ -175,11 +175,12 @@
                 "phpunit/phpunit": "^9",
                 "rregeer/phpunit-coverage-check": "^0.3.1",
                 "symfony/process": "^5.2",
-                "vimeo/psalm": "^4.7"
+                "vimeo/psalm": "^4.8"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
+                    "Fp\\Collections\\": "src/Fp/Collections",
                     "Fp\\Functional\\": "src/Fp/Functional",
                     "Fp\\Psalm\\": "src/Fp/Psalm"
                 },
@@ -197,12 +198,14 @@
                     "src/Fp/Functions/Cast/AsNonEmptyList.php",
                     "src/Fp/Functions/Collection/At.php",
                     "src/Fp/Functions/Collection/ButLast.php",
+                    "src/Fp/Functions/Collection/Chunks.php",
                     "src/Fp/Functions/Collection/Every.php",
                     "src/Fp/Functions/Collection/Exists.php",
                     "src/Fp/Functions/Collection/Filter.php",
                     "src/Fp/Functions/Collection/First.php",
                     "src/Fp/Functions/Collection/FlatMap.php",
                     "src/Fp/Functions/Collection/Fold.php",
+                    "src/Fp/Functions/Collection/ForAll.php",
                     "src/Fp/Functions/Collection/Group.php",
                     "src/Fp/Functions/Collection/Head.php",
                     "src/Fp/Functions/Collection/IsSequence.php",
@@ -252,9 +255,9 @@
             "description": "PHP Functional Programming library",
             "support": {
                 "issues": "https://github.com/whsv26/functional/issues",
-                "source": "https://github.com/whsv26/functional/tree/v2.0.3"
+                "source": "https://github.com/whsv26/functional/tree/v2.2.3"
             },
-            "time": "2021-06-09T20:14:01+00:00"
+            "time": "2021-08-19T16:02:46+00:00"
         }
     ],
     "packages-dev": [
