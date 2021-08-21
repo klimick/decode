@@ -7,7 +7,6 @@ namespace Klimick\PsalmDecode\HighOrder;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\HighOrder\Brand\FromBrand;
-use Klimick\Decode\HighOrder\Brand\ConstrainedBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
 use Klimick\PsalmDecode\Issue\HighOrder\BrandAlreadyDefinedIssue;
@@ -29,13 +28,11 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
 {
     private const METHODS_TO_BRANDS = [
         self::METHOD_OPTIONAL => OptionalBrand::class,
-        self::METHOD_CONSTRAINED => ConstrainedBrand::class,
         self::METHOD_FROM => FromBrand::class,
         self::METHOD_DEFAULT => DefaultBrand::class,
     ];
 
     private const METHOD_OPTIONAL = 'optional';
-    private const METHOD_CONSTRAINED = 'constrained';
     private const METHOD_FROM = 'from';
     private const METHOD_DEFAULT = 'default';
 
