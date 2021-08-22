@@ -32,6 +32,13 @@ final class ArrListDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
+        if (is_array($value)) {
+            foreach (array_keys($value) as $k) {
+                if (is_int($k)) continue;
+                return invalid($context);
+            }
+        }
+
         return arr(int(), $this->decoder)
             ->decode($value, $context)
             ->flatMap(function(Valid $valid) use ($context) {

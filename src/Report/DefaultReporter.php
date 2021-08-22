@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Report;
 
+use Klimick\Decode\Decoder\DecodeErrorInterface;
+use Klimick\Decode\Decoder\UnionTypeErrors;
 use ReflectionClass;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Invalid;
@@ -19,13 +21,31 @@ final class DefaultReporter
 
     public static function report(Invalid $invalid, bool $useShortClassNames = false): ErrorReport
     {
+        return self::reportErrors($invalid->errors, $useShortClassNames);
+    }
+
+    /**
+     * @param non-empty-list<DecodeErrorInterface> $errors
+     * @return ErrorReport
+     */
+    private static function reportErrors(array $errors, bool $useShortClassNames = false): ErrorReport
+    {
         $typeErrors = [];
+        $unionTypeErrors = [];
         $constraintErrors = [];
         $undefinedErrors = [];
 
-        foreach ($invalid->errors as $error) {
+        foreach ($errors as $error) {
             if ($error instanceof TypeError) {
                 $typeErrors[] = self::reportTypeError($error, $useShortClassNames);
+            } elseif ($error instanceof UnionTypeErrors) {
+                $e = [];
+
+                foreach ($error->errors as $typename => $errors) {
+                    $e[$typename] = self::reportErrors($errors, $useShortClassNames);
+                }
+
+                $unionTypeErrors[] = $e;
             } elseif ($error instanceof ConstraintsError) {
                 $constraintErrors = [
                     ...$constraintErrors,
@@ -36,7 +56,7 @@ final class DefaultReporter
             }
         }
 
-        return new ErrorReport($typeErrors, $constraintErrors, $undefinedErrors);
+        return new ErrorReport($typeErrors, $unionTypeErrors, $constraintErrors, $undefinedErrors);
     }
 
     private static function reportConstraintError(ConstraintError $error): ConstraintErrorReport

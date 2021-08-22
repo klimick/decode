@@ -7,9 +7,8 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use function Klimick\Decode\Decoder\int;
-use function Klimick\Decode\Decoder\string;
-use function Klimick\Decode\Decoder\union;
+use function Klimick\Decode\Decoder\invalid;
+use function Klimick\Decode\Decoder\valid;
 
 /**
  * @extends AbstractDecoder<array-key>
@@ -24,6 +23,10 @@ final class ArrKeyDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
-        return union(int(), string())->decode($value, $context);
+        if (!is_int($value) && !is_string($value)) {
+            return invalid($context);
+        }
+
+        return valid($value);
     }
 }

@@ -11,7 +11,7 @@ use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use function Klimick\Decode\Decoder\valid;
 
 /**
- * @template T of object
+ * @template-covariant T of object
  * @extends AbstractDecoder<T>
  * @psalm-immutable
  */

@@ -6,13 +6,14 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
+use Klimick\Decode\Decoder\UnionTypeErrors;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\Decoder\valid;
 use function Klimick\Decode\Decoder\invalids;
 
 /**
- * @template T
+ * @template-covariant T
  * @extends AbstractDecoder<T>
  * @psalm-immutable
  */
@@ -43,17 +44,21 @@ final class UnionDecoder extends AbstractDecoder
         $errors = [];
 
         foreach ($this->decoders as $decoder) {
+            $typename = $decoder->name();
+
             $result = $decoder
-                ->decode($value, $context->append($decoder->name(), $value))
+                ->decode($value, $context->append($typename, $value))
                 ->get();
 
             if ($result instanceof Valid) {
                 return valid($result->value);
             }
 
-            $errors = [...$errors, ...$result->errors];
+            $errors[$typename] = $result->errors;
         }
 
-        return invalids($errors);
+        return invalids([
+            new UnionTypeErrors($errors),
+        ]);
     }
 }
