@@ -44,10 +44,12 @@ abstract class RuntimeData implements JsonSerializable
         return $this->properties;
     }
 
-    public static function type(): AbstractDecoder
+    /**
+     * @return ObjectDecoder<static>
+     */
+    public static function type(): ObjectDecoder
     {
         $shapeDecoder = static::properties();
-        assert($shapeDecoder instanceof ShapeDecoder, 'Must be type checked via psalm plugin');
 
         return new ObjectDecoder(
             objectClass: static::class,
@@ -56,5 +58,5 @@ abstract class RuntimeData implements JsonSerializable
         );
     }
 
-    abstract protected static function properties(): AbstractDecoder;
+    abstract protected static function properties(): ShapeDecoder;
 }

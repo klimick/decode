@@ -19,8 +19,7 @@ final class RuntimeDecoder
     {
         return Option::some($class_string)
             ->filter(fn($class_string) => is_a($class_string, RuntimeData::class, true))
-            ->flatMap(fn($class_string) => Option::try(fn() => $class_string::type()))
-            ->filter(fn($decoder) => $decoder instanceof ObjectDecoder);
+            ->flatMap(fn($class_string) => Option::try(fn() => $class_string::type()));
     }
 
     /**

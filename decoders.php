@@ -319,11 +319,10 @@ function shape(AbstractDecoder ...$decoders): AbstractDecoder
 }
 
 /**
- * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T> ...$decoders
- * @return AbstractDecoder<array<string, T>>
+ * @psalm-param AbstractDecoder ...$decoders
+ * @return AbstractDecoder<array<string, mixed>>
  *
  * @see PartialShapeReturnTypeProvider
  */
@@ -376,7 +375,7 @@ function rec(callable $type): AbstractDecoder
  * @psalm-param AbstractDecoder<T> $first
  * @psalm-param AbstractDecoder<T> $second
  * @psalm-param AbstractDecoder<T> ...$rest
- * @return AbstractDecoder<T>
+ * @psalm-return AbstractDecoder<T> & Internal\UnionDecoder<T>
  */
 function union(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest): AbstractDecoder
 {

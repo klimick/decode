@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test\Static\Fixtures;
 
-use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\RuntimeData;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
 
@@ -14,7 +14,7 @@ use function Klimick\Decode\Decoder\string;
  */
 final class Message extends RuntimeData
 {
-    protected static function properties(): AbstractDecoder
+    protected static function properties(): ShapeDecoder
     {
         return shape(
             id: string(),
