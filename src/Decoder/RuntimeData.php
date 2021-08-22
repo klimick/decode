@@ -45,9 +45,9 @@ abstract class RuntimeData implements JsonSerializable
     }
 
     /**
-     * @return ObjectDecoder<static>
+     * @psalm-return AbstractDecoder<static> & ObjectDecoder<static>
      */
-    public static function type(): ObjectDecoder
+    public static function type(): AbstractDecoder
     {
         $shapeDecoder = static::properties();
 
