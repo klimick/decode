@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
+use Klimick\PsalmDecode\Issue\Object\IntersectionCollisionIssue;
 use Klimick\PsalmDecode\Psalm;
 use Psalm\Type;
 use Psalm\IssueBuffer;
 use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
-use Klimick\PsalmDecode\DecodeIssue;
 use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
 use Fp\Functional\Option\Option;
 use function Fp\Evidence\proveOf;
@@ -47,8 +47,8 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
             }
 
             if (!empty($collisions)) {
-                $issue = DecodeIssue::intersectionCollision($collisions, $event->getCodeLocation());
-                IssueBuffer::accepts($issue);
+                $issue = new IntersectionCollisionIssue($collisions, $event->getCodeLocation());
+                IssueBuffer::accepts($issue, $source->getSuppressedIssues());
             }
 
             return DecoderType::createShape($properties);

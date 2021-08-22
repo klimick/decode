@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\PsalmDecode\Issue\RuntimeData\InvalidRuntimeDataDefinitionIssue;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
@@ -13,7 +14,6 @@ use Psalm\CodeLocation;
 use Psalm\Plugin\EventHandler\AfterFunctionLikeAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterFunctionLikeAnalysisEvent;
 use Klimick\Decode\Decoder\RuntimeData;
-use Klimick\PsalmDecode\DecodeIssue;
 use Klimick\PsalmDecode\ObjectDecoder\GetGeneralParentClass;
 use Fp\Functional\Option\Option;
 use Psalm\Type;
@@ -58,9 +58,9 @@ final class DefinitionReturnAnalysis implements AfterFunctionLikeAnalysisInterfa
 
             if (!$is_return_type_valid) {
                 $code_location = new CodeLocation($source, $return_stmt);
-                $issue = DecodeIssue::invalidRuntimeDataDefinition($code_location);
+                $issue = new InvalidRuntimeDataDefinitionIssue($code_location);
 
-                IssueBuffer::accepts($issue);
+                IssueBuffer::accepts($issue, $source->getSuppressedIssues());
             }
         });
 

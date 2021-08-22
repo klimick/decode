@@ -7,7 +7,9 @@ namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Report\DefaultReporter;
 use Klimick\Decode\Report\ErrorReport;
-use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Issue\RuntimeData\CouldNotAnalyzeOfCallIssue;
+use Klimick\PsalmDecode\Issue\RuntimeData\RuntimeDataPropertyMissingIssue;
+use Klimick\PsalmDecode\Issue\RuntimeData\RuntimeDataTypeErrorIssue;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Fp\Functional\Option\Option;
@@ -46,11 +48,10 @@ final class OfCallAnalysis implements AfterExpressionAnalysisInterface
 
             $arg_type = yield Psalm::getType($type_provider, $method_call->args[0]->value);
 
-            $value = LiteralKeyedArray::toPhpValue($arg_type)->getOrElse(
-                DecodeIssue::couldNotAnalyzeOfCall(new CodeLocation($source, $method_call))
-            );
+            $value = LiteralKeyedArray::toPhpValue($arg_type)
+                ->getOrElse(CouldNotAnalyzeOfCallIssue::from($source, $method_call));
 
-            if ($value instanceof DecodeIssue) {
+            if ($value instanceof CouldNotAnalyzeOfCallIssue) {
                 IssueBuffer::accepts($value, $source->getSuppressedIssues());
                 return;
             }
@@ -82,14 +83,9 @@ final class OfCallAnalysis implements AfterExpressionAnalysisInterface
     ): void
     {
         foreach ($report->typeErrors as $error) {
-            $actual_type = get_debug_type($error->actual);
-
-            $issue = new DecodeIssue(
-                message: implode(' ', [
-                    "Wrong value at {$error->path}.",
-                    "Expected type: {$error->expected}.",
-                    "Actual type: {$actual_type}",
-                ]),
+            $issue = new RuntimeDataTypeErrorIssue(
+                error: $error,
+                actual_type: get_debug_type($error->actual),
                 code_location: $property_locations[$error->path] ?? $call_code_location,
             );
 
@@ -97,8 +93,8 @@ final class OfCallAnalysis implements AfterExpressionAnalysisInterface
         }
 
         foreach ($report->undefinedErrors as $error) {
-            $issue = new DecodeIssue(
-                message: "Undefined property '{$error->property}' at path {$error->path}",
+            $issue = new RuntimeDataPropertyMissingIssue(
+                error: $error,
                 code_location: $property_locations[$error->path] ?? $call_code_location,
             );
 

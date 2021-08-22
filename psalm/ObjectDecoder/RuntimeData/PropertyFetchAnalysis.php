@@ -6,7 +6,7 @@ namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Fp\Functional\Option\Option;
 
-use Klimick\PsalmDecode\DecodeIssue;
+use Klimick\PsalmDecode\Issue\RuntimeData\UndefinedPropertyFetchIssue;
 use PhpParser\Node;
 use Psalm\CodeLocation;
 use Psalm\Type;
@@ -36,7 +36,9 @@ final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface
             if (array_key_exists($identifier->name, $properties)) {
                 $provider->setType($property_fetch, $properties[$identifier->name]);
             } else {
-                $issue = DecodeIssue::undefinedPropertyFetch(new CodeLocation($source, $property_fetch), $class_string, $identifier->name);
+                $code_location = new CodeLocation($source, $property_fetch);
+                $issue = new UndefinedPropertyFetchIssue($code_location, $class_string, $identifier->name);
+
                 IssueBuffer::accepts($issue, $source->getSuppressedIssues());
             }
         });
