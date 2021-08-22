@@ -56,7 +56,7 @@ final class OfCallAnalysis implements AfterExpressionAnalysisInterface
                 return;
             }
 
-            $decoder = yield RuntimeDecoder::instance($class_string);
+            $decoder = yield RuntimeDecoder::getDecoderTypeFromRuntime($class_string);
 
             $decoded = decode($value, $decoder)
                 ->mapLeft(fn(Invalid $invalid) => DefaultReporter::report($invalid));

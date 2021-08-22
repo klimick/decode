@@ -6,7 +6,7 @@ namespace Klimick\Decode\Test\Static\Decoder;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Test\Static\Decoder\Fixtures\Department;
+use Klimick\Decode\Test\Static\Fixtures\Department;
 use function Klimick\Decode\Decoder\arrList;
 use function Klimick\Decode\Decoder\cast;
 use function Klimick\Decode\Decoder\object;

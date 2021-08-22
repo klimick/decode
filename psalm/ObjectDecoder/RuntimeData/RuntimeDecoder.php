@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
+use Klimick\PsalmDecode\Psalm;
 use Psalm\Type;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Decoder\RuntimeData;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Fp\Functional\Option\Option;
-use function Fp\Cast\asList;
-use function Fp\Collection\firstOf;
-use function Fp\Evidence\proveOf;
-use function Fp\Evidence\proveTrue;
 
 final class RuntimeDecoder
 {
     /**
-     * @return Option<AbstractDecoder>
+     * @return Option<ObjectDecoder>
      */
-    public static function instance(string $class_string): Option
+    public static function getDecoderTypeFromRuntime(string $class_string): Option
     {
-        return Option::do(function() use ($class_string) {
-            yield proveTrue(is_a($class_string, RuntimeData::class, true));
-
-            return yield Option::try(fn() => $class_string::type());
-        });
+        return Option::some($class_string)
+            ->filter(fn($class_string) => is_a($class_string, RuntimeData::class, true))
+            ->flatMap(fn($class_string) => Option::try(fn() => $class_string::type()))
+            ->filter(fn($decoder) => $decoder instanceof ObjectDecoder);
     }
 
     /**
@@ -34,18 +29,11 @@ final class RuntimeDecoder
      */
     public static function getProperties(string $class_string): Option
     {
-        return Option::do(function() use ($class_string) {
-            $decoder = yield self::instance($class_string);
-
-            $shape_type = yield proveOf($decoder, ShapeDecoder::class)
-                ->map(fn($object_decoder) => $object_decoder->name())
-                ->flatMap(fn($type) => Option::try(fn() => Type::parseString($type)));
-
-            $atomics = asList($shape_type->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            return yield firstOf($atomics, Type\Atomic\TKeyedArray::class)
-                ->map(fn($keyed_array) => $keyed_array->properties);
-        });
+        return self::getDecoderTypeFromRuntime($class_string)
+            ->map(fn($object_decoder) => $object_decoder->shape->name())
+            ->flatMap(fn($typename) => Option::try(fn() => Type::parseString($typename)))
+            ->flatMap(fn($shape_type) => Psalm::asSingleAtomic($shape_type))
+            ->filter(fn($atomic) => $atomic instanceof Type\Atomic\TKeyedArray)
+            ->map(fn($keyed_array) => $keyed_array->properties);
     }
 }

@@ -19,9 +19,7 @@ final class LiteralKeyedArray
     {
         return Option::do(function() use ($union) {
             $atomics = asList($union->getAtomicTypes());
-
             yield proveTrue(1 === count($atomics));
-            yield proveTrue($atomics[0]::class === Atomic\TKeyedArray::class);
 
             return yield self::fromLiteralAtomic($atomics[0]);
         });

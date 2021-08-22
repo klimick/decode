@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Test\Static\Decoder\Fixtures;
+namespace Klimick\Decode\Test\Static\Fixtures;
 
 /**
  * @psalm-immutable

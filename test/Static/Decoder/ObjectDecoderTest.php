@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Static\Decoder;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Test\Static\Decoder\Fixtures\Person;
+use Klimick\Decode\Test\Static\Fixtures\Person;
 use function Klimick\Decode\Decoder\cast;
 use function Klimick\Decode\Decoder\object;
 use function Klimick\Decode\Decoder\string;
