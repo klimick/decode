@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Psalm\Type;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\Decode\Decoder\AbstractDecoder;
 
 final class DecoderType
@@ -25,17 +25,6 @@ final class DecoderType
         $decoder_atomic->addIntersectionType(new Type\Atomic\TGenericObject(ShapeDecoder::class, [$properties_atomic]));
 
         return new Type\Union([$decoder_atomic]);
-    }
-
-    public static function createObject(string $class): Type\Union
-    {
-        return new Type\Union([
-            new Type\Atomic\TGenericObject(AbstractDecoder::class, [
-                new Type\Union([
-                    new Type\Atomic\TNamedObject($class),
-                ])
-            ]),
-        ]);
     }
 
     public static function withTypeParameter(Type\Union $type_parameter): Type\Union
