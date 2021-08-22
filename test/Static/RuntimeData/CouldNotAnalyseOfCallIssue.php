@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test\Static\RuntimeData;
 
+use DateTimeImmutable;
 use Klimick\Decode\Test\Static\Fixtures\Message;
 
 final class CouldNotAnalyseOfCallIssue
 {
     public function test(): void
     {
-        /** @var string $id */
+        /** @var DateTimeImmutable $id */
         $id = '...';
 
         /** @var non-empty-string $senderId */

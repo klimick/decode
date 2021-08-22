@@ -74,13 +74,39 @@ final class LiteralKeyedArray
                 return [];
             }
 
-            yield proveTrue(
-                $atomic instanceof Atomic\TLiteralString ||
-                $atomic instanceof Atomic\TLiteralFloat ||
-                $atomic instanceof Atomic\TLiteralInt
-            );
+            if ($atomic instanceof Atomic\TLiteralString) {
+                return $atomic->value;
+            }
 
-            return $atomic->value;
+            if ($atomic instanceof Atomic\TNonEmptyString) {
+                return '...';
+            }
+
+            if ($atomic instanceof Atomic\TString) {
+                return '';
+            }
+
+            if ($atomic instanceof Atomic\TLiteralFloat) {
+                return $atomic->value;
+            }
+
+            if ($atomic instanceof Atomic\TFloat) {
+                return 0.0;
+            }
+
+            if ($atomic instanceof Atomic\TLiteralInt) {
+                return $atomic->value;
+            }
+
+            if ($atomic instanceof Atomic\TPositiveInt) {
+                return 1;
+            }
+
+            if ($atomic instanceof Atomic\TInt) {
+                return 0;
+            }
+
+            return yield Option::none();
         });
     }
 }
