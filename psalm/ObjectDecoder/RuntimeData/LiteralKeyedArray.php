@@ -77,7 +77,6 @@ final class LiteralKeyedArray
             }
 
             yield proveTrue(
-                $atomic instanceof Atomic\TLiteralClassString ||
                 $atomic instanceof Atomic\TLiteralString ||
                 $atomic instanceof Atomic\TLiteralFloat ||
                 $atomic instanceof Atomic\TLiteralInt

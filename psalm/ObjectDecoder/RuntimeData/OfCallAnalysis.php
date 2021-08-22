@@ -64,13 +64,7 @@ final class OfCallAnalysis implements AfterExpressionAnalysisInterface
                 $call_code_location = new CodeLocation($source, $method_call);
                 $property_locations = yield self::getPropertyLocations($method_call, $source);
 
-                /**
-                 * @var ErrorReport $report
-                 * @ignore-var
-                 */
-                $report = $decoded->get();
-
-                self::reportIssues($report, $source, $call_code_location, $property_locations);
+                self::reportIssues($decoded->get(), $source, $call_code_location, $property_locations);
             }
         });
 
@@ -96,17 +90,6 @@ final class OfCallAnalysis implements AfterExpressionAnalysisInterface
                     "Expected type: {$error->expected}.",
                     "Actual type: {$actual_type}",
                 ]),
-                code_location: $property_locations[$error->path] ?? $call_code_location,
-            );
-
-            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
-        }
-
-        foreach ($report->constraintErrors as $error) {
-            $payload = json_encode($error->payload);
-
-            $issue = new DecodeIssue(
-                message: "Constraint violation: {$error->constraint}. Payload: {$payload}",
                 code_location: $property_locations[$error->path] ?? $call_code_location,
             );
 
