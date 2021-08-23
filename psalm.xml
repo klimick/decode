@@ -15,17 +15,20 @@
         <InternalClass>
             <errorLevel type="suppress">
                 <directory name="psalm"/>
+                <directory name="psalm-test"/>
             </errorLevel>
         </InternalClass>
         <InternalMethod>
             <errorLevel type="suppress">
                 <directory name="psalm"/>
+                <directory name="psalm-test"/>
             </errorLevel>
         </InternalMethod>
     </issueHandlers>
     <plugins>
         <pluginClass class="Klimick\PsalmDecode\Plugin"/>
         <pluginClass class="Klimick\PsalmShowType\ShowTypePlugin"/>
+        <pluginClass class="Klimick\PsalmTest\Integration\Plugin"/>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
         <pluginClass class="Fp\Psalm\FunctionalPlugin"/>
     </plugins>

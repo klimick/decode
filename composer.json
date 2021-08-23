@@ -12,6 +12,7 @@
     "autoload": {
         "psr-4": {
             "Klimick\\Decode\\": ["./src"],
+            "Klimick\\PsalmTest\\": ["./psalm-test"],
             "Klimick\\PsalmDecode\\": ["./psalm"]
         },
         "files": [
