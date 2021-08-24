@@ -85,7 +85,7 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
 
         return LinkedList::collect($handlers)
             ->filter(fn($handler) => $handler::isSupported($context))
-            ->fold($assertions, fn(Assertions $acc, $collector) => $collector::collect($acc, $context)->getOrElse($acc));
+            ->fold($assertions, fn(Assertions $acc, $collector) => $collector::collect($acc, $context)->get() ?? $acc);
     }
 
     /**

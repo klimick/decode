@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmTest\Integration;
 
+use Klimick\PsalmTest\Integration\Hook\OptionalReturnTypeProvider;
+use Klimick\PsalmTest\Integration\Hook\ShapeReturnTypeProvider;
 use Klimick\PsalmTest\Integration\Hook\TestCaseAnalysis;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
@@ -18,6 +20,8 @@ final class Plugin implements PluginEntryPointInterface
             $registration->registerHooksFromClass($hook);
         };
 
+        $register(ShapeReturnTypeProvider::class);
+        $register(OptionalReturnTypeProvider::class);
         $register(TestCaseAnalysis::class);
     }
 }
