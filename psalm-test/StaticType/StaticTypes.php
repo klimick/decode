@@ -4,32 +4,39 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmTest\StaticType;
 
+use Klimick\PsalmTest\NoCode;
+
 final class StaticTypes
 {
-    /**
-     * @psalm-return StaticTypeInterface<string> & StringStaticType
-     */
-    public static function string(): StaticTypeInterface
+    public static function shape(array $types): StaticTypeInterface
     {
-        return new StringStaticType();
+        NoCode::here();
     }
 
     /**
-     * @return StaticTypeInterface<int> & IntStaticType
+     * @psalm-return StaticTypeInterface<string>
+     */
+    public static function string(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @return StaticTypeInterface<int>
      */
     public static function int(): StaticTypeInterface
     {
-        return new IntStaticType();
+        NoCode::here();
     }
 
     /**
      * @template T of scalar
      *
      * @param T $literal
-     * @return StaticTypeInterface<T> & StaticLiteralType<T>
+     * @return StaticTypeInterface<T>
      */
     public static function literal(mixed $literal): StaticTypeInterface
     {
-        return new StaticLiteralType($literal);
+        NoCode::here();
     }
 }

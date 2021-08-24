@@ -20,11 +20,11 @@ final class StaticTestCase
 
     public function seeReturnType(StaticTypeInterface $is, bool $invariant = true): self
     {
-        return $this;
+        NoCode::here();
     }
 
     public function seePsalmIssue(string $type, string $message): self
     {
-        return $this;
+        NoCode::here();
     }
 }

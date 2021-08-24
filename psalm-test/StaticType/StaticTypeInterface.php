@@ -11,5 +11,8 @@ use Psalm\Type;
  */
 interface StaticTypeInterface
 {
-    public function toPsalm(): Type\Union;
+    /**
+     * @return StaticTypeInterface<T>
+     */
+    public function optional(): StaticTypeInterface;
 }

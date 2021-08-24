@@ -10,6 +10,6 @@ final class PsalmCodeBlockFactory
 {
     public function haveCode(Closure $codeBlock): StaticTestCase
     {
-        return new StaticTestCase($codeBlock);
+        NoCode::here();
     }
 }
