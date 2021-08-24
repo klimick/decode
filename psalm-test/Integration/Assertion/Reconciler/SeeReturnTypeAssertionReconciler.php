@@ -35,14 +35,10 @@ final class SeeReturnTypeAssertionReconciler implements AssertionReconcilerInter
 
     private static function isValid(Type\Union $expected, Type\Union $actual, bool $invariant): bool
     {
-        if ($invariant) {
-            return $expected->equals($actual);
-        }
+        $codebase = ProjectAnalyzer::$instance->getCodebase();
 
-        return UnionTypeComparator::isContainedBy(
-            codebase: ProjectAnalyzer::$instance->getCodebase(),
-            input_type: $actual,
-            container_type: $expected,
-        );
+        return $invariant
+            ? UnionTypeComparator::canExpressionTypesBeIdentical($codebase, $actual, $expected)
+            : UnionTypeComparator::isContainedBy($codebase, $actual, $expected);
     }
 }

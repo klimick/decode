@@ -6,6 +6,7 @@ namespace Klimick\PsalmTest\Integration\Assertion\Collector;
 
 use Fp\Functional\Option\Option;
 use Klimick\PsalmTest\Integration\Assertion\Assertions;
+use Psalm\Type;
 use Psalm\Type\Atomic\TClosure;
 use function Fp\Collection\first;
 
@@ -16,7 +17,7 @@ final class HaveCodeAssertionCollector implements AssertionCollectorInterface
         return first($context->assertion_call->args)
             ->flatMap(fn($arg) => $context->getSingleAtomicType($arg->value))
             ->filter(fn($atomic) => $atomic instanceof TClosure)
-            ->flatMap(fn($atomic) => Option::fromNullable($atomic->return_type))
+            ->map(fn($atomic) => $atomic->return_type ?? Type::getVoid())
             ->map(fn($actual_return_type) => $data->with(
                 new HaveCodeAssertionData($context->getCodeLocation(), $actual_return_type)
             ));
