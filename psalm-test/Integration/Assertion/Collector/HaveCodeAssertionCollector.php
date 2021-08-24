@@ -22,7 +22,7 @@ final class HaveCodeAssertionCollector implements AssertionCollectorInterface
             ));
     }
 
-    public static function isSupported(Assertions $data, AssertionCollectingContext $context): bool
+    public static function isSupported(AssertionCollectingContext $context): bool
     {
         return 'haveCode' === $context->assertion_name;
     }

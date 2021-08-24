@@ -55,7 +55,7 @@ final class SeeReturnTypeAssertionCollector implements AssertionCollectorInterfa
             ->orElse(fn() => Option::some(true));
     }
 
-    public static function isSupported(Assertions $data, AssertionCollectingContext $context): bool
+    public static function isSupported(AssertionCollectingContext $context): bool
     {
         return 'seeReturnType' === $context->assertion_name;
     }

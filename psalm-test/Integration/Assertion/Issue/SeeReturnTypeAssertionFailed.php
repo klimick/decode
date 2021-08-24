@@ -10,14 +10,14 @@ use Psalm\Issue\CodeIssue;
 
 final class SeeReturnTypeAssertionFailed extends CodeIssue
 {
-    public function __construct(HaveCodeAssertionData $haveCodeAssertionData, SeeReturnTypeAssertionData $seeReturnTypeAssertionData)
+    public function __construct(HaveCodeAssertionData $haveCodeAssertion, SeeReturnTypeAssertionData $seeReturnTypeAssertion)
     {
         parent::__construct(
             message: implode(' ', [
-                "Actual return type: {$haveCodeAssertionData->actual_return_type->getId()},",
-                "Expected return type: {$seeReturnTypeAssertionData->expected_return_type->getId()}",
+                "Actual return type: {$haveCodeAssertion->actual_return_type->getId()},",
+                "Expected return type: {$seeReturnTypeAssertion->expected_return_type->getId()}",
             ]),
-            code_location: $seeReturnTypeAssertionData->code_location,
+            code_location: $seeReturnTypeAssertion->code_location,
         );
     }
 }

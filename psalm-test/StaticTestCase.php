@@ -22,4 +22,9 @@ final class StaticTestCase
     {
         return $this;
     }
+
+    public function seePsalmIssue(string $type, string $message): self
+    {
+        return $this;
+    }
 }

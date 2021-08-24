@@ -14,5 +14,5 @@ interface AssertionCollectorInterface
      */
     public static function collect(Assertions $data, AssertionCollectingContext $context): Option;
 
-    public static function isSupported(Assertions $data, AssertionCollectingContext $context): bool;
+    public static function isSupported(AssertionCollectingContext $context): bool;
 }

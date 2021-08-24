@@ -10,7 +10,9 @@ use Klimick\PsalmTest\Integration\Assertion\Assertions;
 use Klimick\PsalmTest\Integration\Assertion\AssertionsStorage;
 use Klimick\PsalmTest\Integration\Assertion\Collector\AssertionCollectingContext;
 use Klimick\PsalmTest\Integration\Assertion\Collector\HaveCodeAssertionCollector;
+use Klimick\PsalmTest\Integration\Assertion\Collector\SeePsalmIssuesCollector;
 use Klimick\PsalmTest\Integration\Assertion\Collector\SeeReturnTypeAssertionCollector;
+use Klimick\PsalmTest\Integration\Assertion\Reconciler\SeePsalmIssuesAssertionReconciler;
 use Klimick\PsalmTest\Integration\Assertion\Reconciler\SeeReturnTypeAssertionReconciler;
 use Klimick\PsalmTest\PsalmCodeBlockFactory;
 use Klimick\PsalmTest\PsalmTest;
@@ -39,10 +41,12 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
 {
     private const ASSERTION_HAVE_CODE = 'haveCode';
     private const ASSERTION_SEE_RETURN_TYPE = 'seeReturnType';
+    private const ASSERTION_SEE_PSALM_ISSUE_TYPE = 'seePsalmIssue';
 
     private const SUPPORTED_ASSERTION_METHODS = [
         self::ASSERTION_HAVE_CODE,
-        self::ASSERTION_SEE_RETURN_TYPE
+        self::ASSERTION_SEE_RETURN_TYPE,
+        self::ASSERTION_SEE_PSALM_ISSUE_TYPE
     ];
 
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
@@ -57,30 +61,31 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
             $assertion_call = yield proveOf($event->getExpr(), MethodCall::class);
             $assertion_name = yield self::getAssertionName($event, $assertion_call);
 
+            $assertions = AssertionsStorage::get($test_class, $test_method);
             $assertion_context = new AssertionCollectingContext($test_class, $test_method, $assertion_name, $assertion_call, $event);
-            $assertion_data = AssertionsStorage::get($test_class, $test_method);
 
-            $new_assertion_data = yield self::handleAssertion($assertion_data, $assertion_context);
-
-            AssertionsStorage::set($test_class, $test_method, $new_assertion_data);
+            $new_data = self::collectAssertions($assertions, $assertion_context);
+            AssertionsStorage::set(
+                test_class: $test_class,
+                test_method: $test_method,
+                new_data: $new_data,
+            );
         });
 
         return null;
     }
 
-    /**
-     * @return Option<Assertions>
-     */
-    private static function handleAssertion(Assertions $data, AssertionCollectingContext $context): Option
+    private static function collectAssertions(Assertions $assertions, AssertionCollectingContext $context): Assertions
     {
-        $handlers = LinkedList::collect([
+        $handlers = [
             HaveCodeAssertionCollector::class,
             SeeReturnTypeAssertionCollector::class,
-        ]);
+            SeePsalmIssuesCollector::class,
+        ];
 
-        return $handlers
-            ->first(fn($handler) => $handler::isSupported($data, $context))
-            ->flatMap(fn($handler) => $handler::collect($data, $context));
+        return LinkedList::collect($handlers)
+            ->filter(fn($handler) => $handler::isSupported($context))
+            ->fold($assertions, fn(Assertions $acc, $collector) => $collector::collect($acc, $context)->getOrElse($acc));
     }
 
     /**
@@ -154,10 +159,23 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
 
             $handlers = [
                 SeeReturnTypeAssertionReconciler::class,
+                SeePsalmIssuesAssertionReconciler::class,
             ];
 
+            $issues = [];
+
             foreach ($handlers as $handler) {
-                $_ = $handler::reconcile($data)->map(fn($issue) => IssueBuffer::accepts($issue));
+                $issue = $handler::reconcile($data)->get();
+
+                if (null === $issue) {
+                    continue;
+                }
+
+                $issues[] = $issue;
+            }
+
+            foreach ($issues as $issue) {
+                IssueBuffer::accepts($issue);
             }
         });
 

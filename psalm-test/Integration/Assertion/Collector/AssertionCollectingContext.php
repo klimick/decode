@@ -30,7 +30,7 @@ final class AssertionCollectingContext
 
     public function getCodeLocation(): CodeLocation
     {
-        return new CodeLocation($this->event->getStatementsSource(), $this->assertion_call->name);
+        return new CodeLocation($this->event->getStatementsSource(), $this->assertion_call);
     }
 
     /**

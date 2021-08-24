@@ -18,20 +18,18 @@ final class SeeReturnTypeAssertionReconciler implements AssertionReconcilerInter
     public static function reconcile(Assertions $data): Option
     {
         return Option::do(function() use ($data) {
-            $haveCodeAssertionData = yield $data(HaveCodeAssertionData::class);
-            $seeReturnTypeAssertionData = yield $data(SeeReturnTypeAssertionData::class);
+            $haveCodeAssertion = yield $data(HaveCodeAssertionData::class);
+            $seeReturnTypeAssertion = yield $data(SeeReturnTypeAssertionData::class);
 
             $isValid = self::isValid(
-                expected: $seeReturnTypeAssertionData->expected_return_type,
-                actual: $haveCodeAssertionData->actual_return_type,
-                invariant: $seeReturnTypeAssertionData->invariant_compare,
+                expected: $seeReturnTypeAssertion->expected_return_type,
+                actual: $haveCodeAssertion->actual_return_type,
+                invariant: $seeReturnTypeAssertion->invariant_compare,
             );
 
-            if (!$isValid) {
-                return new SeeReturnTypeAssertionFailed($haveCodeAssertionData, $seeReturnTypeAssertionData);
-            }
-
-            return yield Option::none();
+            return yield !$isValid
+                ? Option::some(new SeeReturnTypeAssertionFailed($haveCodeAssertion, $seeReturnTypeAssertion))
+                : Option::none();
         });
     }
 
