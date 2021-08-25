@@ -23,7 +23,10 @@ final class StaticTestCase
         NoCode::here();
     }
 
-    public function seePsalmIssue(string $type, string $message): self
+    /**
+     * @param array<string, string> $args
+     */
+    public function seePsalmIssue(string $type, string $message, array $args = []): self
     {
         NoCode::here();
     }

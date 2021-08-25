@@ -28,11 +28,19 @@ final class ExampleStaticsTest extends PsalmTest
             ->seeReturnType(StaticTypes::int(), invariant: false)
             ->seePsalmIssue(
                 type: 'InvalidScalarArgument',
-                message: 'Argument 1 of Klimick\PsalmTest\ExampleStaticsTest::acceptInt expects Fp\Functional\Option\Option<int>, Fp\Functional\Option\Option<"100"> provided',
+                message: 'Argument 1 of #[self]::acceptInt expects #[option]<int>, #[option]<"100"> provided',
+                args: [
+                    'self' => self::class,
+                    'option' => Option::class,
+                ]
             )
             ->seePsalmIssue(
                 type: 'InvalidScalarArgument',
-                message: 'Argument 1 of Klimick\PsalmTest\ExampleStaticsTest::acceptInt expects Fp\Functional\Option\Option<int>, Fp\Functional\Option\Option<"200"> provided',
+                message: 'Argument 1 of #[self]::acceptInt expects #[option]<int>, #[option]<"200"> provided',
+                args: [
+                    'self' => self::class,
+                    'option' => Option::class,
+                ]
             );
     }
 }
