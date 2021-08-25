@@ -13,7 +13,7 @@ final class RuntimeDataPropertyMissingIssue extends CodeIssue
     public function __construct(UndefinedErrorReport $error, CodeLocation $code_location)
     {
         parent::__construct(
-            message: "Required property '{$error->property}' at path {$error->path} is missing",
+            message: sprintf('Required property "%s" at path %s is missing.', $error->property, $error->path),
             code_location: $code_location,
         );
     }

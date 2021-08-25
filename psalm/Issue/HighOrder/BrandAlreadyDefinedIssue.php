@@ -12,7 +12,7 @@ final class BrandAlreadyDefinedIssue extends CodeIssue
     public function __construct(string $brand, CodeLocation $code_location)
     {
         parent::__construct(
-            message: "Method '{$brand}' should not called multiple times.",
+            message: sprintf('Method "%s" should not called multiple times.', $brand),
             code_location: $code_location,
         );
     }

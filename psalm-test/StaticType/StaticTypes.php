@@ -30,6 +30,29 @@ final class StaticTypes
     }
 
     /**
+     * @template T
+     *
+     * @param class-string<T> $class
+     * @return StaticTypeInterface<T>
+     */
+    public static function object(string $class): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @template T
+     * @no-named-arguments
+     *
+     * @param StaticTypeInterface<T> ...$types
+     * @return StaticTypeInterface<T>
+     */
+    public static function union(StaticTypeInterface ...$types): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
      * @template T of scalar
      *
      * @param T $literal

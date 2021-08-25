@@ -14,7 +14,7 @@ final class CouldNotAnalyzeOfCallIssue extends CodeIssue
     public function __construct(CodeLocation $code_location)
     {
         parent::__construct(
-            message: 'RuntimeData::of call could not be analyzed because array value is not literal',
+            message: 'RuntimeData::of call could not be analyzed because array value is not literal.',
             code_location: $code_location
         );
     }

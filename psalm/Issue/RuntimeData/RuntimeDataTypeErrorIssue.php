@@ -16,7 +16,7 @@ final class RuntimeDataTypeErrorIssue extends CodeIssue
             message: implode(' ', [
                 "Wrong value at {$error->path}.",
                 "Expected type: {$error->expected}.",
-                "Actual type: {$actual_type}",
+                "Actual type: {$actual_type}.",
             ]),
             code_location: $code_location,
         );

@@ -12,7 +12,7 @@ final class UnexhaustiveMatchIssue extends CodeIssue
     public function __construct(string $matcher, CodeLocation $code_location)
     {
         parent::__construct(
-            message: "Match with name '{$matcher}' is not specified",
+            message: sprintf('Match with name "%s" is not specified', $matcher),
             code_location: $code_location,
         );
     }

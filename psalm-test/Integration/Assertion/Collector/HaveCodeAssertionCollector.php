@@ -44,8 +44,8 @@ final class HaveCodeAssertionCollector implements AssertionCollectorInterface
     {
         return first($context->assertion_call->args)
             ->map(fn($arg) => $arg->value)
-            ->filter(fn($arg_value) => $arg_value instanceof Node\Expr\Closure)
-            ->map(fn($closure_arg) => new CodeLocation($context->event->getStatementsSource(), $closure_arg));
+            ->filter(fn($arg) => $arg instanceof Node\Expr\Closure || $arg instanceof Node\Expr\ArrowFunction)
+            ->map(fn($arg) => new CodeLocation($context->event->getStatementsSource(), $arg));
     }
 
     public static function isSupported(AssertionCollectingContext $context): bool

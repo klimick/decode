@@ -16,7 +16,7 @@ final class InvalidMatcherTypeIssue extends CodeIssue
             message: implode(' ', [
                 "Invalid matcher type given.",
                 "Expected type: {$expected_matcher_type->getId()}.",
-                "Actual type: {$actual_matcher_type->getId()}",
+                "Actual type: {$actual_matcher_type->getId()}.",
             ]),
             code_location: $code_location,
         );
