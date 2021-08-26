@@ -8,7 +8,6 @@ use Klimick\Decode\Test\Static\Fixtures\Messenger\Messenger;
 use Klimick\Decode\Test\Static\Fixtures\Messenger\SmppSms;
 use Klimick\Decode\Test\Static\Fixtures\Messenger\Telegram;
 use Klimick\Decode\Test\Static\Fixtures\Messenger\Whatsapp;
-use Klimick\Decode\Test\Static\Fixtures\Messenger\Owner\Owner;
 use Klimick\PsalmTest\PsalmTest;
 use Klimick\PsalmTest\StaticTestCase;
 use Klimick\PsalmTest\StaticType\StaticTypes as t;
@@ -24,25 +23,13 @@ final class UnionRuntimeDataTest extends PsalmTest
                 ]);
 
                 return $messenger->match(
-                    smpp: fn(SmppSms $m) => ['smpp', $m, $m->owner],
-                    telegram: fn(Telegram $m) => ['telegram', $m, $m->owner],
-                    whatsapp: fn(Whatsapp $m) => ['whatsapp', $m, $m->owner],
+                    smpp: fn(SmppSms $_m) => 1,
+                    telegram: fn(Telegram $_m) => 2,
+                    whatsapp: fn(Whatsapp $_m) => 3,
                 );
             })
             ->seeReturnType(
-                t::shape([
-                    t::union(
-                        t::literal('smpp'),
-                        t::literal('telegram'),
-                        t::literal('whatsapp'),
-                    ),
-                    t::union(
-                        t::object(SmppSms::class),
-                        t::object(Telegram::class),
-                        t::object(Whatsapp::class),
-                    ),
-                    t::object(Owner::class),
-                ])
+                t::union(t::literal(1), t::literal(2), t::literal(3))
             );
     }
 
