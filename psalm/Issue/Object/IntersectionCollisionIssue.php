@@ -14,7 +14,7 @@ final class IntersectionCollisionIssue extends CodeIssue
      */
     public function __construct(array $properties, CodeLocation $code_location)
     {
-        $duplicate = implode(', ', array_map(fn($p) => "'{$p}'", $properties));
+        $duplicate = implode(', ', array_map(fn($p) => sprintf('"%s"', $p), $properties));
 
         $message = count($properties) > 1
             ? "Intersection collision: properties {$duplicate} defined more than once."

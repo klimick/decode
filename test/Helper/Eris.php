@@ -16,8 +16,3 @@ function eris(int $repeat = null, int $ratio = null): ErisFacade
 {
     return new ErisFacade($repeat, $ratio);
 }
-
-function anyValue(): mixed
-{
-    return null;
-}

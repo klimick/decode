@@ -12,7 +12,7 @@ final class NotPartialPropertyIssue extends CodeIssue
     public function __construct(string $property, CodeLocation $code_location)
     {
         parent::__construct(
-            message: "Property '{$property}' must be nullable in source class.",
+            message: sprintf('Property "%s" must be nullable in source class.', $property),
             code_location: $code_location,
         );
     }

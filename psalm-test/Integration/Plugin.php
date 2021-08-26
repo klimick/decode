@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmTest\Integration;
 
 use Klimick\PsalmTest\Integration\Hook\GenericObjectReturnTypeProvider;
+use Klimick\PsalmTest\Integration\Hook\IntersectionReturnTypeProvider;
 use Klimick\PsalmTest\Integration\Hook\OptionalReturnTypeProvider;
 use Klimick\PsalmTest\Integration\Hook\ShapeReturnTypeProvider;
 use Klimick\PsalmTest\Integration\Hook\TestCaseAnalysis;
@@ -22,6 +23,7 @@ final class Plugin implements PluginEntryPointInterface
         };
 
         $register(ShapeReturnTypeProvider::class);
+        $register(IntersectionReturnTypeProvider::class);
         $register(GenericObjectReturnTypeProvider::class);
         $register(OptionalReturnTypeProvider::class);
         $register(TestCaseAnalysis::class);

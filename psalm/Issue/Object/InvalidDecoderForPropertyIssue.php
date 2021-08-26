@@ -21,13 +21,12 @@ final class InvalidDecoderForPropertyIssue extends CodeIssue
             ? "possibly-undefined|{$actual_type->getId()}>"
             : $actual_type->getId();
 
-        parent::__construct(
-            message: implode(' ', [
-                "Invalid decoder for property '{$property}'.",
-                "Expected: DecoderInterface<{$expected_type->getId()}>.",
-                "Actual: DecoderInterface<{$actual_type_decoder_type_param}>.",
-            ]),
-            code_location: $code_location,
-        );
+        $message = implode(' ', [
+            "Invalid decoder for property \"{$property}\".",
+            "Expected: Klimick\Decode\Decoder\AbstractDecoder<{$expected_type->getId()}>.",
+            "Actual: Klimick\Decode\Decoder\AbstractDecoder<{$actual_type_decoder_type_param}>.",
+        ]);
+
+        parent::__construct($message, $code_location);
     }
 }

@@ -102,6 +102,14 @@ final class StaticTypes
     }
 
     /**
+     * @return StaticTypeInterface<array-key>
+     */
+    public static function arrayKey(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
      * @template T
      *
      * @param class-string<T> $class
@@ -120,6 +128,22 @@ final class StaticTypes
         string $type_constructor,
         StaticTypeInterface $type_param,
         StaticTypeInterface ...$type_params,
+    ): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @template T of object
+     * @no-named-arguments
+     *
+     * @param StaticTypeInterface<T> $type
+     * @param StaticTypeInterface<T> ...$types
+     * @return  StaticTypeInterface<T>
+     */
+    public static function intersection(
+        StaticTypeInterface $type,
+        StaticTypeInterface ...$types,
     ): StaticTypeInterface
     {
         NoCode::here();

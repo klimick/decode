@@ -12,7 +12,7 @@ final class NonexistentPropertyObjectPropertyIssue extends CodeIssue
     public function __construct(string $property, CodeLocation $code_location)
     {
         parent::__construct(
-            message: "Property '{$property}' does not exist.",
+            message: sprintf('Property "%s" does not exist.', $property),
             code_location: $code_location,
         );
     }
