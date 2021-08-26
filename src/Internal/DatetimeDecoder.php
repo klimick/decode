@@ -29,6 +29,11 @@ final class DatetimeDecoder extends AbstractDecoder
         return DateTimeImmutable::class;
     }
 
+    public function is(mixed $value): bool
+    {
+        return $value instanceof DateTimeImmutable;
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         return string()

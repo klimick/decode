@@ -47,6 +47,21 @@ final class ShapeDecoder extends AbstractDecoder
 
     }
 
+    public function is(mixed $value): bool
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        foreach ($this->decoders as $k => $decoder) {
+            if (!array_key_exists($k, $value) || !$this->decoders[$k]->is($value[$k])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function isOptional(AbstractDecoder $decoder): bool
     {
         return $this->partial || $decoder instanceof HighOrderDecoder && $decoder->isOptional();

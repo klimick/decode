@@ -38,6 +38,17 @@ final class IntersectionDecoder extends AbstractDecoder
         return implode(' & ', array_map(fn($t) => $t->name(), $this->decoders));
     }
 
+    public function is(mixed $value): bool
+    {
+        foreach ($this->decoders as $decoder) {
+            if (!$decoder->is($value)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         $decoded = [];

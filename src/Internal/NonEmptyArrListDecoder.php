@@ -28,6 +28,11 @@ final class NonEmptyArrListDecoder extends AbstractDecoder
         return "non-empty-list<{$this->decoder->name()}>";
     }
 
+    public function is(mixed $value): bool
+    {
+        return arrList($this->decoder)->is($value) && 0 !== count($value);
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         return arrList($this->decoder)

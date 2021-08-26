@@ -35,6 +35,25 @@ final class ArrDecoder extends AbstractDecoder
         return "array<{$this->keyDecoder->name()}, {$this->valDecoder->name()}>";
     }
 
+    public function is(mixed $value): bool
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        /**
+         * @psalm-suppress TypeDoesNotContainType
+         *     todo: !$this->keyDecoder->is($k)
+         */
+        foreach ($value as $k => $v) {
+            if (!$this->keyDecoder->is($k) || !$this->valDecoder->is($v)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         if (!is_array($value)) {

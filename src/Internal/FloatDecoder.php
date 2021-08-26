@@ -21,8 +21,16 @@ final class FloatDecoder extends AbstractDecoder
         return 'float';
     }
 
+    /**
+     * @psalm-assert-if-true float $value
+     */
+    public function is(mixed $value): bool
+    {
+        return is_float($value);
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
-        return is_float($value) ? valid($value) : invalid($context);
+        return $this->is($value) ? valid($value) : invalid($context);
     }
 }

@@ -20,6 +20,11 @@ final class MixedDecoder extends AbstractDecoder
         return 'mixed';
     }
 
+    public function is(mixed $value): bool
+    {
+        return true;
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         return valid($value);

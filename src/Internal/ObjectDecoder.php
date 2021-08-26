@@ -36,6 +36,11 @@ final class ObjectDecoder extends AbstractDecoder
         return $this->objectClass;
     }
 
+    public function is(mixed $value): bool
+    {
+        return $value instanceof $this->objectClass;
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         return $this->shape

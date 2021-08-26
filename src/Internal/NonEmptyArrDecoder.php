@@ -33,6 +33,11 @@ final class NonEmptyArrDecoder extends AbstractDecoder
         return "non-empty-array<{$this->keyDecoder->name()}, {$this->valDecoder->name()}>";
     }
 
+    public function is(mixed $value): bool
+    {
+        return arr($this->keyDecoder, $this->valDecoder)->is($value) && 0 !== count($value);
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         return arr($this->keyDecoder, $this->valDecoder)

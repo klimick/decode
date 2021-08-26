@@ -26,6 +26,11 @@ final class FromJsonDecoder extends AbstractDecoder
         return $this->decoder->name();
     }
 
+    public function is(mixed $value): bool
+    {
+        return $this->decoder->is($value);
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         if (!is_string($value)) {
@@ -33,7 +38,7 @@ final class FromJsonDecoder extends AbstractDecoder
         }
 
         try {
-            /** @var mixed $decoded */
+            /** @psalm-var mixed $decoded */
             $decoded = json_decode($value, true, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException) {
             return invalid($context);

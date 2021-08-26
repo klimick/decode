@@ -21,8 +21,16 @@ final class NonEmptyStringDecoder extends AbstractDecoder
         return 'non-empty-string';
     }
 
+    /**
+     * @psalm-assert-if-true non-empty-string $value
+     */
+    public function is(mixed $value): bool
+    {
+        return is_string($value) && $value !== '';
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
-        return is_string($value) && '' !== $value ? valid($value) : invalid($context);
+        return $this->is($value) ? valid($value) : invalid($context);
     }
 }

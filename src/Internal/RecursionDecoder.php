@@ -30,7 +30,7 @@ final class RecursionDecoder extends AbstractDecoder
     /**
      * @return AbstractDecoder<T>
      */
-    public function type(): AbstractDecoder
+    private function type(): AbstractDecoder
     {
         if (null === $this->cache) {
             $this->cache = ($this->type)();
@@ -38,6 +38,11 @@ final class RecursionDecoder extends AbstractDecoder
 
         /** @var AbstractDecoder<T> */
         return $this->cache;
+    }
+
+    public function is(mixed $value): bool
+    {
+        return $this->type()->is($value);
     }
 
     public function name(): string

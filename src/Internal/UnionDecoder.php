@@ -39,6 +39,17 @@ final class UnionDecoder extends AbstractDecoder
         return implode(' | ', array_map(fn($t) => $t->name(), $this->decoders));
     }
 
+    public function is(mixed $value): bool
+    {
+        foreach ($this->decoders as $decoder) {
+            if ($decoder->is($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         $errors = [];

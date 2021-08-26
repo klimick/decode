@@ -21,8 +21,16 @@ final class NumericDecoder extends AbstractDecoder
         return 'numeric';
     }
 
+    /**
+     * @psalm-assert-if-true numeric $value
+     */
+    public function is(mixed $value): bool
+    {
+        return is_numeric($value);
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
-        return is_numeric($value) ? valid($value) : invalid($context);
+        return $this->is($value) ? valid($value) : invalid($context);
     }
 }

@@ -47,6 +47,21 @@ final class TupleDecoder extends AbstractDecoder
         return "array{{$types}}";
     }
 
+    public function is(mixed $value): bool
+    {
+        if (!is_array($value) || !ArrListDecoder::isList($value) || count($value) !== count($this->decoders)) {
+            return false;
+        }
+
+        foreach ($this->decoders as $index => $decoder) {
+            if (!$decoder->is($value[$index])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         return nonEmptyArrList(mixed())

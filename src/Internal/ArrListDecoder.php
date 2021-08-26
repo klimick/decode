@@ -30,6 +30,28 @@ final class ArrListDecoder extends AbstractDecoder
         return "list<{$this->decoder->name()}>";
     }
 
+    public function is(mixed $value): bool
+    {
+        return arr(int(), $this->decoder)->is($value) && self::isList($value);
+    }
+
+    /**
+     * @template T
+     * @psalm-pure
+     *
+     * @param array<array-key, T> $arr
+     * @psalm-assert-if-true list<T> $arr
+     */
+    public static function isList(array $arr): bool
+    {
+        $count = count($arr);
+
+        return (
+            (0 === $count) ||
+            (array_keys($arr) === range(0, $count - 1))
+        );
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         if (is_array($value)) {
@@ -41,12 +63,9 @@ final class ArrListDecoder extends AbstractDecoder
 
         return arr(int(), $this->decoder)
             ->decode($value, $context)
-            ->flatMap(function(Valid $valid) use ($context) {
-                $count = count($valid->value);
-
-                return (0 === $count || array_keys($valid->value) === range(0, $count - 1))
-                    ? valid(array_values($valid->value))
-                    : invalid($context);
-            });
+            ->flatMap(fn(Valid $valid) => self::isList($valid->value)
+                ? valid($valid->value)
+                : invalid($context)
+            );
     }
 }

@@ -30,6 +30,11 @@ abstract class AbstractDecoder
     abstract public function decode(mixed $value, Context $context): Either;
 
     /**
+     * @psalm-assert-if-true T $value
+     */
+    abstract public function is(mixed $value): bool;
+
+    /**
      * @template ContravariantT
      * @no-named-arguments
      *

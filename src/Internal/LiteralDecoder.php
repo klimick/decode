@@ -28,6 +28,17 @@ final class LiteralDecoder extends AbstractDecoder
         ));
     }
 
+    public function is(mixed $value): bool
+    {
+        foreach ($this->literals as $literal) {
+            if ($literal === $value) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function decode(mixed $value, Context $context): Either
     {
         foreach ($this->literals as $literal) {
@@ -37,10 +48,5 @@ final class LiteralDecoder extends AbstractDecoder
         }
 
         return invalid($context);
-    }
-
-    public function encode(mixed $value): mixed
-    {
-        return $value;
     }
 }
