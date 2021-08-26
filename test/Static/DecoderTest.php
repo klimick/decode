@@ -18,7 +18,7 @@ use function Klimick\Decode\Decoder\arrKey;
 use function Klimick\Decode\Decoder\arrList;
 use function Klimick\Decode\Decoder\bool;
 use function Klimick\Decode\Decoder\datetime;
-use function Klimick\Decode\Decoder\fallback;
+use function Klimick\Decode\Decoder\constant;
 use function Klimick\Decode\Decoder\float;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\intersection;
@@ -150,10 +150,10 @@ final class DecoderTest extends PsalmTest
             );
     }
 
-    public function testFallbackDecoder(): void
+    public function testConstantDecoder(): void
     {
         StaticTestCase::describe()
-            ->haveCode(fn() => fallback(1))
+            ->haveCode(fn() => constant(1))
             ->seeReturnType(
                 t::generic(AbstractDecoder::class, t::literal(1))
             );

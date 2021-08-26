@@ -14,20 +14,20 @@ use function Klimick\Decode\Decoder\valid;
  * @extends AbstractDecoder<T>
  * @psalm-immutable
  */
-final class FallbackDecoder extends AbstractDecoder
+final class ConstantDecoder extends AbstractDecoder
 {
     /**
-     * @param T $fallback
+     * @param T $constant
      */
-    public function __construct(public mixed $fallback) { }
+    public function __construct(public mixed $constant) { }
 
     public function name(): string
     {
-        return 'fallback';
+        return 'constant';
     }
 
     public function decode(mixed $value, Context $context): Either
     {
-        return valid($this->fallback);
+        return valid($this->constant);
     }
 }

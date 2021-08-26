@@ -40,7 +40,7 @@ abstract class UnionRuntimeData
 
         return union(...array_map(
             fn($decoder, $type) => object(static::class)(
-                type: fallback($type),
+                type: constant($type),
                 instance: $decoder->from('$'),
             ),
             array_values($cases),

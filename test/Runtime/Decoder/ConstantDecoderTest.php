@@ -8,16 +8,16 @@ use Fp\Functional\Either\Right;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Decoder\decode;
-use function Klimick\Decode\Decoder\fallback;
+use function Klimick\Decode\Decoder\constant;
 use function Klimick\Decode\Test\Helper\forAll;
 
-final class FallbackDecoderTest extends TestCase
+final class ConstantDecoderTest extends TestCase
 {
-    public function testValidForAllGivenFallbacks(): void
+    public function testValidForAllGivenConstants(): void
     {
         forAll(Gen::mixed())
             ->then(function(mixed $value) {
-                $decoder = fallback($value);
+                $decoder = constant($value);
                 self::assertInstanceOf(Right::class, decode($value, $decoder));
             });
     }

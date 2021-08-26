@@ -100,9 +100,9 @@ function mixed(): AbstractDecoder
  * @param T $value
  * @return AbstractDecoder<T>
  */
-function fallback(mixed $value): AbstractDecoder
+function constant(mixed $value): AbstractDecoder
 {
-    return new Internal\FallbackDecoder($value);
+    return new Internal\ConstantDecoder($value);
 }
 
 /**

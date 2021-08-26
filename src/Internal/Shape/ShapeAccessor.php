@@ -6,7 +6,7 @@ namespace Klimick\Decode\Internal\Shape;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Internal\FallbackDecoder;
+use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
 
 /**
@@ -34,8 +34,8 @@ final class ShapeAccessor
             }
         }
 
-        if ($decoder instanceof FallbackDecoder) {
-            return Option::some($decoder->fallback);
+        if ($decoder instanceof ConstantDecoder) {
+            return Option::some($decoder->constant);
         }
 
         if (array_key_exists($key, $shape)) {

@@ -6,7 +6,7 @@ namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\UnionRuntimeData;
-use Klimick\Decode\Internal\FallbackDecoder;
+use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Internal\UnionDecoder;
 use Klimick\PsalmDecode\Issue\UnionRuntimeData\InvalidMatcherTypeIssue;
@@ -193,8 +193,8 @@ final class UnionMatchAnalysis implements AfterExpressionAnalysisInterface
                 yield proveTrue($decoder instanceof ObjectDecoder);
 
                 $matcher_name = yield at($decoder->decoders, 'type')
-                    ->flatMap(fn($d) => proveOf($d, FallbackDecoder::class))
-                    ->flatMap(fn($d) => proveString($d->fallback));
+                    ->flatMap(fn($d) => proveOf($d, ConstantDecoder::class))
+                    ->flatMap(fn($d) => proveString($d->constant));
 
                 $matcher_param_type = yield at($decoder->decoders, 'instance')
                     ->flatMap(fn($d) => proveOf($d, AbstractDecoder::class))
