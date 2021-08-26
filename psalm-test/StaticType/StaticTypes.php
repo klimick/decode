@@ -14,6 +14,54 @@ final class StaticTypes
     }
 
     /**
+     * @template K of array-key
+     * @template V
+     *
+     * @param StaticTypeInterface<K> $k
+     * @param StaticTypeInterface<V> $v
+     * @return StaticTypeInterface<array<K, V>>
+     */
+    public static function array(StaticTypeInterface $k, StaticTypeInterface $v): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @template K of array-key
+     * @template V
+     *
+     * @param StaticTypeInterface<K> $k
+     * @param StaticTypeInterface<V> $v
+     * @return StaticTypeInterface<non-empty-array<K, V>>
+     */
+    public static function nonEmptyArray(StaticTypeInterface $k, StaticTypeInterface $v): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @template V
+     *
+     * @param StaticTypeInterface<V> $v
+     * @return StaticTypeInterface<list<V>>
+     */
+    public static function list(StaticTypeInterface $v): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @template V
+     *
+     * @param StaticTypeInterface<V> $v
+     * @return StaticTypeInterface<non-empty-list<V>>
+     */
+    public static function nonEmptyList(StaticTypeInterface $v): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
      * @psalm-return StaticTypeInterface<string>
      */
     public static function string(): StaticTypeInterface
@@ -30,12 +78,49 @@ final class StaticTypes
     }
 
     /**
+     * @return StaticTypeInterface<positive-int>
+     */
+    public static function positiveInt(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @return StaticTypeInterface<float>
+     */
+    public static function float(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @return StaticTypeInterface<bool>
+     */
+    public static function bool(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
      * @template T
      *
      * @param class-string<T> $class
      * @return StaticTypeInterface<T>
      */
     public static function object(string $class): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @no-named-arguments
+     * @param class-string $type_constructor
+     */
+    public static function generic(
+        string $type_constructor,
+        StaticTypeInterface $type_param,
+        StaticTypeInterface ...$type_params,
+    ): StaticTypeInterface
     {
         NoCode::here();
     }
@@ -59,6 +144,54 @@ final class StaticTypes
      * @return StaticTypeInterface<T>
      */
     public static function literal(mixed $literal): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @return StaticTypeInterface<numeric>
+     */
+    public static function numeric(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @return StaticTypeInterface<numeric-string>
+     */
+    public static function numericString(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @return StaticTypeInterface<mixed>
+     */
+    public static function mixed(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @return StaticTypeInterface<scalar>
+     */
+    public static function scalar(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @return StaticTypeInterface<null>
+     */
+    public static function null(): StaticTypeInterface
+    {
+        NoCode::here();
+    }
+
+    /**
+     * @return StaticTypeInterface<non-empty-string>
+     */
+    public static function nonEmptyString(): StaticTypeInterface
     {
         NoCode::here();
     }

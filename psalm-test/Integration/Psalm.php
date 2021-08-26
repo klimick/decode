@@ -36,4 +36,5 @@ final class Psalm
             ->filter(fn($atomics) => 1 === count($atomics))
             ->flatMap(fn($atomics) => first($atomics));
     }
+
 }
