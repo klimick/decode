@@ -52,48 +52,76 @@ final class NewAnalysis implements AfterExpressionAnalysisInterface
     private static function validateArgs(array $decoders, AfterExpressionAnalysisEvent $event, Node\Expr\New_ $new): void
     {
         $source = $event->getStatementsSource();
-        $code_location = new CodeLocation($source, $new);
 
-        if (count($decoders) !== count($new->args)) {
-            IssueBuffer::accepts(new InvalidArgument('Not all args passed', $code_location));
+        $expected_args_count = count($decoders);
+        $actual_args_count = count($new->args);
+
+        if ($expected_args_count !== $actual_args_count) {
+            IssueBuffer::accepts(new InvalidArgument(
+                message: sprintf("Expected args %s. Actual count %s.", $expected_args_count, $actual_args_count),
+                code_location: new CodeLocation($source, $new),
+            ));
 
             return;
         }
 
         $keys = array_keys($decoders);
+        $named_arguments = false;
 
-        foreach ($new->args as $index => $arg) {
-            if (null !== $arg->name) {
-                IssueBuffer::accepts(new InvalidArgument('Named params not allowed yet', $code_location));
+        foreach ($new->args as $index => $arg_expr) {
+            if (null !== $arg_expr->name) {
+                $named_arguments = true;
+            }
+
+            if ($named_arguments && null === $arg_expr->name) {
+                IssueBuffer::accepts(new InvalidArgument(
+                    message: 'Positional arguments cannot follows after named arguments',
+                    code_location: new CodeLocation($source, $arg_expr),
+                ));
+
+                return;
+            }
+
+            $arg_name = null !== $arg_expr->name
+                ? $arg_expr->name->name
+                : $keys[$index];
+
+            $arg_type = Psalm::getType($source->getNodeTypeProvider(), $arg_expr->value);
+
+            if ($arg_type->isNone()) {
+                IssueBuffer::accepts(new InvalidArgument(
+                    message: sprintf('No type for "%s" arg.', $arg_name),
+                    code_location: new CodeLocation($source, $arg_expr),
+                ));
 
                 continue;
             }
 
-            $type = Psalm::getType($source->getNodeTypeProvider(), $arg->value);
-
-            if ($type->isNone()) {
-                IssueBuffer::accepts(new InvalidArgument("No type for '{$keys[$index]}'", $code_location));
+            if (!array_key_exists($arg_name, $decoders)) {
+                IssueBuffer::accepts(new InvalidArgument(
+                    message: sprintf('No named argument with name "%s".', $arg_name),
+                    code_location: new CodeLocation($source, $arg_expr),
+                ));
 
                 continue;
             }
 
-            $actual_arg_type = $type->get();
-            $expected_arg_type = $decoders[$keys[$index]];
+            $expected_arg_type = $decoders[$arg_name];
+            $actual_arg_type = $arg_type->get();
 
             $is_contained = UnionTypeComparator::isContainedBy(
-                $event->getCodebase(),
+                codebase: $event->getCodebase(),
                 input_type: $actual_arg_type,
                 container_type: $expected_arg_type,
             );
 
             if (!$is_contained) {
+                $actual_id = $actual_arg_type->getId();
+                $expected_id = $expected_arg_type->getId();
+
                 IssueBuffer::accepts(new InvalidArgument(
-                    message: implode(' ', [
-                        "Invalid type for '{$keys[$index]}'.",
-                        "Actual: {$actual_arg_type->getId()}.",
-                        "Expected: {$expected_arg_type->getId()}",
-                    ]),
-                    code_location: $code_location,
+                    message: sprintf('Invalid type for "%s". Actual: "%s". Expected: "%s".', $arg_name, $actual_id, $expected_id),
+                    code_location: new CodeLocation($source, $arg_expr),
                 ));
             }
         }
