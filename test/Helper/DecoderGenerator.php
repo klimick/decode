@@ -83,10 +83,7 @@ final class DecoderGenerator
     }
 
     /**
-     * @psalm-return array{
-     *     d\AbstractDecoder,
-     *     Generator,
-     * }
+     * @psalm-return array{d\AbstractDecoder<mixed>, Generator}
      */
     public static function generate(int $level = 1): array
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode;
 
 use PhpParser\Node;
+use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
 use Psalm\Type;
 use Fp\Functional\Option\Option;
 use Psalm\NodeTypeProvider;
@@ -35,5 +36,14 @@ final class Psalm
 
             return $atomics[0];
         });
+    }
+
+    public static function classExtends(string $class, string $from, AfterExpressionAnalysisEvent $event): bool
+    {
+        $isSubclass = fn(): bool => $event
+            ->getCodebase()->classlikes
+            ->classExtends($class, $from);
+
+        return Option::try($isSubclass)->getOrElse(false);
     }
 }

@@ -19,7 +19,33 @@ abstract class RuntimeData implements JsonSerializable
 
     final public function __construct(mixed ...$properties)
     {
-        $this->properties = $properties;
+        $this->properties = self::completeKeys($properties, self::type());
+    }
+
+    /**
+     * @psalm-suppress MixedAssignment
+     */
+    private static function completeKeys(array $values, ObjectDecoder $decoder): array
+    {
+        $decoders = $decoder->shape->decoders;
+
+        $decoderKeys = array_keys($decoders);
+        $withKeys = [];
+
+        foreach ($values as $index => $value) {
+            if (array_key_exists($index, $decoders)) {
+                $withKeys[$index] = $value;
+                continue;
+            }
+
+            if (!array_key_exists($index, $decoderKeys)) {
+                continue;
+            }
+
+            $withKeys[$decoderKeys[$index]] = $value;
+        }
+
+        return $withKeys;
     }
 
     final public static function of(array $args): static

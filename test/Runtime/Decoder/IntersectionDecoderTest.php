@@ -20,20 +20,10 @@ final class IntersectionDecoderTest extends TestCase
         [$secondPropDecoder, $secondPropGenerator] = DecoderGenerator::generate();
         [$thirdPropDecoder, $thirdPropGenerator] = DecoderGenerator::generate();
 
-        $firstShapeDecoder = shape(
-            firstProp: $firstPropDecoder,
-        );
-        $secondShapeDecoder = shape(
-            secondProp: $secondPropDecoder,
-        );
-        $thirdShapeDecoder = shape(
-            thirdProp: $thirdPropDecoder,
-        );
-
         $intersectionDecoder = intersection(
-            $firstShapeDecoder,
-            $secondShapeDecoder,
-            $thirdShapeDecoder,
+            shape(firstProp: $firstPropDecoder),
+            shape(secondProp: $secondPropDecoder),
+            shape(thirdProp: $thirdPropDecoder),
         );
 
         $shapeGenerator = new AssociativeArrayGenerator([
@@ -44,6 +34,8 @@ final class IntersectionDecoderTest extends TestCase
 
         forAll($shapeGenerator)
             ->withMaxSize(50)
-            ->then(Check::thatValidFor($intersectionDecoder));
+            ->then(
+                Check::thatValidFor($intersectionDecoder)
+            );
     }
 }

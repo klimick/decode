@@ -387,14 +387,21 @@ function union(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder 
  * @psalm-pure
  * @no-named-arguments
  *
- * @psalm-param AbstractDecoder<T> $first
- * @psalm-param AbstractDecoder<T> $second
- * @psalm-param AbstractDecoder<T> ...$rest
- * @return AbstractDecoder<T>
+ * @psalm-param Internal\Shape\ShapeDecoder<T> $first
+ * @psalm-param Internal\Shape\ShapeDecoder<T> $second
+ * @psalm-param Internal\Shape\ShapeDecoder<T> ...$rest
  */
 function intersection(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest): AbstractDecoder
 {
-    return new Internal\IntersectionDecoder($first, $second, ...array_values($rest));
+    $decoders = [];
+
+    foreach ([$first, $second, ...$rest] as $decoder) {
+        foreach ($decoder->decoders as $k => $d) {
+            $decoders[$k] = $d;
+        }
+    }
+
+    return new Internal\Shape\ShapeDecoder($decoders);
 }
 
 /**
