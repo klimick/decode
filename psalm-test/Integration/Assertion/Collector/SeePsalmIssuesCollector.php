@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmTest\Integration\Assertion\Collector;
 
+use Closure;
 use Fp\Functional\Option\Option;
 use Klimick\PsalmTest\Integration\Assertion\Assertions;
 use Klimick\PsalmTest\Integration\Psalm;
@@ -18,10 +19,10 @@ final class SeePsalmIssuesCollector implements AssertionCollectorInterface
     {
         return Option::do(function() use ($data, $context) {
             $issue_type = yield self::getSeePsalmIssueArg($context, position: 0)
-                ->flatMap(fn($atomic) => self::getLiteralStringValue($atomic));
+                ->flatMap(self::getLiteralStringValue());
 
             $issue_message = yield self::getSeePsalmIssueArg($context, position: 1)
-                ->flatMap(fn($atomic) => self::getLiteralStringValue($atomic))
+                ->flatMap(self::getLiteralStringValue())
                 ->map(fn($value) => strtr($value, self::getFormattingArgs($context)));
 
             $code_location = $context->getCodeLocation();
@@ -46,8 +47,9 @@ final class SeePsalmIssuesCollector implements AssertionCollectorInterface
             $replacements = [];
 
             foreach ($issue_args->properties as $name => $property) {
-                $replacements["#[{$name}]"] = yield Psalm::asSingleAtomic($property)
-                    ->flatMap(fn($atomic) => self::getLiteralStringValue($atomic));
+                $replacements["#[{$name}]"] = yield Option::some($property)
+                    ->flatMap(Psalm::asSingleAtomic())
+                    ->flatMap(self::getLiteralStringValue());
             }
 
             return $replacements;
@@ -57,11 +59,11 @@ final class SeePsalmIssuesCollector implements AssertionCollectorInterface
     }
 
     /**
-     * @return Option<string>
+     * @return Closure(Type\Atomic): Option<string>
      */
-    private static function getLiteralStringValue(Type\Atomic $atomic): Option
+    private static function getLiteralStringValue(): Closure
     {
-        return proveOf($atomic, TLiteralString::class)->map(fn($atomic) => $atomic->value);
+        return fn(Type\Atomic $atomic) => proveOf($atomic, TLiteralString::class)->map(fn($atomic) => $atomic->value);
     }
 
     /**

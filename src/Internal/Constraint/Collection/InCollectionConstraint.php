@@ -29,8 +29,12 @@ final class InCollectionConstraint implements ConstraintInterface
 
     public function check(Context $context, mixed $value): Either
     {
-        return !in_array($this->item, $value, strict: true)
-            ? invalid($context, $this, ['notInCollection' => $this->item])
-            : valid();
+        foreach ($value as $v) {
+            if ($this->item === $v) {
+                return valid();
+            }
+        }
+
+        return invalid($context, $this, ['notInCollection' => $this->item]);
     }
 }

@@ -46,126 +46,168 @@ final class DecoderTest extends PsalmTest
     {
         StaticTestCase::describe()
             ->haveCode(fn() => string())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::string())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::string(),
+                ],
+            ));
     }
 
     public function testNonEmptyStringDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => nonEmptyString())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::nonEmptyString())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::nonEmptyString(),
+                ],
+            ));
     }
 
     public function testIntDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => int())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::int())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::int(),
+                ],
+            ));
     }
 
     public function testPositiveIntDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => positiveInt())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::positiveInt())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::positiveInt(),
+                ],
+            ));
     }
 
     public function testFloatDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => float())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::float())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::float(),
+                ],
+            ));
     }
 
     public function testBoolDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => bool())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::bool())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::bool(),
+                ],
+            ));
     }
 
     public function testNumericDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => numeric())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::numeric())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::numeric(),
+                ],
+            ));
     }
 
     public function testNumericStringDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => numericString())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::numericString())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::numericString(),
+                ],
+            ));
     }
 
     public function testArrKeyDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => arrKey())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::arrayKey())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::arrayKey(),
+                ],
+            ));
     }
 
     public function testNullDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => null())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::null())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::null(),
+                ],
+            ));
     }
 
     public function testMixedDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => mixed())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::mixed())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::mixed(),
+                ],
+            ));
     }
 
     public function testScalarDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => scalar())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::scalar())
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::scalar(),
+                ],
+            ));
     }
 
     public function testConstantDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => constant(1))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::literal(1))
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::literal(1),
+                ],
+            ));
     }
 
     public function testDatetimeDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => datetime())
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::object(DateTimeImmutable::class))
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::object(DateTimeImmutable::class),
+                ],
+            ));
     }
 
     /**
@@ -174,36 +216,40 @@ final class DecoderTest extends PsalmTest
      */
     public function testRecDecoder(): void
     {
-        StaticTestCase::describe()
-            ->haveCode(function() {
-                $decoder = rec(function() use (&$decoder) {
-                    /** @var AbstractDecoder<Department> $self */
-                    $self = &$decoder;
+        $decoder = rec(function() use (&$decoder) {
+            /** @var AbstractDecoder<Department> $self */
+            $self = &$decoder;
 
-                    return object(Department::class)(
-                        name: string(),
-                        subDepartments: arrList($self),
-                    );
-                });
-
-                return $decoder;
-            })
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::object(Department::class))
+            return object(Department::class)(
+                name: string(),
+                subDepartments: arrList($self),
             );
+        });
+
+        StaticTestCase::describe()
+            ->haveCode(fn() => $decoder)
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::object(Department::class),
+                ],
+            ));
     }
 
     public function testLiteralDecoder(): void
     {
         StaticTestCase::describe()
             ->haveCode(fn() => literal(1, 2, 3))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::union(
-                    t::literal(1),
-                    t::literal(2),
-                    t::literal(3),
-                ))
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::union([
+                        t::literal(1),
+                        t::literal(2),
+                        t::literal(3),
+                    ]),
+                ]
+            ));
     }
 
     public function testUnionDecoder(): void
@@ -213,12 +259,15 @@ final class DecoderTest extends PsalmTest
                 int(),
                 string(),
             ))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::union(
-                    t::int(),
-                    t::string(),
-                ))
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::union([
+                        t::int(),
+                        t::string(),
+                    ]),
+                ],
+            ));
     }
 
     public function testObjectDecoder(): void
@@ -228,9 +277,12 @@ final class DecoderTest extends PsalmTest
                 name: string(),
                 age: int(),
             ))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::object(Person::class))
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::object(Person::class)
+                ],
+            ));
     }
 
     public function testObjectDecoderMissingPropertyIssue(): void
@@ -285,9 +337,12 @@ final class DecoderTest extends PsalmTest
                 name: string(),
                 age: int(),
             ))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::object(PartialPerson::class))
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::object(PartialPerson::class),
+                ],
+            ));
     }
 
     public function test(): void
@@ -315,37 +370,50 @@ final class DecoderTest extends PsalmTest
                 int(),
                 bool()->optional()
             ))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::shape([
-                    t::string(),
-                    t::int(),
-                    t::bool()->optional(),
-                ]))
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::shape([
+                        t::string(),
+                        t::int(),
+                        t::bool()->optional(),
+                    ]),
+                ],
+            ));
     }
 
     public function testShapeDecoder(): void
     {
+        $expected_decoder_type = t::intersection([
+            t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::shape([
+                        'name' => t::string(),
+                        'age' => t::int(),
+                        'bornAt' => t::object(DateTimeImmutable::class)->optional(),
+                    ]),
+                ],
+            ),
+            t::generic(
+                ofType: ShapeDecoder::class,
+                withParams: [
+                    t::shape([
+                        'name' => t::string(),
+                        'age' => t::bool(),
+                        'bornAt' => t::object(DateTimeImmutable::class)->optional(),
+                    ]),
+                ],
+            ),
+        ]);
+
         StaticTestCase::describe()
             ->haveCode(fn() => shape(
                 name: string(),
                 age: int(),
                 bornAt: datetime()->optional(),
             ))
-            ->seeReturnType(
-                t::intersection(
-                    t::generic(AbstractDecoder::class, t::shape([
-                        'name' => t::string(),
-                        'age' => t::int(),
-                        'bornAt' => t::object(DateTimeImmutable::class)->optional(),
-                    ])),
-                    t::generic(ShapeDecoder::class, t::shape([
-                        'name' => t::string(),
-                        'age' => t::bool(),
-                        'bornAt' => t::object(DateTimeImmutable::class)->optional(),
-                    ])),
-                ),
-            );
+            ->seeReturnType($expected_decoder_type);
     }
 
     public function testIntersectionDecoder(): void
@@ -356,16 +424,19 @@ final class DecoderTest extends PsalmTest
                 shape(prop3: string(), prop4: string()),
                 shape(prop5: string(), prop6: string()),
             ))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::shape([
-                    'prop1' => t::string(),
-                    'prop2' => t::string(),
-                    'prop3' => t::string(),
-                    'prop4' => t::string(),
-                    'prop5' => t::string(),
-                    'prop6' => t::string(),
-                ]))
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::shape([
+                        'prop1' => t::string(),
+                        'prop2' => t::string(),
+                        'prop3' => t::string(),
+                        'prop4' => t::string(),
+                        'prop5' => t::string(),
+                        'prop6' => t::string(),
+                    ]),
+                ],
+            ));
     }
 
     public function testIntersectionDecoderIntersectionCollisionIssue(): void
@@ -384,16 +455,13 @@ final class DecoderTest extends PsalmTest
     public function testArrDecoder(): void
     {
         StaticTestCase::describe()
-            ->haveCode(fn() => arr(
-                int(),
-                string()
-            ))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::array(
-                    t::int(),
-                    t::string(),
-                ))
-            );
+            ->haveCode(fn() => arr(int(), string()))
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::array(t::int(), t::string()),
+                ],
+            ));
     }
 
     public function testNonEmptyArrDecoder(): void
@@ -403,37 +471,35 @@ final class DecoderTest extends PsalmTest
                 int(),
                 string()
             ))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::nonEmptyArray(
-                    t::int(),
-                    t::string(),
-                ))
-            );
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::nonEmptyArray(t::int(), t::string()),
+                ],
+            ));
     }
 
     public function testListDecoder(): void
     {
         StaticTestCase::describe()
-            ->haveCode(fn() => arrList(
-                int(),
-            ))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::list(
-                    t::int(),
-                ))
-            );
+            ->haveCode(fn() => arrList(int()))
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::list(t::int()),
+                ],
+            ));
     }
 
     public function testNonEmptyListDecoder(): void
     {
         StaticTestCase::describe()
-            ->haveCode(fn() => nonEmptyArrList(
-                int()
-            ))
-            ->seeReturnType(
-                t::generic(AbstractDecoder::class, t::nonEmptyList(
-                    t::int(),
-                ))
-            );
+            ->haveCode(fn() => nonEmptyArrList(int()))
+            ->seeReturnType(t::generic(
+                ofType: AbstractDecoder::class,
+                withParams: [
+                    t::nonEmptyList(t::int()),
+                ],
+            ));
     }
 }

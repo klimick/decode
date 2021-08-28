@@ -121,30 +121,21 @@ final class StaticTypes
     }
 
     /**
-     * @no-named-arguments
-     * @param class-string $type_constructor
+     * @param class-string $ofType
+     * @param non-empty-list<StaticTypeInterface> $withParams
      */
-    public static function generic(
-        string $type_constructor,
-        StaticTypeInterface $type_param,
-        StaticTypeInterface ...$type_params,
-    ): StaticTypeInterface
+    public static function generic(string $ofType, array $withParams): StaticTypeInterface
     {
         NoCode::here();
     }
 
     /**
      * @template T of object
-     * @no-named-arguments
      *
-     * @param StaticTypeInterface<T> $type
-     * @param StaticTypeInterface<T> ...$types
+     * @param non-empty-list<StaticTypeInterface<T>> $types
      * @return  StaticTypeInterface<T>
      */
-    public static function intersection(
-        StaticTypeInterface $type,
-        StaticTypeInterface ...$types,
-    ): StaticTypeInterface
+    public static function intersection(array $types): StaticTypeInterface
     {
         NoCode::here();
     }
@@ -153,10 +144,10 @@ final class StaticTypes
      * @template T
      * @no-named-arguments
      *
-     * @param StaticTypeInterface<T> ...$types
+     * @param non-empty-list<StaticTypeInterface<T>> ...$types
      * @return StaticTypeInterface<T>
      */
-    public static function union(StaticTypeInterface ...$types): StaticTypeInterface
+    public static function union(array $types): StaticTypeInterface
     {
         NoCode::here();
     }

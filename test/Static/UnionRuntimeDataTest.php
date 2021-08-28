@@ -29,7 +29,9 @@ final class UnionRuntimeDataTest extends PsalmTest
                 );
             })
             ->seeReturnType(
-                t::union(t::literal(1), t::literal(2), t::literal(3))
+                t::union([
+                    t::literal(1), t::literal(2), t::literal(3)
+                ])
             );
     }
 

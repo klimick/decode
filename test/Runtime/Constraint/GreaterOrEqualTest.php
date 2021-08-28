@@ -15,34 +15,30 @@ final class GreaterOrEqualTest extends TestCase
     public function testValid(): void
     {
         eris(repeat: 1000, ratio: 40)
-            ->forAll(Gen::int(), Gen::int())
-            ->when(fn(int $actual, int $expected) => $actual >= $expected)
-            ->then(fn(int $actual, int $expected) => Check::isValid()
-                ->forConstraint(greaterOrEqual(to: $expected))
-                ->withValue($actual));
+            ->forAll(Gen::int(), Gen::elements(0, 1))
+            ->then(fn(int $num, int|float $zeroOrOne) => Check::isValid()
+                ->forConstraint(greaterOrEqual(to: $num))
+                ->withValue($num + $zeroOrOne));
 
         eris(repeat: 1000, ratio: 40)
-            ->forAll(Gen::float(), Gen::float())
-            ->when(fn(float $actual, float $expected) => $actual >= $expected)
-            ->then(fn(float $actual, float $expected) => Check::isValid()
-                ->forConstraint(greaterOrEqual(to: $expected))
-                ->withValue($actual));
+            ->forAll(Gen::float(), Gen::elements(0, 0.1, 1))
+            ->then(fn(float $num, int|float $zeroOrOne) => Check::isValid()
+                ->forConstraint(greaterOrEqual(to: $num))
+                ->withValue($num + $zeroOrOne));
     }
 
     public function testInvalid(): void
     {
         eris(repeat: 1000, ratio: 40)
-            ->forAll(Gen::int(), Gen::int())
-            ->when(fn(int $actual, int $expected) => $actual < $expected)
-            ->then(fn(int $actual, int $expected) => Check::isInvalid()
-                ->forConstraint(greaterOrEqual(to: $expected))
-                ->withValue($actual));
+            ->forAll(Gen::int(), Gen::elements(0.1, 1))
+            ->then(fn(int $num, int|float $zeroOrOne) => Check::isInvalid()
+                ->forConstraint(greaterOrEqual(to: $num))
+                ->withValue($num - $zeroOrOne));
 
         eris(repeat: 1000, ratio: 40)
-            ->forAll(Gen::float(), Gen::float())
-            ->when(fn(float $actual, float $expected) => $actual < $expected)
-            ->then(fn(float $actual, float $expected) => Check::isInvalid()
-                ->forConstraint(greaterOrEqual(to: $expected))
-                ->withValue($actual));
+            ->forAll(Gen::float(), Gen::elements(0.1, 1))
+            ->then(fn(int $num, int|float $zeroOrOne) => Check::isInvalid()
+                ->forConstraint(greaterOrEqual(to: $num))
+                ->withValue($num - $zeroOrOne));
     }
 }

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmTest\StaticType;
 
-use Psalm\Type;
-
 /**
- * @template T
+ * @template-covariant T
  */
 interface StaticTypeInterface
 {

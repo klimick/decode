@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmTest\Integration\Hook;
 
+use Fp\Collections\NonEmptyLinkedList;
 use Fp\Functional\Option\Option;
 use Klimick\PsalmTest\Integration\Psalm;
 use Klimick\PsalmTest\StaticType\StaticTypeInterface;
@@ -12,9 +13,7 @@ use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
 use Psalm\Type;
 use Psalm\Type\Atomic\TGenericObject;
-use function Fp\Cast\asList;
 use function Fp\Collection\first;
-use function Fp\Collection\tail;
 use function Fp\Evidence\proveTrue;
 
 final class IntersectionReturnTypeProvider implements MethodReturnTypeProviderInterface
@@ -29,17 +28,16 @@ final class IntersectionReturnTypeProvider implements MethodReturnTypeProviderIn
         $return_type = Option::do(function() use ($event) {
             yield proveTrue('intersection' === $event->getMethodNameLowercase());
 
-            [$type, $types] = yield self::getTypes($event);
+            $types = yield self::getTypes($event);
+            $first_type = clone $types->head();
 
-            $intersected = clone $type;
-
-            foreach ($types as $addToIntersection) {
-                $intersected->addIntersectionType($addToIntersection);
+            foreach ($types->tail() as $addToIntersection) {
+                $first_type->addIntersectionType($addToIntersection);
             }
 
             return new Type\Union([
                 new TGenericObject(StaticTypeInterface::class, [
-                    new Type\Union([$intersected])
+                    new Type\Union([$first_type])
                 ]),
             ]);
         });
@@ -48,30 +46,26 @@ final class IntersectionReturnTypeProvider implements MethodReturnTypeProviderIn
     }
 
     /**
-     * @return Option<array{Type\Atomic\TNamedObject, non-empty-list<Type\Atomic\TNamedObject>}>
+     * @return Option<NonEmptyLinkedList<Type\Atomic\TNamedObject>>
      */
     private static function getTypes(MethodReturnTypeProviderEvent $event): Option
     {
         return Option::do(function() use ($event) {
+            $keyed_array = yield first($event->getCallArgs())
+                ->flatMap(Psalm::getArgType(from: $event))
+                ->flatMap(Psalm::asSingleAtomicOf(class: Type\Atomic\TKeyedArray::class))
+                ->filter(fn($keyed_array) => $keyed_array->is_list);
+
             $types = [];
 
-            foreach ($event->getCallArgs() as $arg) {
-                $types[] = yield Psalm::getType($arg->value, $event)
-                    ->flatMap(fn($arg_type) => Psalm::asSingleAtomic($arg_type))
-                    ->filter(fn($atomic) => $atomic instanceof TGenericObject)
-                    ->filter(fn($atomic) => StaticTypeInterface::class === $atomic->value)
-                    ->flatMap(fn($atomic) => first($atomic->type_params))
-                    ->flatMap(fn($atomic) => Psalm::asSingleAtomic($atomic))
-                    ->filter(fn($atomic) => $atomic instanceof Type\Atomic\TNamedObject);
+            foreach ($keyed_array->properties as $property) {
+                $types[] = yield Option::some($property)
+                    ->flatMap(Psalm::asSingleAtomicOf(class: Type\Atomic\TGenericObject::class))
+                    ->flatMap(Psalm::getTypeParam(of: StaticTypeInterface::class, position: 0))
+                    ->flatMap(Psalm::asSingleAtomicOf(class: Type\Atomic\TNamedObject::class));
             }
 
-            return [
-                yield first($types),
-                yield Option::some(tail($types))
-                    ->filter(fn($types) => count($types) >= 1)
-                    ->map(fn($types) => asList($types)),
-            ];
+            return NonEmptyLinkedList::collectNonEmpty($types);
         });
     }
-
 }

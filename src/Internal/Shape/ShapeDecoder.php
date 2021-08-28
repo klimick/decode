@@ -53,7 +53,7 @@ final class ShapeDecoder extends AbstractDecoder
             return false;
         }
 
-        foreach ($this->decoders as $k => $decoder) {
+        foreach (array_keys($this->decoders) as $k) {
             if (!array_key_exists($k, $value) || !$this->decoders[$k]->is($value[$k])) {
                 return false;
             }
