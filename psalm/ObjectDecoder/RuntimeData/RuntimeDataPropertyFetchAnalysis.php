@@ -16,7 +16,7 @@ use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
 use function Fp\Evidence\proveOf;
 
-final class PropertyFetchAnalysis implements AfterExpressionAnalysisInterface
+final class RuntimeDataPropertyFetchAnalysis implements AfterExpressionAnalysisInterface
 {
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
-use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\UnionRuntimeData;
 use Klimick\PsalmDecode\Issue\UnionRuntimeData\InvalidMatcherTypeIssue;
 use Klimick\PsalmDecode\Issue\UnionRuntimeData\UnexhaustiveMatchIssue;
@@ -22,13 +21,11 @@ use Psalm\StatementsSource;
 use Psalm\Storage\FunctionLikeParameter;
 use Psalm\Type;
 use Psalm\Type\Atomic\TNamedObject;
-use ReflectionMethod;
 use function Fp\Collection\first;
 use function Fp\Evidence\proveOf;
-use function Fp\Evidence\proveString;
 use function Fp\Evidence\proveTrue;
 
-final class UnionMatchAnalysis implements AfterExpressionAnalysisInterface
+final class UnionRuntimeDataMatchAnalysis implements AfterExpressionAnalysisInterface
 {
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
@@ -50,7 +47,7 @@ final class UnionMatchAnalysis implements AfterExpressionAnalysisInterface
                 ->filter(fn($class) => is_subclass_of($class, UnionRuntimeData::class));
 
             $actual_match_arg_nodes = yield self::getActualMatchArgNodes($match_call);
-            $required_match_args = yield self::getRequiredMatchArgs($union_runtime_data_class);
+            $required_match_args = yield RuntimeDecoder::getUnionCases($union_runtime_data_class);
 
             self::analyzeMatch(
                 $codebase,
@@ -169,56 +166,6 @@ final class UnionMatchAnalysis implements AfterExpressionAnalysisInterface
             }
 
             return $match_args;
-        });
-    }
-
-    /**
-     * @param class-string<UnionRuntimeData> $union_runtime_data_class
-     * @return Option<array<string, AbstractDecoder>>
-     */
-    private static function getCases(string $union_runtime_data_class): Option
-    {
-        return Option::do(function() use ($union_runtime_data_class) {
-            $result = yield Option
-                ::try(function() use ($union_runtime_data_class): mixed {
-                    $ref = new ReflectionMethod("{$union_runtime_data_class}::cases");
-                    $ref->setAccessible(true);
-
-                    return $ref->invoke(null);
-                })
-                ->filter(fn(mixed $result) => is_array($result));
-
-            $cases = [];
-
-            /** @psalm-suppress MixedAssignment */
-            foreach ($result as $k => $v) {
-                $case = yield proveString($k);
-                $decoder = yield proveOf($v, AbstractDecoder::class);
-
-                $cases[$case] = $decoder;
-            }
-
-            return $cases;
-        });
-    }
-
-    /**
-     * @param class-string<UnionRuntimeData> $union_runtime_data_class
-     * @return Option<array<string, Type\Union>>
-     */
-    private static function getRequiredMatchArgs(string $union_runtime_data_class): Option
-    {
-        return Option::do(function() use ($union_runtime_data_class) {
-            $cases = yield self::getCases($union_runtime_data_class);
-            $required_args = [];
-
-            foreach ($cases as $case => $decoder) {
-                $required_args[$case] = yield Option::try(
-                    fn() => Type::parseString($decoder->name())
-                );
-            }
-
-            return $required_args;
         });
     }
 

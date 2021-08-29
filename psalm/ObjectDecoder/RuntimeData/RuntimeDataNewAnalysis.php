@@ -5,9 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\RuntimeData;
-use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Psalm\CodeLocation;
@@ -17,28 +15,20 @@ use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
 use Psalm\Type;
-use function Fp\Evidence\proveNonEmptyArray;
-use function Fp\Evidence\proveNonEmptyString;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
 
-final class NewAnalysis implements AfterExpressionAnalysisInterface
+final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
 {
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
         Option::do(function() use ($event) {
             $new_expr = yield proveOf($event->getExpr(), Node\Expr\New_::class);
 
-            /** @var class-string<RuntimeData> $runtime_data_class */
-            $runtime_data_class = yield proveOf($new_expr->class, Node\Name::class)
+            $expected_constructor_params = yield proveOf($new_expr->class, Node\Name::class)
                 ->flatMap(fn($name) => proveString($name->getAttribute('resolvedName')))
-                ->filter(fn(string $class) => Psalm::classExtends($class, from: RuntimeData::class, event: $event));
-
-            $expected_constructor_params = yield Option
-                ::try(fn() => $runtime_data_class::type())
-                ->flatMap(fn($object_decoder) => proveOf($object_decoder, ObjectDecoder::class))
-                ->flatMap(fn($object_decoder) => proveNonEmptyArray($object_decoder->shape->decoders))
-                ->flatMap(fn($decoders) => self::toConstructor($decoders));
+                ->filter(fn(string $class) => Psalm::classExtends($class, from: RuntimeData::class, event: $event))
+                ->flatMap(fn($class) => RuntimeDecoder::getProperties($class));
 
             self::validateArgs($expected_constructor_params, $event, $new_expr);
         });
@@ -47,7 +37,7 @@ final class NewAnalysis implements AfterExpressionAnalysisInterface
     }
 
     /**
-     * @param non-empty-array<non-empty-string, Type\Union> $decoders
+     * @param non-empty-array<string, Type\Union> $decoders
      */
     private static function validateArgs(array $decoders, AfterExpressionAnalysisEvent $event, Node\Expr\New_ $new): void
     {
@@ -125,25 +115,5 @@ final class NewAnalysis implements AfterExpressionAnalysisInterface
                 ));
             }
         }
-    }
-
-    /**
-     * @param non-empty-array<array-key, AbstractDecoder<mixed>> $decoders
-     * @return Option<non-empty-array<non-empty-string, Type\Union>>
-     */
-    private static function toConstructor(array $decoders): Option
-    {
-        return Option::do(function() use ($decoders) {
-            $param_types = [];
-
-            foreach ($decoders as $k => $decoder) {
-                $key = yield proveNonEmptyString($k);
-                $type = yield Option::try(fn() => Type::parseString($decoder->name()));
-
-                $param_types[$key] = $type;
-            }
-
-            return $param_types;
-        });
     }
 }
