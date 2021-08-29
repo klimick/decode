@@ -6,11 +6,11 @@ namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\RuntimeData;
+use Klimick\PsalmDecode\Issue\RuntimeData\UnsafeRuntimeDataInstantiation;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Psalm\CodeLocation;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
-use Psalm\Issue\InvalidArgument;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
@@ -47,10 +47,13 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
         $actual_args_count = count($new->args);
 
         if ($expected_args_count !== $actual_args_count) {
-            IssueBuffer::accepts(new InvalidArgument(
-                message: sprintf("Expected args %s. Actual count %s.", $expected_args_count, $actual_args_count),
-                code_location: new CodeLocation($source, $new),
-            ));
+            IssueBuffer::accepts(
+                e: new UnsafeRuntimeDataInstantiation(
+                    message: sprintf("Expected args %s. Actual count %s.", $expected_args_count, $actual_args_count),
+                    code_location: new CodeLocation($source, $new),
+                ),
+                suppressed_issues: $source->getSuppressedIssues(),
+            );
 
             return;
         }
@@ -64,10 +67,13 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
             }
 
             if ($named_arguments && null === $arg_expr->name) {
-                IssueBuffer::accepts(new InvalidArgument(
-                    message: 'Positional arguments cannot follows after named arguments',
-                    code_location: new CodeLocation($source, $arg_expr),
-                ));
+                IssueBuffer::accepts(
+                    e: new UnsafeRuntimeDataInstantiation(
+                        message: 'Positional arguments cannot follows after named arguments',
+                        code_location: new CodeLocation($source, $arg_expr),
+                    ),
+                    suppressed_issues: $source->getSuppressedIssues(),
+                );
 
                 return;
             }
@@ -79,19 +85,25 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
             $arg_type = Psalm::getType($source->getNodeTypeProvider(), $arg_expr->value);
 
             if ($arg_type->isNone()) {
-                IssueBuffer::accepts(new InvalidArgument(
-                    message: sprintf('No type for "%s" arg.', $arg_name),
-                    code_location: new CodeLocation($source, $arg_expr),
-                ));
+                IssueBuffer::accepts(
+                    e: new UnsafeRuntimeDataInstantiation(
+                        message: sprintf('No type for "%s" arg.', $arg_name),
+                        code_location: new CodeLocation($source, $arg_expr),
+                    ),
+                    suppressed_issues: $source->getSuppressedIssues(),
+                );
 
                 continue;
             }
 
             if (!array_key_exists($arg_name, $decoders)) {
-                IssueBuffer::accepts(new InvalidArgument(
-                    message: sprintf('No named argument with name "%s".', $arg_name),
-                    code_location: new CodeLocation($source, $arg_expr),
-                ));
+                IssueBuffer::accepts(
+                    e: new UnsafeRuntimeDataInstantiation(
+                        message: sprintf('No named argument with name "%s".', $arg_name),
+                        code_location: new CodeLocation($source, $arg_expr),
+                    ),
+                    suppressed_issues: $source->getSuppressedIssues(),
+                );
 
                 continue;
             }
@@ -109,10 +121,13 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
                 $actual_id = $actual_arg_type->getId();
                 $expected_id = $expected_arg_type->getId();
 
-                IssueBuffer::accepts(new InvalidArgument(
-                    message: sprintf('Invalid type for "%s". Actual: "%s". Expected: "%s".', $arg_name, $actual_id, $expected_id),
-                    code_location: new CodeLocation($source, $arg_expr),
-                ));
+                IssueBuffer::accepts(
+                    e: new UnsafeRuntimeDataInstantiation(
+                        message: sprintf('Invalid type for "%s". Actual: "%s". Expected: "%s".', $arg_name, $actual_id, $expected_id),
+                        code_location: new CodeLocation($source, $arg_expr),
+                    ),
+                    suppressed_issues: $source->getSuppressedIssues(),
+                );
             }
         }
     }
