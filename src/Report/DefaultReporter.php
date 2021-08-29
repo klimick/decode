@@ -41,8 +41,8 @@ final class DefaultReporter
             } elseif ($error instanceof UnionTypeErrors) {
                 $e = [];
 
-                foreach ($error->errors as $typename => $errors) {
-                    $e[$typename] = self::reportErrors($errors, $useShortClassNames);
+                foreach ($error->errors as $caseErrors) {
+                    $e[] = new UnionCaseReport($caseErrors->case, self::reportErrors($caseErrors->errors, $useShortClassNames));
                 }
 
                 $unionTypeErrors[] = $e;

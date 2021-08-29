@@ -6,6 +6,7 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
+use Klimick\Decode\Decoder\UnionCaseErrors;
 use Klimick\Decode\Decoder\UnionTypeErrors;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\AbstractDecoder;
@@ -65,7 +66,7 @@ final class UnionDecoder extends AbstractDecoder
                 return valid($result->value);
             }
 
-            $errors[$typename] = $result->errors;
+            $errors[] = new UnionCaseErrors($typename, $result->errors);
         }
 
         return invalids([

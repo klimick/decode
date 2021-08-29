@@ -10,7 +10,7 @@ namespace Klimick\Decode\Decoder;
 final class UnionTypeErrors implements DecodeErrorInterface
 {
     /**
-     * @param non-empty-array<non-empty-string, non-empty-list<DecodeErrorInterface>> $errors
+     * @param non-empty-list<UnionCaseErrors> $errors
      */
     public function __construct(public array $errors)
     {
