@@ -13,22 +13,29 @@ use RuntimeException;
  */
 abstract class UnionRuntimeData
 {
-    final public function __construct(
-        private string $type,
-        private RuntimeData|UnionRuntimeData $instance,
-    ) {}
+    private string $caseId;
+    private RuntimeData|UnionRuntimeData $instance;
 
-    final public static function of(array $args): static
+    final public function __construct(RuntimeData|UnionRuntimeData $case)
     {
-        return decode($args, static::type())
-            ->map(fn(Valid $v) => $v->value)
-            ->mapLeft(fn() => throw new RuntimeException('Could not create RuntimeData. Check psalm issues.'))
-            ->get();
+        $this->caseId = static::getCaseIdByInstance($case);
+        $this->instance = $case;
+    }
+
+    private static function getCaseIdByInstance(RuntimeData|UnionRuntimeData $instance): string
+    {
+        foreach (static::getCases() as $type => $decoder) {
+            if ($decoder->is($instance)) {
+                return $type;
+            }
+        }
+
+        throw new RuntimeException('Unable to create UnionRuntimeData. Check psalm issues.');
     }
 
     final public function match(callable ...$matchers): mixed
     {
-        return ($matchers[$this->type])($this->instance);
+        return ($matchers[$this->caseId])($this->instance);
     }
 
     /**
@@ -36,16 +43,36 @@ abstract class UnionRuntimeData
      */
     final public static function type(): AbstractDecoder
     {
-        $cases = static::cases();
+        /** @var null|(AbstractDecoder<static> & UnionDecoder<static>) $decoder */
+        static $decoder = null;
 
-        return union(...array_map(
-            fn($decoder, $type) => object(static::class)(
-                type: constant($type),
-                instance: $decoder->from('$'),
-            ),
-            array_values($cases),
-            array_keys($cases),
+        if (null !== $decoder) {
+            return $decoder;
+        }
+
+        return ($decoder = new UnionDecoder(
+            ...array_map(
+                fn($decoder) => new ObjectDecoder(static::class, [
+                    'instance' => $decoder->from('$'),
+                ]),
+                array_values(static::getCases()),
+            )
         ));
+    }
+
+    /**
+     * @psalm-return non-empty-array<non-empty-string, ObjectDecoder<RuntimeData> | UnionDecoder<UnionRuntimeData>>
+     */
+    private static function getCases(): array
+    {
+        /** @var null|non-empty-array<non-empty-string, ObjectDecoder<RuntimeData> | UnionDecoder<UnionRuntimeData>> $cases */
+        static $cases = null;
+
+        if (null !== $cases) {
+            return $cases;
+        }
+
+        return ($cases = static::cases());
     }
 
     /**

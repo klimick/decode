@@ -18,7 +18,7 @@ abstract class RuntimeData implements JsonSerializable
 
     final public function __construct(mixed ...$properties)
     {
-        $this->properties = self::completeKeys($properties, self::type());
+        $this->properties = static::completeKeys($properties, static::type());
     }
 
     /**

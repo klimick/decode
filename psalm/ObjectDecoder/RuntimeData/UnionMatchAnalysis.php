@@ -6,9 +6,6 @@ namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
 
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\UnionRuntimeData;
-use Klimick\Decode\Internal\ConstantDecoder;
-use Klimick\Decode\Internal\ObjectDecoder;
-use Klimick\Decode\Internal\UnionDecoder;
 use Klimick\PsalmDecode\Issue\UnionRuntimeData\InvalidMatcherTypeIssue;
 use Klimick\PsalmDecode\Issue\UnionRuntimeData\UnexhaustiveMatchIssue;
 use Klimick\PsalmDecode\Psalm;
@@ -25,7 +22,7 @@ use Psalm\StatementsSource;
 use Psalm\Storage\FunctionLikeParameter;
 use Psalm\Type;
 use Psalm\Type\Atomic\TNamedObject;
-use function Fp\Collection\at;
+use ReflectionMethod;
 use function Fp\Collection\first;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
@@ -141,8 +138,6 @@ final class UnionMatchAnalysis implements AfterExpressionAnalysisInterface
                     $issue = new InvalidMatcherTypeIssue($required_matcher_param_type, $actual_marcher_arg_type, $code_location);
 
                     IssueBuffer::accepts($issue, $source->getSuppressedIssues());
-
-                    continue;
                 }
             }
 
@@ -179,31 +174,48 @@ final class UnionMatchAnalysis implements AfterExpressionAnalysisInterface
 
     /**
      * @param class-string<UnionRuntimeData> $union_runtime_data_class
+     * @return Option<array<string, AbstractDecoder>>
+     */
+    private static function getCases(string $union_runtime_data_class): Option
+    {
+        return Option::do(function() use ($union_runtime_data_class) {
+            $result = yield Option
+                ::try(function() use ($union_runtime_data_class): mixed {
+                    $ref = new ReflectionMethod("{$union_runtime_data_class}::cases");
+                    $ref->setAccessible(true);
+
+                    return $ref->invoke(null);
+                })
+                ->filter(fn(mixed $result) => is_array($result));
+
+            $cases = [];
+
+            /** @psalm-suppress MixedAssignment */
+            foreach ($result as $k => $v) {
+                $case = yield proveString($k);
+                $decoder = yield proveOf($v, AbstractDecoder::class);
+
+                $cases[$case] = $decoder;
+            }
+
+            return $cases;
+        });
+    }
+
+    /**
+     * @param class-string<UnionRuntimeData> $union_runtime_data_class
      * @return Option<array<string, Type\Union>>
      */
     private static function getRequiredMatchArgs(string $union_runtime_data_class): Option
     {
         return Option::do(function() use ($union_runtime_data_class) {
-            $union_decoder = yield Option::try(fn() => $union_runtime_data_class::type())
-                ->flatMap(fn($decoder) => proveOf($decoder, UnionDecoder::class));
-
+            $cases = yield self::getCases($union_runtime_data_class);
             $required_args = [];
 
-            foreach ($union_decoder->decoders as $decoder) {
-                yield proveTrue($decoder instanceof ObjectDecoder);
-
-                $matcher_name = yield at($decoder->decoders, 'type')
-                    ->flatMap(fn($d) => proveOf($d, ConstantDecoder::class))
-                    ->flatMap(fn($d) => proveString($d->constant));
-
-                $matcher_param_type = yield at($decoder->decoders, 'instance')
-                    ->flatMap(fn($d) => proveOf($d, AbstractDecoder::class))
-                    ->map(fn($d) => $d->name())
-                    ->flatMap(fn($name) => Option::try(
-                        fn() => Type::parseString($name)
-                    ));
-
-                $required_args[$matcher_name] = $matcher_param_type;
+            foreach ($cases as $case => $decoder) {
+                $required_args[$case] = yield Option::try(
+                    fn() => Type::parseString($decoder->name())
+                );
             }
 
             return $required_args;
