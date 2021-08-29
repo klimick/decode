@@ -18,11 +18,7 @@ final class NamedArgumentsMapper
      * @param list<Node\Arg> $call_args
      * @return Option<Type\Union>
      */
-    public static function map(
-        array $call_args,
-        NodeTypeProvider $provider,
-        bool $partial = false,
-    ): Option
+    public static function map(array $call_args, NodeTypeProvider $provider, bool $partial = false): Option
     {
         return Option::do(function() use ($call_args, $provider, $partial) {
             $properties = [];
@@ -40,17 +36,9 @@ final class NamedArgumentsMapper
     }
 
     /**
-     * @psalm-type PropertyInfo = array{
-     *     property: string,
-     *     type: Type\Union
-     * }
-     *
-     * @return Option<PropertyInfo>
+     * @return Option<array{property: string, type: Type\Union}>
      */
-    private static function getPropertyInfo(
-        Node\Arg $named_arg,
-        NodeTypeProvider $provider,
-    ): Option
+    private static function getPropertyInfo(Node\Arg $named_arg, NodeTypeProvider $provider): Option
     {
         return Option::do(function() use ($named_arg, $provider) {
             $named_arg_type = yield Psalm::getType($provider, $named_arg->value);
