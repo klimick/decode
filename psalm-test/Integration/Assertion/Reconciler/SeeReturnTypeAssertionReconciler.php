@@ -38,7 +38,7 @@ final class SeeReturnTypeAssertionReconciler implements AssertionReconcilerInter
         $codebase = ProjectAnalyzer::$instance->getCodebase();
 
         return $invariant
-            ? UnionTypeComparator::canExpressionTypesBeIdentical($codebase, $actual, $expected)
+            ? $actual->getId() === $expected->getId()
             : UnionTypeComparator::isContainedBy($codebase, $actual, $expected);
     }
 }

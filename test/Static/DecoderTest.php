@@ -7,6 +7,7 @@ namespace Klimick\Decode\Test\Static;
 use DateTimeImmutable;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\Decode\Internal\UnionDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Department;
 use Klimick\Decode\Test\Static\Fixtures\PartialPerson;
 use Klimick\Decode\Test\Static\Fixtures\Person;
@@ -254,12 +255,8 @@ final class DecoderTest extends PsalmTest
 
     public function testUnionDecoder(): void
     {
-        StaticTestCase::describe()
-            ->haveCode(fn() => union(
-                int(),
-                string(),
-            ))
-            ->seeReturnType(t::generic(
+        $expected_decoder_type = t::intersection([
+            t::generic(
                 ofType: AbstractDecoder::class,
                 withParams: [
                     t::union([
@@ -267,7 +264,24 @@ final class DecoderTest extends PsalmTest
                         t::string(),
                     ]),
                 ],
-            ));
+            ),
+            t::generic(
+                ofType: UnionDecoder::class,
+                withParams: [
+                    t::union([
+                        t::int(),
+                        t::string(),
+                    ])
+                ]
+            )
+        ]);
+
+        StaticTestCase::describe()
+            ->haveCode(fn() => union(
+                int(),
+                string(),
+            ))
+            ->seeReturnType($expected_decoder_type);
     }
 
     public function testObjectDecoder(): void
@@ -400,7 +414,7 @@ final class DecoderTest extends PsalmTest
                 withParams: [
                     t::shape([
                         'name' => t::string(),
-                        'age' => t::bool(),
+                        'age' => t::int(),
                         'bornAt' => t::object(DateTimeImmutable::class)->optional(),
                     ]),
                 ],
@@ -418,13 +432,8 @@ final class DecoderTest extends PsalmTest
 
     public function testIntersectionDecoder(): void
     {
-        StaticTestCase::describe()
-            ->haveCode(fn() => intersection(
-                shape(prop1: string(), prop2: string()),
-                shape(prop3: string(), prop4: string()),
-                shape(prop5: string(), prop6: string()),
-            ))
-            ->seeReturnType(t::generic(
+        $expected_decoder_type = t::intersection([
+            t::generic(
                 ofType: AbstractDecoder::class,
                 withParams: [
                     t::shape([
@@ -436,7 +445,29 @@ final class DecoderTest extends PsalmTest
                         'prop6' => t::string(),
                     ]),
                 ],
-            ));
+            ),
+            t::generic(
+                ofType: ShapeDecoder::class,
+                withParams: [
+                    t::shape([
+                        'prop1' => t::string(),
+                        'prop2' => t::string(),
+                        'prop3' => t::string(),
+                        'prop4' => t::string(),
+                        'prop5' => t::string(),
+                        'prop6' => t::string(),
+                    ]),
+                ],
+            ),
+        ]);
+
+        StaticTestCase::describe()
+            ->haveCode(fn() => intersection(
+                shape(prop1: string(), prop2: string()),
+                shape(prop3: string(), prop4: string()),
+                shape(prop5: string(), prop6: string()),
+            ))
+            ->seeReturnType($expected_decoder_type);
     }
 
     public function testIntersectionDecoderIntersectionCollisionIssue(): void
