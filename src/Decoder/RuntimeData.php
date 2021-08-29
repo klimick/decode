@@ -8,7 +8,6 @@ use JsonSerializable;
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use OutOfRangeException;
-use RuntimeException;
 
 /**
  * @psalm-immutable
@@ -23,6 +22,9 @@ abstract class RuntimeData implements JsonSerializable
     }
 
     /**
+     * Completes named arguments if instance was created with the new expression.
+     * If instance was created with the decoding this call is just redundant.
+     *
      * @psalm-suppress MixedAssignment
      */
     private static function completeKeys(array $values, ObjectDecoder $decoder): array
@@ -48,14 +50,6 @@ abstract class RuntimeData implements JsonSerializable
         return $withKeys;
     }
 
-    final public static function of(array $args): static
-    {
-        return decode($args, static::type())
-            ->map(fn(Valid $v) => $v->value)
-            ->mapLeft(fn() => throw new RuntimeException('Could not create RuntimeData. Check psalm issues.'))
-            ->get();
-    }
-
     public function __get(string $name)
     {
         if (!array_key_exists($name, $this->properties)) {
@@ -75,13 +69,20 @@ abstract class RuntimeData implements JsonSerializable
      */
     public static function type(): AbstractDecoder
     {
+        /** @var null|(AbstractDecoder<static> & ObjectDecoder<static>) $decoder */
+        static $decoder = null;
+
+        if (null !== $decoder) {
+            return $decoder;
+        }
+
         $shapeDecoder = static::properties();
 
-        return new ObjectDecoder(
+        return ($decoder = new ObjectDecoder(
             objectClass: static::class,
             decoders: $shapeDecoder->decoders,
             partial: $shapeDecoder->partial,
-        );
+        ));
     }
 
     abstract protected static function properties(): ShapeDecoder;

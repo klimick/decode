@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test\Static;
 
-use DateTimeImmutable;
 use Klimick\Decode\Test\Static\Fixtures\Message;
 use Klimick\PsalmTest\PsalmTest;
 use Klimick\PsalmTest\StaticTestCase;
@@ -15,11 +14,8 @@ final class RuntimeDataIssuesTest extends PsalmTest
     {
         StaticTestCase::describe()
             ->haveCode(function(): mixed {
-                $message = Message::of([
-                    'id' => '...',
-                    'senderId' => '...',
-                    'receiverId' => '...',
-                ]);
+                /** @var Message $message */
+                $message = null;
 
                 return $message->misspelledReceiverId;
             })
@@ -36,15 +32,15 @@ final class RuntimeDataIssuesTest extends PsalmTest
     {
         StaticTestCase::describe()
             ->haveCode(function() {
-                return Message::of([
-                    'id' => '...',
-                    'senderId' => '...',
-                    'receiverId' => 123456,
-                ]);
+                return new Message(
+                    id: '...',
+                    senderId: '...',
+                    receiverId: 123456,
+                );
             })
             ->seePsalmIssue(
-                type: 'RuntimeDataTypeErrorIssue',
-                message: 'Wrong value at $.receiverId. Expected type: string. Actual type: int.',
+                type: 'InvalidArgument',
+                message: 'Invalid type for "receiverId". Actual: "123456". Expected: "string".',
             );
     }
 
@@ -52,32 +48,14 @@ final class RuntimeDataIssuesTest extends PsalmTest
     {
         StaticTestCase::describe()
             ->haveCode(function() {
-                return Message::of([
-                    'id' => '...',
-                    'senderId' => '...',
-                ]);
+                return new Message(
+                    id: '...',
+                    senderId: '...',
+                );
             })
             ->seePsalmIssue(
-                type: 'RuntimeDataPropertyMissingIssue',
-                message: 'Required property "receiverId" at path $ is missing.',
-            );
-    }
-    public function testCouldNotAnalyzeOfCallIssue(): void
-    {
-        StaticTestCase::describe()
-            ->haveCode(function() {
-                /** @psalm-var DateTimeImmutable $id */
-                $id = '...';
-
-                return Message::of([
-                    'id' => $id,
-                    'senderId' => '...',
-                    'receiverId' => '...',
-                ]);
-            })
-            ->seePsalmIssue(
-                type: 'CouldNotAnalyzeOfCallIssue',
-                message: 'RuntimeData::of call could not be analyzed because array value is not literal.'
+                type: 'InvalidArgument',
+                message: 'Expected args 3. Actual count 2.',
             );
     }
 }
