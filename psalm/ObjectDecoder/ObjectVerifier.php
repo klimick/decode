@@ -16,7 +16,6 @@ use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use Klimick\PsalmDecode\ShapeDecoder\ShapePropertiesExtractor;
 use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
-use Klimick\Decode\Decoder\RuntimeData;
 use Fp\Functional\Option\Option;
 use function Fp\Cast\asList;
 use function Fp\Collection\first;
@@ -31,17 +30,6 @@ final class ObjectVerifier
         Option::do(function() use ($event) {
             $source = $event->getSource();
             $codebase = $source->getCodebase();
-            $context = $event->getContext();
-
-            $inside_class = null !== $context->self && $codebase->classlike_storage_provider->has($context->self);
-
-            if ($inside_class) {
-                $general_class = yield GetGeneralParentClass::for($context->self, $codebase);
-
-                if ($general_class === RuntimeData::class) {
-                    return;
-                }
-            }
 
             $actual_shape = yield NamedArgumentsMapper::map(
                 call_args: $event->getCallArgs(),
