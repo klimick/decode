@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal;
 
+use Closure;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
@@ -22,11 +23,13 @@ final class ObjectDecoder extends AbstractDecoder
     /**
      * @param class-string<T> $objectClass
      * @param array<array-key, AbstractDecoder<mixed>> $decoders
+     * @param Closure(array<array-key, mixed>): T $customConstructor
      */
     public function __construct(
         public string $objectClass,
         public array $decoders,
         public bool $partial = false,
+        public null|Closure $customConstructor = null,
     ) {
         $this->shape = new ShapeDecoder($decoders, $partial);
     }
@@ -47,7 +50,9 @@ final class ObjectDecoder extends AbstractDecoder
             ->decode($value, $context)
             ->flatMap(function($validShape) {
                 /** @psalm-suppress MixedMethodCall */
-                $instance = new ($this->objectClass)(...$validShape->value);
+                $instance = null !== $this->customConstructor
+                    ? ($this->customConstructor)($validShape->value)
+                    : new ($this->objectClass)(...$validShape->value);
 
                 return valid($instance);
             });

@@ -8,6 +8,9 @@ use JsonSerializable;
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use OutOfRangeException;
+use ReflectionClass;
+use ReflectionProperty;
+use RuntimeException;
 
 /**
  * @psalm-immutable
@@ -18,12 +21,20 @@ abstract class RuntimeData implements JsonSerializable
 
     final public function __construct(mixed ...$properties)
     {
-        $this->properties = static::completeKeys($properties, static::type());
+        /** @var ObjectDecoder<static> $decoder */
+        $decoder = static::type();
+
+        $propertiesWithKeys = static::completeKeys($properties, $decoder);
+
+        if (!$decoder->shape->is($propertiesWithKeys)) {
+            throw new RuntimeException('Invalid data');
+        }
+
+        $this->properties = $propertiesWithKeys;
     }
 
     /**
      * Completes named arguments if instance was created with the new expression.
-     * If instance was created with the decoding this call is just redundant.
      *
      * @psalm-suppress MixedAssignment
      */
@@ -69,20 +80,28 @@ abstract class RuntimeData implements JsonSerializable
      */
     public static function type(): AbstractDecoder
     {
-        /** @var null|(AbstractDecoder<static> & ObjectDecoder<static>) $decoder */
-        static $decoder = null;
-
-        if (null !== $decoder) {
-            return $decoder;
-        }
-
         $shapeDecoder = static::properties();
 
-        return ($decoder = new ObjectDecoder(
+        $constructor = static function(array $properties): static {
+            $classReflection = new ReflectionClass(static::class);
+
+            /** @var static $instance */
+            $instance = $classReflection->newInstanceWithoutConstructor();
+
+            $propertiesReflection = new ReflectionProperty(RuntimeData::class, 'properties');
+            $propertiesReflection->setAccessible(true);
+            $propertiesReflection->setValue($instance, $properties);
+            $propertiesReflection->setAccessible(false);
+
+            return $instance;
+        };
+
+        return new ObjectDecoder(
             objectClass: static::class,
             decoders: $shapeDecoder->decoders,
             partial: $shapeDecoder->partial,
-        ));
+            customConstructor: $constructor,
+        );
     }
 
     abstract protected static function properties(): ShapeDecoder;

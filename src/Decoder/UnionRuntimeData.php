@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Decoder;
 
+use JsonSerializable;
+use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Internal\UnionDecoder;
+use ReflectionClass;
+use ReflectionProperty;
 use RuntimeException;
 
 /**
  * @psalm-immutable
  */
-abstract class UnionRuntimeData
+abstract class UnionRuntimeData implements JsonSerializable
 {
     private string $caseId;
     private RuntimeData|UnionRuntimeData $instance;
@@ -24,7 +28,7 @@ abstract class UnionRuntimeData
 
     private static function getCaseIdByInstance(RuntimeData|UnionRuntimeData $instance): string
     {
-        foreach (static::getCases() as $type => $decoder) {
+        foreach (static::cases() as $type => $decoder) {
             if ($decoder->is($instance)) {
                 return $type;
             }
@@ -43,36 +47,46 @@ abstract class UnionRuntimeData
      */
     final public static function type(): AbstractDecoder
     {
-        /** @var null|(AbstractDecoder<static> & UnionDecoder<static>) $decoder */
-        static $decoder = null;
+        $constructor = static function(array $properties): static {
+            $classReflection = new ReflectionClass(static::class);
 
-        if (null !== $decoder) {
-            return $decoder;
-        }
+            /** @var static $instance */
+            $instance = $classReflection->newInstanceWithoutConstructor();
 
-        return ($decoder = new UnionDecoder(
+            $instanceReflection = new ReflectionProperty(UnionRuntimeData::class, 'instance');
+            $instanceReflection->setAccessible(true);
+            $instanceReflection->setValue($instance, $properties['instance']);
+            $instanceReflection->setAccessible(false);
+
+            $caseIdReflection = new ReflectionProperty(UnionRuntimeData::class, 'caseId');
+            $caseIdReflection->setAccessible(true);
+            $caseIdReflection->setValue($instance, $properties['caseId']);
+            $caseIdReflection->setAccessible(false);
+
+            return $instance;
+        };
+
+        $cases = static::cases();
+
+        return new UnionDecoder(
             ...array_map(
-                fn($decoder) => new ObjectDecoder(static::class, [
-                    'instance' => $decoder->from('$'),
-                ]),
-                array_values(static::getCases()),
+                fn($decoder, $case) => new ObjectDecoder(
+                    objectClass: static::class,
+                    decoders: [
+                        'instance' => $decoder->from('$'),
+                        'caseId' => new ConstantDecoder($case)
+                    ],
+                    customConstructor: $constructor
+                ),
+                array_values($cases),
+                array_keys($cases),
             )
-        ));
+        );
     }
 
-    /**
-     * @psalm-return non-empty-array<non-empty-string, ObjectDecoder<RuntimeData> | UnionDecoder<UnionRuntimeData>>
-     */
-    private static function getCases(): array
+    public function jsonSerialize(): RuntimeData|UnionRuntimeData
     {
-        /** @var null|non-empty-array<non-empty-string, ObjectDecoder<RuntimeData> | UnionDecoder<UnionRuntimeData>> $cases */
-        static $cases = null;
-
-        if (null !== $cases) {
-            return $cases;
-        }
-
-        return ($cases = static::cases());
+        return $this->instance;
     }
 
     /**

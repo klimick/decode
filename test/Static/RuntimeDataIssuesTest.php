@@ -39,7 +39,7 @@ final class RuntimeDataIssuesTest extends PsalmTest
                 );
             })
             ->seePsalmIssue(
-                type: 'InvalidArgument',
+                type: 'UnsafeRuntimeDataInstantiation',
                 message: 'Invalid type for "receiverId". Actual: "123456". Expected: "string".',
             );
     }
@@ -54,7 +54,7 @@ final class RuntimeDataIssuesTest extends PsalmTest
                 );
             })
             ->seePsalmIssue(
-                type: 'InvalidArgument',
+                type: 'UnsafeRuntimeDataInstantiation',
                 message: 'Expected args 3. Actual count 2.',
             );
     }

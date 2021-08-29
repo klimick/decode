@@ -24,7 +24,7 @@ final class UnionRuntimeDataTest extends PsalmTest
         );
 
         $telegram = new Telegram(
-            telegram_id: 'test-id',
+            telegramId: 'test-id',
             owner: new Owner(case: $bot)
         );
 
