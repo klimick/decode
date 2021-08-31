@@ -21,13 +21,6 @@ final class Context implements JsonSerializable
         return new self([...$this->entries, new ContextEntry($name, $actual, $key)]);
     }
 
-    public static function root(string $name, mixed $actual): self
-    {
-        return new self([
-            new ContextEntry($name, $actual),
-        ]);
-    }
-
     public function jsonSerialize()
     {
         return $this->entries;
