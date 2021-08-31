@@ -76,7 +76,7 @@ final class ProductTypeTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid data');
 
-        /** @psalm-suppress UnsafeSumTypeInstantiation */
+        /** @psalm-suppress InvalidProductTypeInstantiationIssue */
         new Bot('token-val', apiVersion: 'v4');
     }
 }

@@ -6,7 +6,7 @@ namespace Klimick\PsalmDecode\ObjectDecoder\ADT;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\ProductType;
-use Klimick\PsalmDecode\Issue\RuntimeData\UnsafeSumTypeInstantiation;
+use Klimick\PsalmDecode\Issue\RuntimeData\InvalidProductTypeInstantiationIssue;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Psalm\CodeLocation;
@@ -48,7 +48,7 @@ final class ProductTypeNewAnalysis implements AfterExpressionAnalysisInterface
 
         if ($expected_args_count !== $actual_args_count) {
             IssueBuffer::accepts(
-                e: new UnsafeSumTypeInstantiation(
+                e: new InvalidProductTypeInstantiationIssue(
                     message: sprintf("Expected args %s. Actual count %s.", $expected_args_count, $actual_args_count),
                     code_location: new CodeLocation($source, $new),
                 ),
@@ -68,7 +68,7 @@ final class ProductTypeNewAnalysis implements AfterExpressionAnalysisInterface
 
             if ($named_arguments && null === $arg_expr->name) {
                 IssueBuffer::accepts(
-                    e: new UnsafeSumTypeInstantiation(
+                    e: new InvalidProductTypeInstantiationIssue(
                         message: 'Positional arguments cannot follows after named arguments',
                         code_location: new CodeLocation($source, $arg_expr),
                     ),
@@ -86,7 +86,7 @@ final class ProductTypeNewAnalysis implements AfterExpressionAnalysisInterface
 
             if ($arg_type->isNone()) {
                 IssueBuffer::accepts(
-                    e: new UnsafeSumTypeInstantiation(
+                    e: new InvalidProductTypeInstantiationIssue(
                         message: sprintf('No type for "%s" arg.', $arg_name),
                         code_location: new CodeLocation($source, $arg_expr),
                     ),
@@ -98,7 +98,7 @@ final class ProductTypeNewAnalysis implements AfterExpressionAnalysisInterface
 
             if (!array_key_exists($arg_name, $decoders)) {
                 IssueBuffer::accepts(
-                    e: new UnsafeSumTypeInstantiation(
+                    e: new InvalidProductTypeInstantiationIssue(
                         message: sprintf('No named argument with name "%s".', $arg_name),
                         code_location: new CodeLocation($source, $arg_expr),
                     ),
@@ -122,7 +122,7 @@ final class ProductTypeNewAnalysis implements AfterExpressionAnalysisInterface
                 $expected_id = $expected_arg_type->getId();
 
                 IssueBuffer::accepts(
-                    e: new UnsafeSumTypeInstantiation(
+                    e: new InvalidProductTypeInstantiationIssue(
                         message: sprintf('Invalid type for "%s". Actual: "%s". Expected: "%s".', $arg_name, $actual_id, $expected_id),
                         code_location: new CodeLocation($source, $arg_expr),
                     ),

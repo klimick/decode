@@ -39,7 +39,7 @@ final class ProductTypeIssuesTest extends PsalmTest
                 );
             })
             ->seePsalmIssue(
-                type: 'UnsafeSumTypeInstantiation',
+                type: 'InvalidProductTypeInstantiationIssue',
                 message: 'Invalid type for "receiverId". Actual: "123456". Expected: "string".',
             );
     }
@@ -54,7 +54,7 @@ final class ProductTypeIssuesTest extends PsalmTest
                 );
             })
             ->seePsalmIssue(
-                type: 'UnsafeSumTypeInstantiation',
+                type: 'InvalidProductTypeInstantiationIssue',
                 message: 'Expected args 3. Actual count 2.',
             );
     }

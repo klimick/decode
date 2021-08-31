@@ -6,6 +6,6 @@ namespace Klimick\PsalmDecode\Issue\RuntimeData;
 
 use Psalm\Issue\CodeIssue;
 
-final class UnsafeSumTypeInstantiation extends CodeIssue
+final class InvalidProductTypeInstantiationIssue extends CodeIssue
 {
 }
