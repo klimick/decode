@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
+namespace Klimick\PsalmDecode\ObjectDecoder\ADT;
 
 use Fp\Functional\Option\Option;
 
@@ -16,7 +16,7 @@ use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
 use function Fp\Evidence\proveOf;
 
-final class RuntimeDataPropertyFetchAnalysis implements AfterExpressionAnalysisInterface
+final class ProductTypePropertyFetchAnalysis implements AfterExpressionAnalysisInterface
 {
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {

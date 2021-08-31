@@ -8,7 +8,7 @@ use Klimick\Decode\Test\Static\Fixtures\Message;
 use Klimick\PsalmTest\PsalmTest;
 use Klimick\PsalmTest\StaticTestCase;
 
-final class RuntimeDataIssuesTest extends PsalmTest
+final class ProductTypeIssuesTest extends PsalmTest
 {
     public function testUndefinedPropertyFetchIssue(): void
     {
@@ -28,7 +28,7 @@ final class RuntimeDataIssuesTest extends PsalmTest
             );
     }
 
-    public function testRuntimeDataTypeErrorIssue(): void
+    public function testTypeErrorIssue(): void
     {
         StaticTestCase::describe()
             ->haveCode(function() {
@@ -39,12 +39,12 @@ final class RuntimeDataIssuesTest extends PsalmTest
                 );
             })
             ->seePsalmIssue(
-                type: 'UnsafeRuntimeDataInstantiation',
+                type: 'UnsafeSumTypeInstantiation',
                 message: 'Invalid type for "receiverId". Actual: "123456". Expected: "string".',
             );
     }
 
-    public function testRuntimeDataPropertyMissingIssue(): void
+    public function testPropertyMissingIssue(): void
     {
         StaticTestCase::describe()
             ->haveCode(function() {
@@ -54,7 +54,7 @@ final class RuntimeDataIssuesTest extends PsalmTest
                 );
             })
             ->seePsalmIssue(
-                type: 'UnsafeRuntimeDataInstantiation',
+                type: 'UnsafeSumTypeInstantiation',
                 message: 'Expected args 3. Actual count 2.',
             );
     }

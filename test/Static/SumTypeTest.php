@@ -14,7 +14,7 @@ use Klimick\PsalmTest\PsalmTest;
 use Klimick\PsalmTest\StaticTestCase;
 use Klimick\PsalmTest\StaticType\StaticTypes as t;
 
-final class UnionRuntimeDataTest extends PsalmTest
+final class SumTypeTest extends PsalmTest
 {
     private static function messenger(): Messenger
     {

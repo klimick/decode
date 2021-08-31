@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test\Static\Fixtures\Messenger\Owner;
 
-use Klimick\Decode\Decoder\UnionRuntimeData;
+use Klimick\Decode\Decoder\SumType;
 
 /**
  * @psalm-immutable
  */
-final class Owner extends UnionRuntimeData
+final class Owner extends SumType
 {
     protected static function cases(): array
     {

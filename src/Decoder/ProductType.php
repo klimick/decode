@@ -15,7 +15,7 @@ use RuntimeException;
 /**
  * @psalm-immutable
  */
-abstract class RuntimeData implements JsonSerializable
+abstract class ProductType implements JsonSerializable
 {
     private array $properties;
 
@@ -88,7 +88,7 @@ abstract class RuntimeData implements JsonSerializable
             /** @var static $instance */
             $instance = $classReflection->newInstanceWithoutConstructor();
 
-            $propertiesReflection = new ReflectionProperty(RuntimeData::class, 'properties');
+            $propertiesReflection = new ReflectionProperty(ProductType::class, 'properties');
             $propertiesReflection->setAccessible(true);
             $propertiesReflection->setValue($instance, $properties);
             $propertiesReflection->setAccessible(false);

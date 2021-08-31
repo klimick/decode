@@ -7,10 +7,10 @@ namespace Klimick\PsalmDecode;
 use Klimick\PsalmDecode\HighOrder\ConstrainedContravariantCheckHandler;
 use Klimick\PsalmDecode\HighOrder\FromArgumentAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
-use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\AfterMethodAnalysis;
-use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\RuntimeDataNewAnalysis;
-use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\RuntimeDataPropertyFetchAnalysis;
-use Klimick\PsalmDecode\ObjectDecoder\RuntimeData\UnionRuntimeDataMatchAnalysis;
+use Klimick\PsalmDecode\ObjectDecoder\ADT\AfterMethodAnalysis;
+use Klimick\PsalmDecode\ObjectDecoder\ADT\ProductTypeNewAnalysis;
+use Klimick\PsalmDecode\ObjectDecoder\ADT\ProductTypePropertyFetchAnalysis;
+use Klimick\PsalmDecode\ObjectDecoder\ADT\SumTypeMatchAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\IntersectionReturnTypeProvider;
 use Klimick\PsalmDecode\HighOrder\DecoderMethodsAnalysis;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
@@ -30,9 +30,9 @@ final class Plugin implements PluginEntryPointInterface
 
         $register(ObjectDecoderFactoryReturnTypeProvider::class);
 
-        $register(UnionRuntimeDataMatchAnalysis::class);
-        $register(RuntimeDataPropertyFetchAnalysis::class);
-        $register(RuntimeDataNewAnalysis::class);
+        $register(SumTypeMatchAnalysis::class);
+        $register(ProductTypePropertyFetchAnalysis::class);
+        $register(ProductTypeNewAnalysis::class);
 
         $register(ShapeReturnTypeProvider::class);
         $register(IntersectionReturnTypeProvider::class);

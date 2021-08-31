@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
+namespace Klimick\PsalmDecode\ObjectDecoder\ADT;
 
-use Klimick\Decode\Decoder\UnionRuntimeData;
+use Klimick\Decode\Decoder\SumType;
 use Klimick\PsalmDecode\Issue\UnionRuntimeData\InvalidMatcherTypeIssue;
 use Klimick\PsalmDecode\Issue\UnionRuntimeData\UnexhaustiveMatchIssue;
 use Klimick\PsalmDecode\Psalm;
@@ -25,7 +25,7 @@ use function Fp\Collection\first;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
-final class UnionRuntimeDataMatchAnalysis implements AfterExpressionAnalysisInterface
+final class SumTypeMatchAnalysis implements AfterExpressionAnalysisInterface
 {
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
@@ -44,7 +44,7 @@ final class UnionRuntimeDataMatchAnalysis implements AfterExpressionAnalysisInte
                 ->filter(fn($atomic) => $atomic instanceof TNamedObject)
                 ->map(fn($atomic) => $atomic->value)
                 ->filter(fn($class) => class_exists($class))
-                ->filter(fn($class) => is_subclass_of($class, UnionRuntimeData::class));
+                ->filter(fn($class) => is_subclass_of($class, SumType::class));
 
             $actual_match_arg_nodes = yield self::getActualMatchArgNodes($match_call);
             $required_match_args = yield RuntimeDecoder::getUnionCases($union_runtime_data_class);

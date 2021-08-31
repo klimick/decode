@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
+namespace Klimick\PsalmDecode\ObjectDecoder\ADT;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\RuntimeData;
-use Klimick\PsalmDecode\Issue\RuntimeData\UnsafeRuntimeDataInstantiation;
+use Klimick\Decode\Decoder\ProductType;
+use Klimick\PsalmDecode\Issue\RuntimeData\UnsafeSumTypeInstantiation;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Psalm\CodeLocation;
@@ -18,7 +18,7 @@ use Psalm\Type;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
 
-final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
+final class ProductTypeNewAnalysis implements AfterExpressionAnalysisInterface
 {
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
@@ -27,7 +27,7 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
 
             $expected_constructor_params = yield proveOf($new_expr->class, Node\Name::class)
                 ->flatMap(fn($name) => proveString($name->getAttribute('resolvedName')))
-                ->filter(fn(string $class) => Psalm::classExtends($class, from: RuntimeData::class, event: $event))
+                ->filter(fn(string $class) => Psalm::classExtends($class, from: ProductType::class, event: $event))
                 ->flatMap(fn($class) => RuntimeDecoder::getProperties($class));
 
             self::validateArgs($expected_constructor_params, $event, $new_expr);
@@ -48,7 +48,7 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
 
         if ($expected_args_count !== $actual_args_count) {
             IssueBuffer::accepts(
-                e: new UnsafeRuntimeDataInstantiation(
+                e: new UnsafeSumTypeInstantiation(
                     message: sprintf("Expected args %s. Actual count %s.", $expected_args_count, $actual_args_count),
                     code_location: new CodeLocation($source, $new),
                 ),
@@ -68,7 +68,7 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
 
             if ($named_arguments && null === $arg_expr->name) {
                 IssueBuffer::accepts(
-                    e: new UnsafeRuntimeDataInstantiation(
+                    e: new UnsafeSumTypeInstantiation(
                         message: 'Positional arguments cannot follows after named arguments',
                         code_location: new CodeLocation($source, $arg_expr),
                     ),
@@ -86,7 +86,7 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
 
             if ($arg_type->isNone()) {
                 IssueBuffer::accepts(
-                    e: new UnsafeRuntimeDataInstantiation(
+                    e: new UnsafeSumTypeInstantiation(
                         message: sprintf('No type for "%s" arg.', $arg_name),
                         code_location: new CodeLocation($source, $arg_expr),
                     ),
@@ -98,7 +98,7 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
 
             if (!array_key_exists($arg_name, $decoders)) {
                 IssueBuffer::accepts(
-                    e: new UnsafeRuntimeDataInstantiation(
+                    e: new UnsafeSumTypeInstantiation(
                         message: sprintf('No named argument with name "%s".', $arg_name),
                         code_location: new CodeLocation($source, $arg_expr),
                     ),
@@ -122,7 +122,7 @@ final class RuntimeDataNewAnalysis implements AfterExpressionAnalysisInterface
                 $expected_id = $expected_arg_type->getId();
 
                 IssueBuffer::accepts(
-                    e: new UnsafeRuntimeDataInstantiation(
+                    e: new UnsafeSumTypeInstantiation(
                         message: sprintf('Invalid type for "%s". Actual: "%s". Expected: "%s".', $arg_name, $actual_id, $expected_id),
                         code_location: new CodeLocation($source, $arg_expr),
                     ),

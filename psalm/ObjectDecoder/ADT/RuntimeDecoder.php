@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ObjectDecoder\RuntimeData;
+namespace Klimick\PsalmDecode\ObjectDecoder\ADT;
 
 use ReflectionMethod;
 use Psalm\Type;
 use Klimick\PsalmDecode\Psalm;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Decoder\UnionRuntimeData;
+use Klimick\Decode\Decoder\SumType;
 use Klimick\Decode\Internal\ObjectDecoder;
-use Klimick\Decode\Decoder\RuntimeData;
+use Klimick\Decode\Decoder\ProductType;
 use Fp\Functional\Option\Option;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
@@ -23,7 +23,7 @@ final class RuntimeDecoder
     public static function getDecoderFromRuntime(string $class_string): Option
     {
         return Option::some($class_string)
-            ->filter(fn($class_string) => is_a($class_string, RuntimeData::class, true))
+            ->filter(fn($class_string) => is_a($class_string, ProductType::class, true))
             ->flatMap(fn($class_string) => Option::try(fn() => $class_string::type()));
     }
 
@@ -51,7 +51,7 @@ final class RuntimeDecoder
     }
 
     /**
-     * @param class-string<UnionRuntimeData> $union_runtime_data_class
+     * @param class-string<SumType> $union_runtime_data_class
      * @return Option<non-empty-array<string, Type\Union>>
      */
     public static function getUnionCases(string $union_runtime_data_class): Option
@@ -71,7 +71,7 @@ final class RuntimeDecoder
     }
 
     /**
-     * @param class-string<UnionRuntimeData> $union_runtime_data_class
+     * @param class-string<SumType> $union_runtime_data_class
      * @return Option<non-empty-array<string, AbstractDecoder>>
      */
     private static function getCasesWithReflection(string $union_runtime_data_class): Option

@@ -15,18 +15,18 @@ use RuntimeException;
 /**
  * @psalm-immutable
  */
-abstract class UnionRuntimeData implements JsonSerializable
+abstract class SumType implements JsonSerializable
 {
     private string $caseId;
-    private RuntimeData|UnionRuntimeData $instance;
+    private ProductType|SumType $instance;
 
-    final public function __construct(RuntimeData|UnionRuntimeData $case)
+    final public function __construct(ProductType|SumType $case)
     {
         $this->caseId = static::getCaseIdByInstance($case);
         $this->instance = $case;
     }
 
-    private static function getCaseIdByInstance(RuntimeData|UnionRuntimeData $instance): string
+    private static function getCaseIdByInstance(ProductType|SumType $instance): string
     {
         foreach (static::cases() as $type => $decoder) {
             if ($decoder->is($instance)) {
@@ -34,7 +34,7 @@ abstract class UnionRuntimeData implements JsonSerializable
             }
         }
 
-        throw new RuntimeException('Unable to create UnionRuntimeData. Check psalm issues.');
+        throw new RuntimeException('Unable to create SumType. Check psalm issues.');
     }
 
     final public function match(callable ...$matchers): mixed
@@ -53,12 +53,12 @@ abstract class UnionRuntimeData implements JsonSerializable
             /** @var static $instance */
             $instance = $classReflection->newInstanceWithoutConstructor();
 
-            $instanceReflection = new ReflectionProperty(UnionRuntimeData::class, 'instance');
+            $instanceReflection = new ReflectionProperty(SumType::class, 'instance');
             $instanceReflection->setAccessible(true);
             $instanceReflection->setValue($instance, $properties['instance']);
             $instanceReflection->setAccessible(false);
 
-            $caseIdReflection = new ReflectionProperty(UnionRuntimeData::class, 'caseId');
+            $caseIdReflection = new ReflectionProperty(SumType::class, 'caseId');
             $caseIdReflection->setAccessible(true);
             $caseIdReflection->setValue($instance, $properties['caseId']);
             $caseIdReflection->setAccessible(false);
@@ -84,13 +84,13 @@ abstract class UnionRuntimeData implements JsonSerializable
         );
     }
 
-    public function jsonSerialize(): RuntimeData|UnionRuntimeData
+    public function jsonSerialize(): ProductType|SumType
     {
         return $this->instance;
     }
 
     /**
-     * @psalm-return non-empty-array<non-empty-string, ObjectDecoder<RuntimeData> | UnionDecoder<UnionRuntimeData>>
+     * @psalm-return non-empty-array<non-empty-string, ObjectDecoder<ProductType> | UnionDecoder<SumType>>
      */
     abstract protected static function cases(): array;
 }

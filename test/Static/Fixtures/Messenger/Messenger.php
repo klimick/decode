@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test\Static\Fixtures\Messenger;
 
-use Klimick\Decode\Decoder\UnionRuntimeData;
+use Klimick\Decode\Decoder\SumType;
 
 /**
  * @psalm-immutable
  */
-final class Messenger extends UnionRuntimeData
+final class Messenger extends SumType
 {
     protected static function cases(): array
     {
