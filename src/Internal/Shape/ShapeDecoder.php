@@ -79,7 +79,7 @@ final class ShapeDecoder extends AbstractDecoder
         foreach ($this->decoders as $key => $decoder) {
             /** @psalm-suppress MixedAssignment */
             $fromShape = ShapeAccessor::access($decoder, $key, $value)
-                ->getOrElse(fn() => new UndefinedError(
+                ->getOrCall(fn() => new UndefinedError(
                     $context->append(
                         name: $decoder->name(),
                         actual: null,
