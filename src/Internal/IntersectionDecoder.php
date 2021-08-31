@@ -56,7 +56,7 @@ final class IntersectionDecoder extends AbstractDecoder
 
         foreach ($this->decoders as $decoder) {
             $result = $decoder
-                ->decode($value, $context->append($decoder->name(), $value))
+                ->decode($value, $context($decoder->name(), $value))
                 ->get();
 
             if ($result instanceof Invalid) {

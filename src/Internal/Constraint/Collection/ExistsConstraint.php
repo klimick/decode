@@ -35,7 +35,7 @@ final class ExistsConstraint implements ConstraintInterface
         foreach ($value as $k => $v) {
             foreach ($this->constraints as $constraint) {
                 $result = $constraint
-                    ->check($context->append($constraint->name(), $v, (string) $k), $v)
+                    ->check($context($constraint->name(), $v, (string) $k), $v)
                     ->get();
 
                 if ($result instanceof Valid) {

@@ -78,7 +78,7 @@ final class TupleDecoder extends AbstractDecoder
                 /** @psalm-var mixed $v */
                 foreach ($list as $k => $v) {
                     $result = $this->decoders[$k]
-                        ->decode($v, $context->append($this->decoders[$k]->name(), $v, (string) $k))
+                        ->decode($v, $context($this->decoders[$k]->name(), $v, (string) $k))
                         ->get();
 
                     if ($result instanceof Invalid) {

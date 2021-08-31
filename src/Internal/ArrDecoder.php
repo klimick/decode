@@ -66,11 +66,11 @@ final class ArrDecoder extends AbstractDecoder
         /** @psalm-suppress MixedAssignment */
         foreach ($value as $k => $v) {
             $decodedK = $this->keyDecoder
-                ->decode($k, $context->append($this->keyDecoder->name(), $k, (string) $k))
+                ->decode($k, $context($this->keyDecoder->name(), $k, (string) $k))
                 ->get();
 
             $decodedV = $this->valDecoder
-                ->decode($v, $context->append($this->valDecoder->name(), $k, (string) $k))
+                ->decode($v, $context($this->valDecoder->name(), $k, (string) $k))
                 ->get();
 
             if ($decodedV instanceof Invalid) {

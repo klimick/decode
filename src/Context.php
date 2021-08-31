@@ -16,7 +16,7 @@ final class Context implements JsonSerializable
      */
     public function __construct(public array $entries) { }
 
-    public function append(string $name, mixed $actual, string $key = ''): self
+    public function __invoke(string $name, mixed $actual, string $key = ''): self
     {
         return new self([...$this->entries, new ContextEntry($name, $actual, $key)]);
     }

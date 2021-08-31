@@ -59,7 +59,7 @@ final class UnionDecoder extends AbstractDecoder
             $typename = $decoder->name();
 
             $result = $decoder
-                ->decode($value, $context->append($typename, $value))
+                ->decode($value, $context($typename, $value))
                 ->get();
 
             if ($result instanceof Valid) {
