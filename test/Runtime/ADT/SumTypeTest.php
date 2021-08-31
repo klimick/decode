@@ -26,8 +26,8 @@ final class SumTypeTest extends TestCase
         );
 
         assertEquals('bot', $owner->match(
-            customer: fn(Customer $v) => 'customer',
-            bot: fn(Bot $v) => 'bot',
+            customer: fn(Customer $_v) => 'customer',
+            bot: fn(Bot $_v) => 'bot',
         ));
     }
 
@@ -38,8 +38,8 @@ final class SumTypeTest extends TestCase
 
         assertNotNull($decoded);
         assertEquals('bot', $decoded->match(
-            customer: fn(Customer $v) => 'customer',
-            bot: fn(Bot $v) => 'bot',
+            customer: fn(Customer $_v) => 'customer',
+            bot: fn(Bot $_v) => 'bot',
         ));
     }
 
@@ -69,6 +69,7 @@ final class SumTypeTest extends TestCase
             ),
         );
 
+        /** @psalm-suppress InvalidSumTypeInstantiationIssue */
         new Owner(case: $invalidCase);
     }
 }

@@ -6,6 +6,7 @@ namespace Klimick\PsalmDecode;
 
 use Klimick\PsalmDecode\HighOrder\ConstrainedContravariantCheckHandler;
 use Klimick\PsalmDecode\HighOrder\FromArgumentAnalysis;
+use Klimick\PsalmDecode\ObjectDecoder\ADT\SumTypeNewAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
 use Klimick\PsalmDecode\ObjectDecoder\ADT\AfterMethodAnalysis;
 use Klimick\PsalmDecode\ObjectDecoder\ADT\ProductTypeNewAnalysis;
@@ -33,6 +34,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(SumTypeMatchAnalysis::class);
         $register(ProductTypePropertyFetchAnalysis::class);
         $register(ProductTypeNewAnalysis::class);
+        $register(SumTypeNewAnalysis::class);
 
         $register(ShapeReturnTypeProvider::class);
         $register(IntersectionReturnTypeProvider::class);

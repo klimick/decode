@@ -6,6 +6,7 @@ namespace Klimick\Decode\Test\Static;
 
 use Klimick\Decode\Test\Static\Fixtures\Messenger\Messenger;
 use Klimick\Decode\Test\Static\Fixtures\Messenger\Owner\Bot;
+use Klimick\Decode\Test\Static\Fixtures\Messenger\Owner\Customer;
 use Klimick\Decode\Test\Static\Fixtures\Messenger\Owner\Owner;
 use Klimick\Decode\Test\Static\Fixtures\Messenger\SmppSms;
 use Klimick\Decode\Test\Static\Fixtures\Messenger\Telegram;
@@ -29,6 +30,30 @@ final class SumTypeTest extends PsalmTest
         );
 
         return new Messenger(case: $telegram);
+    }
+
+    public function testTypeErrorIssue(): void
+    {
+        StaticTestCase::describe()
+            ->haveCode(function() {
+                $invalidCase = new Telegram(
+                    telegramId: '...',
+                    owner: new Owner(
+                        case: new Bot(token: '...', apiVersion: 'v3'),
+                    ),
+                );
+
+                return new Owner(case: $invalidCase);
+            })
+            ->seePsalmIssue(
+                type: 'InvalidSumTypeInstantiationIssue',
+                message: 'Expected type: #[bot]|#[customer]. Actual type: #[telegram].',
+                args: [
+                    'bot' => Bot::class,
+                    'customer' => Customer::class,
+                    'telegram' => Telegram::class,
+                ],
+            );
     }
 
     public function testMatchTypeInference(): void
