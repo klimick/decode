@@ -16,7 +16,7 @@ use function Klimick\Decode\Decoder\union;
  */
 final class Customer extends ProductType
 {
-    protected static function properties(): ShapeDecoder
+    protected static function definition(): ShapeDecoder
     {
         return shape(
             firstName: nonEmptyString(),

@@ -16,7 +16,7 @@ use function Klimick\Decode\Decoder\string;
  */
 final class SmppSms extends ProductType
 {
-    protected static function properties(): ShapeDecoder
+    protected static function definition(): ShapeDecoder
     {
         return shape(
             login: nonEmptyString(),

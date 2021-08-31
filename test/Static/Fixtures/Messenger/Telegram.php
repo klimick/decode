@@ -17,7 +17,7 @@ use function Klimick\Decode\Decoder\string;
  */
 final class Telegram extends ProductType
 {
-    protected static function properties(): ShapeDecoder
+    protected static function definition(): ShapeDecoder
     {
         return shape(
             telegramId: string()->constrained(

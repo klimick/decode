@@ -15,7 +15,7 @@ use function Klimick\Decode\Decoder\shape;
  */
 final class Bot extends ProductType
 {
-    protected static function properties(): ShapeDecoder
+    protected static function definition(): ShapeDecoder
     {
         return shape(
             token: nonEmptyString(),

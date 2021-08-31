@@ -11,7 +11,7 @@ use Klimick\Decode\Decoder\SumType;
  */
 final class Owner extends SumType
 {
-    protected static function cases(): array
+    protected static function definition(): array
     {
         return [
             'bot' => Bot::type(),

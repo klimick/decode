@@ -14,7 +14,7 @@ use function Klimick\Decode\Decoder\string;
  */
 final class Message extends ProductType
 {
-    protected static function properties(): ShapeDecoder
+    protected static function definition(): ShapeDecoder
     {
         return shape(
             id: string(),

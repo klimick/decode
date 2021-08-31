@@ -51,11 +51,9 @@ abstract class ProductType implements JsonSerializable
                 continue;
             }
 
-            if (!array_key_exists($index, $decoderKeys)) {
-                continue;
+            if (array_key_exists($index, $decoderKeys)) {
+                $withKeys[$decoderKeys[$index]] = $value;
             }
-
-            $withKeys[$decoderKeys[$index]] = $value;
         }
 
         return $withKeys;
@@ -80,7 +78,7 @@ abstract class ProductType implements JsonSerializable
      */
     public static function type(): AbstractDecoder
     {
-        $shapeDecoder = static::properties();
+        $shapeDecoder = static::definition();
 
         $constructor = static function(array $properties): static {
             $classReflection = new ReflectionClass(static::class);
@@ -104,5 +102,5 @@ abstract class ProductType implements JsonSerializable
         );
     }
 
-    abstract protected static function properties(): ShapeDecoder;
+    abstract protected static function definition(): ShapeDecoder;
 }

@@ -79,7 +79,7 @@ final class RuntimeDecoder
         return Option::do(function() use ($union_runtime_data_class) {
             $result = yield Option
                 ::try(function() use ($union_runtime_data_class): mixed {
-                    $ref = new ReflectionMethod("{$union_runtime_data_class}::cases");
+                    $ref = new ReflectionMethod("{$union_runtime_data_class}::definition");
                     $ref->setAccessible(true);
 
                     return $ref->invoke(null);
