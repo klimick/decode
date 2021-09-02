@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Runtime\Decoder;
 
 use Fp\Functional\Option\Option;
+use Klimick\Decode\Context;
+use Klimick\Decode\ContextEntry;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Internal\Shape\ShapeAccessor;
 use PHPUnit\Framework\TestCase;
@@ -27,7 +29,11 @@ final class ShapeAccessorTest extends TestCase
      */
     public function testShapeAccessor(AbstractDecoder $decoder, int|string $key, array $shape, Option $expected): void
     {
-        $actual = ShapeAccessor::access($decoder, $key, $shape);
+        $context = new Context([
+            new ContextEntry($decoder->name(), $shape, (string) $key),
+        ]);
+
+        $actual = ShapeAccessor::decodeShapeProperty($context, $decoder, $key, $shape);
         assertEquals($expected, $actual);
     }
 

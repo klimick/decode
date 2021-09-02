@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\Shape;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Decoder\UndefinedError;
+use Fp\Functional\Semigroup\ValidatedSemigroup;
+use Fp\Functional\Validated\Validated;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
-use Klimick\Decode\Decoder\Invalid;
+use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\Decoder\invalid;
-use function Klimick\Decode\Decoder\invalids;
-use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template TVal
@@ -22,7 +21,7 @@ use function Klimick\Decode\Decoder\valid;
 final class ShapeDecoder extends AbstractDecoder
 {
     /**
-     * @param array<array-key, AbstractDecoder<TVal>> $decoders
+     * @param array<string, AbstractDecoder<TVal>> $decoders
      */
     public function __construct(
         public array $decoders,
@@ -73,44 +72,20 @@ final class ShapeDecoder extends AbstractDecoder
             return invalid($context);
         }
 
-        $errors = [];
-        $shape = [];
+        $S = new ValidatedSemigroup(
+            new ShapePropertySemigroup(),
+            new ShapeErrorSemigroup(),
+        );
+
+        $result = Validated::valid(new Valid([]));
 
         foreach ($this->decoders as $key => $decoder) {
-            /** @psalm-suppress MixedAssignment */
-            $fromShape = ShapeAccessor::access($decoder, $key, $value)
-                ->getOrCall(fn() => new UndefinedError(
-                    $context(
-                        name: $decoder->name(),
-                        actual: null,
-                        key: (string) $key,
-                    )
-                ));
-
-            if ($fromShape instanceof UndefinedError) {
-                if (!$this->isOptional($decoder)) {
-                    $errors[] = $fromShape;
-                }
-
-                continue;
-            }
-
-            $result = $decoder
-                ->decode($fromShape, $context($decoder->name(), $fromShape, (string) $key))
-                ->get();
-
-            if ($result instanceof Invalid) {
-                $errors = [...$errors, ...$result->errors];
-            } else {
-                $shape[(string) $key] = $result->value;
-            }
+            $result = $S->combine(
+                $result,
+                ShapeAccessor::decodeShapeProperty($context, $decoder, $key, $value)->toValidated()
+            );
         }
 
-        return match (true) {
-            (!empty($errors)) => invalids($errors),
-            (!empty($shape)) => valid($shape),
-            ($this->partial) => valid([]),
-        };
-
+        return $result->toEither();
     }
 }

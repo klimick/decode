@@ -31,6 +31,12 @@ final class ObjectDecoderFactory
      */
     public function __invoke(AbstractDecoder ...$decoders): AbstractDecoder
     {
-        return new ObjectDecoder($this->objectClass, $decoders, $this->partial);
+        /**
+         * Validated via psalm plugin hook at this moment
+         * @var array<string, AbstractDecoder<mixed>> $mapDecoders
+         */
+        $mapDecoders = $decoders;
+
+        return new ObjectDecoder($this->objectClass, $mapDecoders, $this->partial);
     }
 }

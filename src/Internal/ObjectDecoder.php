@@ -22,7 +22,7 @@ final class ObjectDecoder extends AbstractDecoder
 
     /**
      * @param class-string<T> $objectClass
-     * @param array<array-key, AbstractDecoder<mixed>> $decoders
+     * @param array<string, AbstractDecoder<mixed>> $decoders
      * @param Closure(array<array-key, mixed>): T $customConstructor
      */
     public function __construct(

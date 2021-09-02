@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 /**
- * @template TDecoded
+ * @template-covariant TDecoded
  * @psalm-immutable
  */
 final class Valid
