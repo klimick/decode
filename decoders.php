@@ -6,6 +6,7 @@ namespace Klimick\Decode\Decoder;
 
 use Closure;
 use DateTimeImmutable;
+use Fp\Collections\HashMap;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\ErrorInterface;
@@ -318,7 +319,7 @@ function shape(AbstractDecoder ...$decoders): AbstractDecoder
     /** @var array<string, AbstractDecoder> $decodersMap */
     $decodersMap = $decoders;
 
-    return new Internal\Shape\ShapeDecoder($decodersMap);
+    return new Internal\Shape\ShapeDecoder(HashMap::collectIterable($decodersMap));
 }
 
 /**
@@ -334,7 +335,7 @@ function partialShape(AbstractDecoder ...$decoders): AbstractDecoder
     /** @var array<string, AbstractDecoder> $decodersMap */
     $decodersMap = $decoders;
 
-    return new Internal\Shape\ShapeDecoder($decodersMap, partial: true);
+    return new Internal\Shape\ShapeDecoder(HashMap::collectIterable($decodersMap), partial: true);
 }
 
 /**
@@ -402,12 +403,12 @@ function intersection(AbstractDecoder $first, AbstractDecoder $second, AbstractD
     $decoders = [];
 
     foreach ([$first, $second, ...$rest] as $decoder) {
-        foreach ($decoder->decoders as $k => $d) {
+        foreach ($decoder->decoders->toArray() as [$k, $d]) {
             $decoders[$k] = $d;
         }
     }
 
-    return new Internal\Shape\ShapeDecoder($decoders);
+    return new Internal\Shape\ShapeDecoder(HashMap::collectIterable($decoders));
 }
 
 /**

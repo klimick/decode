@@ -27,10 +27,10 @@ final class ShapeAccessorTest extends TestCase
     /**
      * @dataProvider provideCases
      */
-    public function testShapeAccessor(AbstractDecoder $decoder, int|string $key, array $shape, Option $expected): void
+    public function testShapeAccessor(AbstractDecoder $decoder, string $key, array $shape, Option $expected): void
     {
         $context = new Context([
-            new ContextEntry($decoder->name(), $shape, (string) $key),
+            new ContextEntry($decoder->name(), $shape, $key),
         ]);
 
         $actual = ShapeAccessor::decodeShapeProperty($context, $decoder, $key, $shape);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Decoder;
 
+use Fp\Collections\HashMap;
 use JsonSerializable;
 use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\ObjectDecoder;
@@ -72,10 +73,10 @@ abstract class SumType implements JsonSerializable
             ...array_map(
                 fn($decoder, $case) => new ObjectDecoder(
                     objectClass: static::class,
-                    decoders: [
-                        'instance' => $decoder->from('$'),
-                        'caseId' => new ConstantDecoder($case)
-                    ],
+                    decoders: HashMap::collect([
+                        ['instance', $decoder->from('$')],
+                        ['caseId', new ConstantDecoder($case)],
+                    ]),
                     customConstructor: $constructor
                 ),
                 array_values($cases),

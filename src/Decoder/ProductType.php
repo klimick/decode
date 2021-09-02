@@ -42,11 +42,11 @@ abstract class ProductType implements JsonSerializable
     {
         $decoders = $decoder->shape->decoders;
 
-        $decoderKeys = array_keys($decoders);
+        $decoderKeys = $decoders->keys()->toArray();
         $withKeys = [];
 
         foreach ($values as $index => $value) {
-            if (array_key_exists($index, $decoders)) {
+            if (is_string($index) && !$decoders($index)->isEmpty()) {
                 $withKeys[$index] = $value;
                 continue;
             }
