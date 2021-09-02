@@ -315,7 +315,10 @@ function fromJson(AbstractDecoder $decoder): AbstractDecoder
  */
 function shape(AbstractDecoder ...$decoders): AbstractDecoder
 {
-    return new Internal\Shape\ShapeDecoder($decoders);
+    /** @var array<string, AbstractDecoder> $decodersMap */
+    $decodersMap = $decoders;
+
+    return new Internal\Shape\ShapeDecoder($decodersMap);
 }
 
 /**
@@ -328,7 +331,10 @@ function shape(AbstractDecoder ...$decoders): AbstractDecoder
  */
 function partialShape(AbstractDecoder ...$decoders): AbstractDecoder
 {
-    return new Internal\Shape\ShapeDecoder($decoders, partial: true);
+    /** @var array<string, AbstractDecoder> $decodersMap */
+    $decodersMap = $decoders;
+
+    return new Internal\Shape\ShapeDecoder($decodersMap, partial: true);
 }
 
 /**
