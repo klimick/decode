@@ -20,29 +20,59 @@ final class ShapeAccessor
      */
     public static function access(AbstractDecoder $decoder, int|string $key, array $shape): Option
     {
-        if ($decoder instanceof HighOrderDecoder) {
-            if ($decoder->isDefault() && !array_key_exists($key, $shape)) {
-                return Option::some($decoder->asDefault()->default);
-            }
+        return self::getConstant($decoder)
+            ->orElse(fn() => self::getAliased($decoder, $shape))
+            ->orElse(fn() => self::getByKey($decoder, $key, $shape));
+    }
 
-            if ($decoder->isFrom()) {
-                $path = explode('.', preg_replace('/^\$\.(.+)/', '$1', $decoder->asFrom()->alias));
+    /**
+     * @return Option<mixed>
+     * @psalm-pure
+     */
+    private static function getConstant(AbstractDecoder $decoder): Option
+    {
+        return $decoder instanceof ConstantDecoder
+            ? Option::some($decoder->constant)
+            : Option::none();
+    }
 
-                return $path !== ['$']
-                    ? self::dotAccess($path, $shape)
-                    : Option::some($shape);
-            }
+    /**
+     * @return Option<mixed>
+     * @psalm-pure
+     */
+    private static function getAliased(AbstractDecoder $decoder, array $shape): Option
+    {
+        if (!($decoder instanceof HighOrderDecoder) || !$decoder->isFrom()) {
+            return Option::none();
         }
 
-        if ($decoder instanceof ConstantDecoder) {
-            return Option::some($decoder->constant);
-        }
+        $path = explode('.', preg_replace('/^\$\.(.+)/', '$1', $decoder->asFrom()->alias));
 
-        if (array_key_exists($key, $shape)) {
-            return Option::some($shape[$key]);
-        }
+        return $path !== ['$']
+            ? self::dotAccess($path, $shape)->orElse(fn() => self::getDefault($decoder))
+            : Option::some($shape);
+    }
 
-        return Option::none();
+    /**
+     * @return Option<mixed>
+     * @psalm-pure
+     */
+    private static function getByKey(AbstractDecoder $decoder, int|string $key, array $shape): Option
+    {
+        return array_key_exists($key, $shape)
+            ? Option::some($shape[$key])
+            : self::getDefault($decoder);
+    }
+
+    /**
+     * @return Option<mixed>
+     * @psalm-pure
+     */
+    private static function getDefault(AbstractDecoder $decoder): Option
+    {
+        return $decoder instanceof HighOrderDecoder && $decoder->isDefault()
+            ? Option::some($decoder->asDefault()->default)
+            : Option::none();
     }
 
     /**
