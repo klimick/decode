@@ -17,14 +17,15 @@ use function Klimick\Decode\Decoder\valid;
 
 /**
  * @psalm-immutable
+ * @psalm-import-type ValidShapeProperties from ShapePropertySemigroup
  */
 final class ShapeAccessor
 {
     /**
-     * @return Either<Invalid, Valid<array<string, mixed>>>
+     * @return Either<Invalid, ValidShapeProperties>
      * @psalm-pure
      */
-    public static function decodeShapeProperty(
+    public static function decodeProperty(
         Context $context,
         AbstractDecoder $decoder,
         string $key,
@@ -103,6 +104,7 @@ final class ShapeAccessor
 
     /**
      * @param non-empty-list<string> $path
+     * @return Option<mixed>
      * @psalm-pure
      */
     private static function dotAccess(array $path, array $shape): Option
@@ -134,7 +136,7 @@ final class ShapeAccessor
     }
 
     /**
-     * @return Either<Invalid, Valid<array<string, mixed>>>
+     * @return Either<Invalid, ValidShapeProperties>
      * @psalm-pure
      */
     private static function decode(AbstractDecoder $decoder, array $value, string $key, Context $context): Either

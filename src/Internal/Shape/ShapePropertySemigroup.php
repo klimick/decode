@@ -8,7 +8,9 @@ use Fp\Functional\Semigroup\Semigroup;
 use Klimick\Decode\Decoder\Valid;
 
 /**
- * @extends Semigroup<Valid<array<string, mixed>>>
+ * @psalm-type ValidShapeProperties = Valid<array<string, mixed>>
+ *
+ * @extends Semigroup<ValidShapeProperties>
  * @psalm-immutable
  */
 final class ShapePropertySemigroup extends Semigroup

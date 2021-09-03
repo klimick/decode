@@ -33,7 +33,7 @@ final class ShapeAccessorTest extends TestCase
             new ContextEntry($decoder->name(), $shape, $key),
         ]);
 
-        $actual = ShapeAccessor::decodeShapeProperty($context, $decoder, $key, $shape);
+        $actual = ShapeAccessor::decodeProperty($context, $decoder, $key, $shape);
         assertEquals($expected, $actual);
     }
 
