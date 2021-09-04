@@ -146,7 +146,7 @@ final class ShapeAccessor
         }
 
         return $decoder
-            ->decode($value[$key], $context($decoder->name(), $value, $key))
+            ->decode($value[$key], $context($decoder->name(), $value[$key], $key))
             ->map(fn(Valid $valid) => new Valid([$key => $valid->value]));
     }
 }
