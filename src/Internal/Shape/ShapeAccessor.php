@@ -38,7 +38,7 @@ final class ShapeAccessor
             ->orElse(fn() => self::getByOriginalKey($decoder, $key, $shape))
             ->map(fn($value) => [$key => $value])
             ->orElse(fn() => self::asEmptyWhenOptional($decoder, $partial))
-            ->toRight(fn() => self::undefinedProperty($context, $decoder, $shape, $key))
+            ->toRight(fn() => self::undefinedProperty($context))
             ->flatMap(fn($value) => self::decode($decoder, $value, $key, $context));
     }
 
@@ -128,10 +128,10 @@ final class ShapeAccessor
     /**
      * @psalm-pure
      */
-    private static function undefinedProperty(Context $context, AbstractDecoder $decoder, array $shape, string $key): Invalid
+    private static function undefinedProperty(Context $context): Invalid
     {
         return new Invalid([
-            new UndefinedError($context(name: $decoder->name(), actual: $shape, key: $key))
+            new UndefinedError($context),
         ]);
     }
 
