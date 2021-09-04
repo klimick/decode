@@ -11,7 +11,7 @@ final class ErrorReport
 {
     /**
      * @param list<TypeErrorReport> $typeErrors
-     * @param list<non-empty-list<UnionCaseReport>> $unionTypeErrors
+     * @param list<UnionCaseReport> $unionTypeErrors
      * @param list<ConstraintErrorReport> $constraintErrors
      * @param list<UndefinedErrorReport> $undefinedErrors
      */

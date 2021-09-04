@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Report;
 
+use Klimick\Decode\ContextEntry;
 use Klimick\Decode\Decoder\DecodeErrorInterface;
 use Klimick\Decode\Decoder\UnionTypeErrors;
 use ReflectionClass;
@@ -39,13 +40,16 @@ final class DefaultReporter
             if ($error instanceof TypeError) {
                 $typeErrors[] = self::reportTypeError($error, $useShortClassNames);
             } elseif ($error instanceof UnionTypeErrors) {
-                $e = [];
-
-                foreach ($error->errors as $caseErrors) {
-                    $e[] = new UnionCaseReport($caseErrors->case, self::reportErrors($caseErrors->errors, $useShortClassNames));
-                }
-
-                $unionTypeErrors[] = $e;
+                $unionTypeErrors = [
+                    ...$unionTypeErrors,
+                    ...array_map(
+                        fn($caseErrors) => new UnionCaseReport(
+                            case: $useShortClassNames ? self::formatExpectedType($caseErrors->case) : $caseErrors->case,
+                            errors: self::reportErrors($caseErrors->errors, $useShortClassNames),
+                        ),
+                        $error->errors,
+                    ),
+                ];
             } elseif ($error instanceof ConstraintsError) {
                 $constraintErrors = [
                     ...$constraintErrors,
@@ -67,7 +71,7 @@ final class DefaultReporter
         return new ConstraintErrorReport(
             path: $propertyPath,
             constraint: $error->constraint,
-            value: $lastErr->actual,
+            value: self::actualValue($lastErr),
             payload: $error->payload,
         );
     }
@@ -82,8 +86,13 @@ final class DefaultReporter
             expected: $useShortClassNames
                 ? self::formatExpectedType($lastErr->name)
                 : $lastErr->name,
-            actual: $lastErr->actual,
+            actual: self::actualValue($lastErr),
         );
+    }
+
+    private static function actualValue(ContextEntry $entry): mixed
+    {
+        return is_string($entry->actual) ? "'{$entry->actual}'" : $entry->actual;
     }
 
     private static function reportUndefinedError(UndefinedError $error): UndefinedErrorReport
