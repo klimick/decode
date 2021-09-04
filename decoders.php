@@ -7,6 +7,7 @@ namespace Klimick\Decode\Decoder;
 use Closure;
 use DateTimeImmutable;
 use Fp\Collections\HashMap;
+use Fp\Collections\Map;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\ErrorInterface;
@@ -311,10 +312,10 @@ function fromJson(AbstractDecoder $decoder): AbstractDecoder
  */
 function shape(AbstractDecoder ...$decoders): AbstractDecoder
 {
-    /** @var array<string, AbstractDecoder> $decodersMap */
-    $decodersMap = $decoders;
+    /** @psalm-var Map<string, AbstractDecoder> $decodersMap */
+    $decodersMap = HashMap::collectIterable($decoders);
 
-    return new Internal\Shape\ShapeDecoder(HashMap::collectIterable($decodersMap));
+    return new Internal\Shape\ShapeDecoder($decodersMap);
 }
 
 /**
@@ -327,10 +328,10 @@ function shape(AbstractDecoder ...$decoders): AbstractDecoder
  */
 function partialShape(AbstractDecoder ...$decoders): AbstractDecoder
 {
-    /** @var array<string, AbstractDecoder> $decodersMap */
-    $decodersMap = $decoders;
+    /** @psalm-var HashMap<string, AbstractDecoder> $decodersMap */
+    $decodersMap = HashMap::collectIterable($decoders);
 
-    return new Internal\Shape\ShapeDecoder(HashMap::collectIterable($decodersMap), partial: true);
+    return new Internal\Shape\ShapeDecoder($decodersMap, partial: true);
 }
 
 /**
