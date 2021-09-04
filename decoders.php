@@ -12,7 +12,6 @@ use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\ErrorInterface;
 use Klimick\Decode\Internal;
 use Klimick\Decode\Context;
-use Klimick\Decode\ContextEntry;
 use Klimick\PsalmDecode\ShapeDecoder\PartialShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
@@ -26,11 +25,7 @@ use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
  */
 function decode(mixed $data, AbstractDecoder $decoder): Either
 {
-    $context = new Context([
-        new ContextEntry($decoder->name(), $data),
-    ]);
-
-    return $decoder->decode($data, $context);
+    return $decoder->decode($data, Context::root($decoder->name(), $data));
 }
 
 /**

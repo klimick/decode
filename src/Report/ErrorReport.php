@@ -16,9 +16,9 @@ final class ErrorReport
      * @param list<UndefinedErrorReport> $undefinedErrors
      */
     public function __construct(
-        public array $typeErrors,
-        public array $unionTypeErrors,
-        public array $constraintErrors,
-        public array $undefinedErrors,
+        public array $typeErrors = [],
+        public array $unionTypeErrors = [],
+        public array $constraintErrors = [],
+        public array $undefinedErrors = [],
     ) { }
 }

@@ -16,7 +16,9 @@ use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Decoder\constant;
 use function Klimick\Decode\Test\Helper\forAll;
 use function PHPUnit\Framework\assertEquals;
+use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertNotNull;
+use function PHPUnit\Framework\assertTrue;
 
 final class ShapeDecoderTest extends TestCase
 {
@@ -49,6 +51,7 @@ final class ShapeDecoderTest extends TestCase
             name: string()->from('$.person_name'),
             age: int()->from('$.person_age'),
             is_person: bool()->default(true),
+            is_admin: bool()->optional(),
             is_approved: constant(true),
         );
 
@@ -61,5 +64,25 @@ final class ShapeDecoderTest extends TestCase
 
         assertNotNull($decoded);
         assertEquals(['name' => 'foo', 'age' => 42, 'is_person' => true, 'is_approved' => true], $decoded);
+    }
+
+    public function testValidWithTypeAssertion(): void
+    {
+        $decoder = shape(name: string());
+
+        /** @var mixed $value */
+        $value = ['name' => ''];
+
+        assertTrue($decoder->is($value));
+    }
+
+    public function testInvalidWithTypeAssertion(): void
+    {
+        $decoder = shape(name: string());
+
+        /** @var mixed $value */
+        $value = null;
+
+        assertFalse($decoder->is($value));
     }
 }

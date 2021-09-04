@@ -102,9 +102,7 @@ final class DefaultReporter
         $last = $error->context->entries[$size - 1];
         $rest = array_slice($error->context->entries, offset: 0, length: $size - 1);
 
-        $path = !empty($rest)
-            ? self::pathFromContext(new Context($rest))
-            : '$';
+        $path = !empty($rest) ? self::pathFromContext(new Context($rest)) : '$';
 
         return new UndefinedErrorReport($path, $last->key);
     }
@@ -125,18 +123,10 @@ final class DefaultReporter
 
     private static function pathFromContext(Context $context): string
     {
-        $pathParts = [];
-
-        foreach ($context->entries as $entry) {
-            if ('' !== $entry->key) {
-                $pathParts[] = $entry->key;
-            }
-        }
-
         return preg_replace(
             self::INDEXED_ACCESS_WITHOUT_BRACKETS,
             self::TO_INDEXED_ACCESS_WITH_BRACKETS,
-            implode('.', ['$', ...$pathParts]),
+            $context->path(),
         );
     }
 }

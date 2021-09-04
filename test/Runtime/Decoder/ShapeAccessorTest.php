@@ -6,7 +6,6 @@ namespace Klimick\Decode\Test\Runtime\Decoder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\ContextEntry;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\UndefinedError;
@@ -33,9 +32,7 @@ final class ShapeAccessorTest extends TestCase
      */
     public function testShapeAccessor(AbstractDecoder $decoder, string $key, array $shape, Either $expected): void
     {
-        $context = new Context([
-            new ContextEntry($decoder->name(), $shape, $key),
-        ]);
+        $context = Context::root($decoder->name(), $shape);
 
         $actual = ShapeAccessor::decodeProperty($context, $decoder, $key, $shape);
         assertEquals($expected, $actual);
@@ -46,75 +43,77 @@ final class ShapeAccessorTest extends TestCase
      */
     public function provideCases(): iterable
     {
-        $anyDecoder = mixed();
-        $anyField = 'any_field_name';
+        $decoder = mixed();
+        $field = 'any_field_name';
 
         $valid = fn(array $val): Either => Either::right(new Valid($val));
 
         $undefinedProperty = Either::left(
             new Invalid([
                 new UndefinedError(
-                    new Context([
-                        new ContextEntry($anyDecoder->name(), [], $anyField),
-                    ])
+                    Context::root(name: $decoder->name(), actual: [])(
+                        name: $decoder->name(),
+                        actual: null,
+                        key: $field,
+                    ),
                 )
             ])
         );
 
         yield 'field does not exist' => [
-            'decoder' => $anyDecoder,
-            'field' => $anyField,
+            'decoder' => $decoder,
+            'field' => $field,
             'shape' => [],
             'expected' => $undefinedProperty,
         ];
 
         yield 'field exists' => [
-            'decoder' => $anyDecoder,
-            'field' => $anyField,
-            'shape' => [$anyField => 'val'],
-            'expected' => $valid([$anyField => 'val']),
+            'decoder' => $decoder,
+            'field' => $field,
+            'shape' => [$field => 'val'],
+            'expected' => $valid([$field => 'val']),
         ];
 
         yield 'aliased field does not exist' => [
-            'decoder' => $anyDecoder->from('$.some_field.path'),
-            'field' => $anyField,
+            'decoder' => $decoder->from('$.some_field.path'),
+            'field' => $field,
             'shape' => [],
             'expected' => $undefinedProperty,
         ];
 
         yield 'aliased field exists' => [
-            'decoder' => $anyDecoder->from('$.some_field.path'),
-            'field' => $anyField,
+            'decoder' => $decoder->from('$.some_field.path'),
+            'field' => $field,
             'shape' => ['some_field' => ['path' => 'val']],
-            'expected' => $valid([$anyField => 'val']),
+            'expected' => $valid([$field => 'val']),
         ];
 
         yield 'from self' => [
-            'decoder' => $anyDecoder->from('$'),
-            'field' => $anyField,
+            'decoder' => $decoder->from('$'),
+            'field' => $field,
             'shape' => ['val1' => 10, 'val2' => 20],
-            'expected' => $valid([$anyField => ['val1' => 10, 'val2' => 20]]),
+            'expected' => $valid([$field => ['val1' => 10, 'val2' => 20]]),
         ];
 
         yield 'with default' => [
-            'decoder' => $anyDecoder->default(10),
-            'field' => $anyField,
+            'decoder' => $decoder->default(10),
+            'field' => $field,
             'shape' => [],
-            'expected' => $valid([$anyField => 10]),
+            'expected' => $valid([$field => 10]),
         ];
 
         yield 'optional field' => [
-            'decoder' => $anyDecoder->optional(),
-            'field' => $anyField,
+            'decoder' => $decoder->optional(),
+            'field' => $field,
             'shape' => [],
             'expected' => $valid([]),
         ];
 
         yield 'constant field' => [
             'decoder' => constant(10),
-            'field' => $anyField,
+            'field' => $field,
             'shape' => [],
-            'expected' => $valid([$anyField => 10]),
+            'expected' => $valid([$field => 10]),
         ];
     }
 }

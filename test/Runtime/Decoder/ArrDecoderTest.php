@@ -59,4 +59,34 @@ final class ArrDecoderTest extends TestCase
                 Check::thatInvalidFor(arr(arrKey(), mixed()))
             );
     }
+
+    public function testInvalidForAllArrayWithNonStringKeys(): void
+    {
+        [$arrItemDecoder, $arrItemGen] = DecoderGenerator::generate();
+
+        forAll(Gen::nonEmptyArr(Gen::arrKey('string'), $arrItemGen))
+            ->withMaxSize(50)
+            ->then(
+                Check::thatInvalidFor(arr(int(), $arrItemDecoder))
+            );
+    }
+
+    public function testInvalidForAllNonIntValues(): void
+    {
+        $arrGen = Gen::nonEmptyArr(
+            Gen::arrKey('string'),
+            Gen::oneOf(
+                Gen::string(),
+                Gen::nonEmptyString(),
+                Gen::bool(),
+                Gen::float(),
+            ),
+        );
+
+        forAll($arrGen)
+            ->withMaxSize(50)
+            ->then(
+                Check::thatInvalidFor(arr(string(), int()))
+            );
+    }
 }

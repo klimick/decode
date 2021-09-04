@@ -54,9 +54,7 @@ final class ConstrainedDecoder extends HighOrderDecoder
         }
 
         foreach ($this->constraints as $constraint) {
-            $context = new Context([
-                new ContextEntry($constraint->name(), $value)
-            ]);
+            $context = Context::root($constraint->name(), $value);
 
             if ($constraint->check($context, $value) instanceof Left) {
                 return false;
@@ -70,7 +68,7 @@ final class ConstrainedDecoder extends HighOrderDecoder
     {
         return $this->decoder
             ->decode($value, $context)
-            ->flatMap(function(Valid $decoded) {
+            ->flatMap(function(Valid $decoded) use ($context) {
                 if (null === $decoded->value) {
                     return valid($decoded->value);
                 }
@@ -78,12 +76,16 @@ final class ConstrainedDecoder extends HighOrderDecoder
                 $errors = [];
 
                 foreach ($this->constraints as $constraint) {
-                    $context = new Context([
-                        new ContextEntry($constraint->name(), $decoded->value)
+                    $constraintContext = new Context([
+                        new ContextEntry(
+                            name: $constraint->name(),
+                            actual: $decoded->value,
+                            key: $context->path(),
+                        ),
                     ]);
 
                     $result = $constraint
-                        ->check($context, $decoded->value)
+                        ->check($constraintContext, $decoded->value)
                         ->get();
 
                     if ($result instanceof Invalid) {

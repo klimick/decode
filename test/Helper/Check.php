@@ -9,6 +9,7 @@ use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use function Klimick\Decode\Decoder\decode;
+use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertInstanceOf;
 use function PHPUnit\Framework\assertTrue;
 
@@ -32,17 +33,19 @@ final class Check
     }
 
     /**
-     * @param AbstractDecoder<mixed> | callable(): AbstractDecoder<mixed> $decoderOrCallable
+     * @param AbstractDecoder<mixed> $decoderOrCallable
      * @return Closure(mixed): void
      */
-    public static function thatInvalidFor(callable|AbstractDecoder $decoderOrCallable): Closure
+    public static function thatInvalidFor(AbstractDecoder $decoder): Closure
     {
-        $decoder = is_callable($decoderOrCallable)
-            ? $decoderOrCallable()
-            : $decoderOrCallable;
-
         return function(mixed $value) use ($decoder): void {
-            assertInstanceOf(Left::class, decode($value, $decoder));
+            $testData = json_encode([
+                'data' => $value,
+                'decoder' => $decoder->name(),
+            ]);
+
+            assertInstanceOf(Left::class, decode($value, $decoder), "Should not decode: {$testData}");
+            assertFalse($decoder->is($value), "Should not be valid: {$testData}");
         };
     }
 }

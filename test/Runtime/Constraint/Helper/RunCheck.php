@@ -8,7 +8,6 @@ use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Constraint\Invalid;
 use Klimick\Decode\Constraint\Valid;
 use Klimick\Decode\Context;
-use Klimick\Decode\ContextEntry;
 use function PHPUnit\Framework\assertInstanceOf;
 
 final class RunCheck
@@ -20,9 +19,7 @@ final class RunCheck
 
     public function withValue(mixed $actual): void
     {
-        $context = new Context([
-            new ContextEntry($this->constraint->name(), $actual),
-        ]);
+        $context = Context::root($this->constraint->name(), $actual);
 
         $result = $this->constraint
             ->check(context: $context, value: $actual)
