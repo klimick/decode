@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal;
 
+use Fp\Collections\Map;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
@@ -22,44 +23,29 @@ use function Klimick\Decode\Decoder\valid;
 final class TupleDecoder extends AbstractDecoder
 {
     /**
-     * @var non-empty-list<AbstractDecoder<T>>
+     * @param Map<int, AbstractDecoder<T>> $decoders
      */
-    public array $decoders;
-
-    /**
-     * @param AbstractDecoder<T> $first
-     * @param AbstractDecoder<T> ...$rest
-     *
-     * @no-named-arguments
-     */
-    public function __construct(AbstractDecoder $first, AbstractDecoder ...$rest)
-    {
-        $this->decoders = [$first, ...$rest];
-    }
+    public function __construct(private Map $decoders) { }
 
     public function name(): string
     {
-        $types = implode(', ', array_map(
-            fn(AbstractDecoder $decoder) => $decoder->name(),
-            $this->decoders,
-        ));
+        $types = $this->decoders
+            ->map(fn($kv) => $kv->value->name())
+            ->values()
+            ->toArray();
 
-        return "array{{$types}}";
+        return 'array{' . implode(', ', $types) . '}';
     }
 
     public function is(mixed $value): bool
     {
-        if (!is_array($value) || !ArrListDecoder::isList($value) || count($value) !== count($this->decoders)) {
+        if (!is_array($value)) {
             return false;
         }
 
-        foreach ($this->decoders as $index => $decoder) {
-            if (!$decoder->is($value[$index])) {
-                return false;
-            }
-        }
-
-        return true;
+        return $this->decoders->every(
+            fn($decoder, $index) => array_key_exists($index, $value) && $decoder->is($value[$index]),
+        );
     }
 
     public function decode(mixed $value, Context $context): Either
@@ -67,18 +53,17 @@ final class TupleDecoder extends AbstractDecoder
         return nonEmptyArrList(mixed())
             ->decode($value, $context)
             ->map(fn($valid) => $valid->value)
-            ->flatMap(function($list) use ($context) {
-                if (count($list) !== count($this->decoders)) {
+            ->flatMap(function($tuple) use ($context) {
+                if (count($tuple) !== count($this->decoders)) {
                     return invalid($context);
                 }
 
                 $decoded = [];
                 $errors = [];
 
-                /** @psalm-var mixed $v */
-                foreach ($list as $k => $v) {
-                    $result = $this->decoders[$k]
-                        ->decode($v, $context($this->decoders[$k]->name(), $v, (string) $k))
+                foreach ($this->decoders->toArray() as [$k, $decoder]) {
+                    $result = $decoder
+                        ->decode($tuple[$k], $context($decoder->name(), $tuple[$k], (string) $k))
                         ->get();
 
                     if ($result instanceof Invalid) {

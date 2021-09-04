@@ -418,5 +418,7 @@ function intersection(AbstractDecoder $first, AbstractDecoder $second, AbstractD
  */
 function tuple(AbstractDecoder $first, AbstractDecoder ...$rest): AbstractDecoder
 {
-    return new Internal\TupleDecoder($first, ...array_values($rest));
+    return new Internal\TupleDecoder(
+        HashMap::collectIterable([$first, ...$rest])
+    );
 }
