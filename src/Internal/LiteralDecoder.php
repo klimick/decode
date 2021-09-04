@@ -2,6 +2,7 @@
 
 namespace Klimick\Decode\Internal;
 
+use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
@@ -16,27 +17,26 @@ use function Klimick\Decode\Decoder\valid;
 final class LiteralDecoder extends AbstractDecoder
 {
     /**
-     * @param non-empty-list<T> $literals
+     * @param NonEmptyArrayList<T> $literals
      */
-    public function __construct(public array $literals) {}
+    public function __construct(public NonEmptyArrayList $literals) { }
 
     public function name(): string
     {
-        return implode(' | ', array_map(
-            callback: fn(mixed $v) => is_string($v) ? "'$v'" : (string) $v,
-            array: $this->literals
-        ));
+        $literals = $this->literals
+            ->map(fn($literal) => match(true) {
+                is_string($literal) => "'$literal'",
+                is_bool($literal) => $literal ? 'true' : 'false',
+                default => (string) $literal,
+            })
+            ->toArray();
+
+        return implode(' | ', $literals);
     }
 
     public function is(mixed $value): bool
     {
-        foreach ($this->literals as $literal) {
-            if ($literal === $value) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->literals->exists(fn($literal) => $literal === $value);
     }
 
     public function decode(mixed $value, Context $context): Either

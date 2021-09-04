@@ -8,6 +8,7 @@ use Closure;
 use DateTimeImmutable;
 use Fp\Collections\HashMap;
 use Fp\Collections\Map;
+use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\ErrorInterface;
@@ -233,7 +234,9 @@ function arrKey(): AbstractDecoder
  */
 function literal(mixed $head, mixed ...$tail): AbstractDecoder
 {
-    return new Internal\LiteralDecoder([$head, ...$tail]);
+    $literals = NonEmptyArrayList::collectNonEmpty([$head, ...$tail]);
+
+    return new Internal\LiteralDecoder($literals);
 }
 
 /**
