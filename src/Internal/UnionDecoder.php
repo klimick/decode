@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal;
 
+use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
+use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\UnionCaseErrors;
 use Klimick\Decode\Decoder\UnionTypeErrors;
 use Klimick\Decode\Decoder\Valid;
@@ -20,57 +22,75 @@ use function Klimick\Decode\Decoder\invalids;
  */
 final class UnionDecoder extends AbstractDecoder
 {
-    /** @var non-empty-list<AbstractDecoder<T>> $decoders */
-    public array $decoders;
-
     /**
-     * @param AbstractDecoder<T> $first
-     * @param AbstractDecoder<T> $second
-     * @param AbstractDecoder<T> ...$rest
-     *
-     * @no-named-arguments
+     * @param NonEmptyArrayList<AbstractDecoder<T>> $decoders
      */
-    public function __construct(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest)
-    {
-        $this->decoders = [$first, $second, ...$rest];
-    }
+    public function __construct(private NonEmptyArrayList $decoders) { }
 
     public function name(): string
     {
-        return implode(' | ', array_map(fn($t) => $t->name(), $this->decoders));
+        $types = $this->decoders
+            ->map(fn($t) => $t->name())
+            ->toArray();
+
+        return implode(' | ', $types);
     }
 
     public function is(mixed $value): bool
     {
-        foreach ($this->decoders as $decoder) {
-            if ($decoder->is($value)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->decoders->exists(fn($decoder) => $decoder->is($value));
     }
 
     public function decode(mixed $value, Context $context): Either
     {
-        $errors = [];
+        return self::decodeRec(
+            toDecode: $value,
+            inContext: $context,
+            decoder: $this->decoders->head(),
+            decoders: $this->decoders->tail()->toArray(),
+        );
+    }
 
-        foreach ($this->decoders as $decoder) {
-            $typename = $decoder->name();
+    /**
+     * @template TUnion
+     *
+     * @param AbstractDecoder<TUnion> $decoder
+     * @param list<AbstractDecoder<TUnion>> $decoders
+     * @param list<UnionCaseErrors> $errors
+     * @return Either<Invalid, Valid<TUnion>>
+     *
+     * @psalm-pure
+     */
+    private static function decodeRec(
+        mixed $toDecode,
+        Context $inContext,
+        AbstractDecoder $decoder,
+        array $decoders,
+        array $errors = [],
+    ): Either
+    {
+        $typename = $decoder->name();
 
-            $result = $decoder
-                ->decode($value, $context($typename, $value))
-                ->get();
+        $decoded = $decoder
+            ->decode($toDecode, $inContext($typename, $toDecode))
+            ->get();
 
-            if ($result instanceof Valid) {
-                return valid($result->value);
-            }
-
-            $errors[] = new UnionCaseErrors($typename, $result->errors);
+        if ($decoded instanceof Valid) {
+            return valid($decoded->value);
         }
 
-        return invalids([
-            new UnionTypeErrors($errors),
-        ]);
+        $allErrors = [...$errors, new UnionCaseErrors($typename, $decoded->errors)];
+
+        return 0 !== count($decoders)
+            ? self::decodeRec(
+                toDecode: $toDecode,
+                inContext: $inContext,
+                decoder: $decoders[0],
+                decoders: array_slice($decoders, offset: 1),
+                errors: $allErrors,
+            )
+            : invalids([
+                new UnionTypeErrors($allErrors),
+            ]);
     }
 }

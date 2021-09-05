@@ -385,7 +385,9 @@ function rec(callable $type): AbstractDecoder
  */
 function union(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest): AbstractDecoder
 {
-    return new Internal\UnionDecoder($first, $second, ...array_values($rest));
+    $decoders = NonEmptyArrayList::collectNonEmpty([$first, $second, ...$rest]);
+
+    return new Internal\UnionDecoder($decoders);
 }
 
 /**

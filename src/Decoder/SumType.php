@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Fp\Collections\HashMap;
+use Fp\Collections\NonEmptyArrayList;
 use JsonSerializable;
 use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\ObjectDecoder;
@@ -69,8 +70,9 @@ abstract class SumType implements JsonSerializable
 
         $cases = static::definition();
 
-        return new UnionDecoder(
-            ...array_map(
+        /** @var NonEmptyArrayList<ObjectDecoder<static>> $decoders */
+        $decoders = NonEmptyArrayList::collectNonEmpty(
+            array_map(
                 fn($decoder, $case) => new ObjectDecoder(
                     objectClass: static::class,
                     decoders: HashMap::collect([
@@ -83,6 +85,8 @@ abstract class SumType implements JsonSerializable
                 array_keys($cases),
             )
         );
+
+        return new UnionDecoder($decoders);
     }
 
     public function jsonSerialize(): ProductType|SumType
