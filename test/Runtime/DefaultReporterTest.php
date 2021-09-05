@@ -14,7 +14,6 @@ use Klimick\Decode\Test\Static\Fixtures\Person;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Constraint\maxLength;
 use function Klimick\Decode\Constraint\minLength;
-use function Klimick\Decode\Decoder\bool;
 use function Klimick\Decode\Decoder\decode;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\literal;
@@ -34,7 +33,7 @@ final class DefaultReporterTest extends TestCase
         $decoder = shape(
             name: string(),
             age: int(),
-            is_approved: bool(),
+            is_approved: literal(true, false),
             application_ver: literal('v1', 'v2'),
             admin: object(Person::class)(
                 name: string(),

@@ -46,10 +46,7 @@ final class ArrListDecoder extends AbstractDecoder
     {
         $count = count($arr);
 
-        return (
-            (0 === $count) ||
-            (array_keys($arr) === range(0, $count - 1))
-        );
+        return 0 === $count || array_keys($arr) === range(0, $count - 1);
     }
 
     public function decode(mixed $value, Context $context): Either
