@@ -37,7 +37,7 @@ final class GenericObjectReturnTypeProvider implements MethodReturnTypeProviderI
             ]);
 
             return new Type\Union([
-                new Type\Atomic\TGenericObject(StaticTypeInterface::class, [$inferred_type])
+                new Type\Atomic\TGenericObject(StaticTypeInterface::class, [$inferred_type]),
             ]);
         });
 

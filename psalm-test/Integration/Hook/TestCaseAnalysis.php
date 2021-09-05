@@ -14,13 +14,13 @@ use Klimick\PsalmTest\Integration\Assertion\Collector\SeePsalmIssuesCollector;
 use Klimick\PsalmTest\Integration\Assertion\Collector\SeeReturnTypeAssertionCollector;
 use Klimick\PsalmTest\Integration\Assertion\Reconciler\SeePsalmIssuesAssertionReconciler;
 use Klimick\PsalmTest\Integration\Assertion\Reconciler\SeeReturnTypeAssertionReconciler;
+use Klimick\PsalmTest\Integration\Psalm;
 use Klimick\PsalmTest\PsalmCodeBlockFactory;
 use Klimick\PsalmTest\PsalmTest;
 use Klimick\PsalmTest\StaticTestCase;
 use PhpParser\Node\Expr\MethodCall;
 use PhpParser\Node\Identifier;
 use PhpParser\Node\Stmt\ClassMethod;
-use Psalm\Codebase;
 use Psalm\Context;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
@@ -28,8 +28,6 @@ use Psalm\Plugin\EventHandler\AfterFunctionLikeAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
 use Psalm\Plugin\EventHandler\Event\AfterFunctionLikeAnalysisEvent;
 use Psalm\Type\Atomic\TNamedObject;
-use function Fp\Cast\asList;
-use function Fp\Collection\first;
 use function Fp\Collection\second;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
@@ -52,11 +50,8 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
         Option::do(function() use ($event) {
-            $context = $event->getContext();
-            $codebase = $event->getCodebase();
-
-            $test_class = yield self::getTestClass($context, $codebase);
-            $test_method = yield self::getTestMethod($context);
+            $test_class = yield self::getTestClass($event->getContext());
+            $test_method = yield self::getTestMethod($event->getContext());
 
             $assertion_call = yield proveOf($event->getExpr(), MethodCall::class);
             $assertion_name = yield self::getAssertionName($event, $assertion_call);
@@ -64,11 +59,10 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
             $assertions = AssertionsStorage::get($test_class, $test_method);
             $assertion_context = new AssertionCollectingContext($test_class, $test_method, $assertion_name, $assertion_call, $event);
 
-            $new_data = self::collectAssertions($assertions, $assertion_context);
             AssertionsStorage::set(
                 test_class: $test_class,
                 test_method: $test_method,
-                new_data: $new_data,
+                new_data: self::collectAssertions($assertions, $assertion_context),
             );
         });
 
@@ -85,13 +79,13 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
 
         return LinkedList::collect($handlers)
             ->filter(fn($handler) => $handler::isSupported($context))
-            ->fold($assertions, fn(Assertions $acc, $collector) => $collector::collect($acc, $context)->get() ?? $acc);
+            ->fold($assertions, fn(Assertions $acc, $collector) => $collector::collect($acc, $context)->getOrCall(fn() => $acc));
     }
 
     /**
      * @psalm-return Option<AssertionName>
      */
-    private static function getAssertionName(AfterFunctionLikeAnalysisEvent|AfterExpressionAnalysisEvent $event, MethodCall $method_call): Option
+    private static function getAssertionName(AfterExpressionAnalysisEvent $event, MethodCall $method_call): Option
     {
         return self::filterAssertionCall($event, $method_call)
             ->flatMap(fn($method_call) => proveOf($method_call->name, Identifier::class))
@@ -102,36 +96,22 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
     /**
      * @return Option<MethodCall>
      */
-    private static function filterAssertionCall(AfterFunctionLikeAnalysisEvent|AfterExpressionAnalysisEvent $event, MethodCall $method_call): Option
+    private static function filterAssertionCall(AfterExpressionAnalysisEvent $event, MethodCall $method_call): Option
     {
-        return Option::do(function() use ($event, $method_call) {
-            $caller_type = yield Option::fromNullable(
-                $event->getStatementsSource()
-                    ->getNodeTypeProvider()
-                    ->getType($method_call->var)
-            );
-
-            $atomics = asList($caller_type->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            return yield first($atomics)
-                ->filter(fn($a) => $a instanceof TNamedObject)
-                ->filter(fn($a) => $a->value === StaticTestCase::class || $a->value === PsalmCodeBlockFactory::class)
-                ->map(fn() => $method_call);
-        });
+        return Option::some($method_call->var)
+            ->flatMap(Psalm::getType($event))
+            ->flatMap(Psalm::asSingleAtomicOf(TNamedObject::class))
+            ->filter(fn($a) => $a->value === StaticTestCase::class || $a->value === PsalmCodeBlockFactory::class)
+            ->map(fn() => $method_call);
     }
 
     /**
      * @return Option<class-string<PsalmTest>>
      */
-    private static function getTestClass(Context $context, Codebase $codebase): Option
+    private static function getTestClass(Context $context): Option
     {
-        /** @var Option<class-string<PsalmTest>> */
         return Option::fromNullable($context->self)
-            ->filter(fn($self) => Option
-                ::try(fn() => $codebase->classlikes->classExtends($self, PsalmTest::class))
-                ->getOrElse(false)
-            );
+            ->flatMap(Psalm::asSubclass(of: PsalmTest::class));
     }
 
     /**
@@ -149,11 +129,8 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
         Option::do(function() use ($event) {
             yield proveTrue($event->getStmt() instanceof ClassMethod);
 
-            $context = $event->getContext();
-            $codebase = $event->getCodebase();
-
-            $test_class = yield self::getTestClass($context, $codebase);
-            $test_method = yield self::getTestMethod($context);
+            $test_class = yield self::getTestClass($event->getContext());
+            $test_method = yield self::getTestMethod($event->getContext());
 
             $data = AssertionsStorage::get($test_class, $test_method);
 

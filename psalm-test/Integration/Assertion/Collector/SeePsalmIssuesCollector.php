@@ -11,7 +11,6 @@ use Klimick\PsalmTest\Integration\Psalm;
 use Psalm\Type;
 use Psalm\Type\Atomic\TLiteralString;
 use function Fp\Collection\at;
-use function Fp\Evidence\proveOf;
 
 final class SeePsalmIssuesCollector implements AssertionCollectorInterface
 {
@@ -42,14 +41,12 @@ final class SeePsalmIssuesCollector implements AssertionCollectorInterface
     {
         $formatting_args = Option::do(function() use ($context) {
             $issue_args = yield self::getSeePsalmIssueArg($context, position: 2)
-                ->filter(fn($atomic) => $atomic instanceof Type\Atomic\TKeyedArray);
+                ->flatMap(Psalm::asSingleAtomicOf(Type\Atomic\TKeyedArray::class));
 
             $replacements = [];
 
             foreach ($issue_args->properties as $name => $property) {
-                $replacements["#[{$name}]"] = yield Option::some($property)
-                    ->flatMap(Psalm::asSingleAtomic())
-                    ->flatMap(self::getLiteralStringValue());
+                $replacements["#[{$name}]"] = yield self::getLiteralStringValue()($property);
             }
 
             return $replacements;
@@ -59,20 +56,21 @@ final class SeePsalmIssuesCollector implements AssertionCollectorInterface
     }
 
     /**
-     * @return Closure(Type\Atomic): Option<string>
+     * @return Closure(Type\Union): Option<string>
      */
     private static function getLiteralStringValue(): Closure
     {
-        return fn(Type\Atomic $atomic) => proveOf($atomic, TLiteralString::class)->map(fn($atomic) => $atomic->value);
+        return fn(Type\Union $atomic) => Option::some($atomic)
+            ->flatMap(Psalm::asSingleAtomicOf(TLiteralString::class))
+            ->map(fn($atomic) => $atomic->value);
     }
 
     /**
-     * @return Option<Type\Atomic>
+     * @return Option<Type\Union>
      */
     private static function getSeePsalmIssueArg(AssertionCollectingContext $context, int $position): Option
     {
-        return at($context->assertion_call->args, $position)
-            ->flatMap(fn($arg) => $context->getSingleAtomicType($arg->value));
+        return at($context->assertion_call->args, $position)->flatMap(Psalm::getArgType($context->event));
     }
 
     public static function isSupported(AssertionCollectingContext $context): bool

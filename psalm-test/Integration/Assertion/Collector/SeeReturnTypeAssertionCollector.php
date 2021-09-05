@@ -6,6 +6,7 @@ namespace Klimick\PsalmTest\Integration\Assertion\Collector;
 
 use Fp\Functional\Option\Option;
 use Klimick\PsalmTest\Integration\Assertion\Assertions;
+use Klimick\PsalmTest\Integration\Psalm;
 use Klimick\PsalmTest\StaticType\StaticTypeInterface;
 use Psalm\Type;
 use Psalm\Type\Atomic\TFalse;
@@ -34,10 +35,9 @@ final class SeeReturnTypeAssertionCollector implements AssertionCollectorInterfa
     private static function getExpectedReturnType(AssertionCollectingContext $context): Option
     {
         return first($context->assertion_call->args)
-            ->flatMap(fn($arg) => $context->getSingleAtomicType($arg->value))
-            ->filter(fn($atomic) => $atomic instanceof TGenericObject)
-            ->filter(fn($atomic) => StaticTypeInterface::class === $atomic->value)
-            ->flatMap(fn($atomic) => first($atomic->type_params));
+            ->flatMap(Psalm::getArgType($context->event))
+            ->flatMap(Psalm::asSingleAtomicOf(TGenericObject::class))
+            ->flatMap(Psalm::getTypeParam(StaticTypeInterface::class, position: 0));
     }
 
     /**
@@ -46,7 +46,8 @@ final class SeeReturnTypeAssertionCollector implements AssertionCollectorInterfa
     private static function isInvariantCompare(AssertionCollectingContext $context): Option
     {
         return second($context->assertion_call->args)
-            ->flatMap(fn($arg) => $context->getSingleAtomicType($arg->value))
+            ->flatMap(Psalm::getArgType($context->event))
+            ->flatMap(Psalm::asSingleAtomic())
             ->filter(fn($atomic) => $atomic instanceof TTrue || $atomic instanceof TFalse)
             ->map(fn($atomic) => match(true) {
                 $atomic instanceof TTrue => true,

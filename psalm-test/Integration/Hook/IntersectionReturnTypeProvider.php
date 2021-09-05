@@ -37,7 +37,7 @@ final class IntersectionReturnTypeProvider implements MethodReturnTypeProviderIn
 
             return new Type\Union([
                 new TGenericObject(StaticTypeInterface::class, [
-                    new Type\Union([$first_type])
+                    new Type\Union([$first_type]),
                 ]),
             ]);
         });

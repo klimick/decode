@@ -6,6 +6,7 @@ namespace Klimick\PsalmTest\Integration;
 
 use Closure;
 use PhpParser\Node;
+use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
 use Psalm\Type;
 use Fp\Functional\Option\Option;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
@@ -19,19 +20,22 @@ final class Psalm
     /**
      * @return Closure(Node\Expr | Node\Name | Node\Stmt\Return_): Option<Type\Union>
      */
-    public static function getType(MethodReturnTypeProviderEvent $from): Closure
+    public static function getType(MethodReturnTypeProviderEvent | AfterExpressionAnalysisEvent $from): Closure
     {
+        $type_provider = match (true) {
+            $from instanceof MethodReturnTypeProviderEvent => $from->getSource()->getNodeTypeProvider(),
+            $from instanceof AfterExpressionAnalysisEvent => $from->getStatementsSource()->getNodeTypeProvider(),
+        };
+
         return fn(Node\Expr | Node\Name | Node\Stmt\Return_ $for) => Option::fromNullable(
-            $from->getSource()
-                ->getNodeTypeProvider()
-                ->getType($for)
+            $type_provider->getType($for)
         );
     }
 
     /**
      * @return Closure(Node\Arg): Option<Type\Union>
      */
-    public static function getArgType(MethodReturnTypeProviderEvent $from): Closure
+    public static function getArgType(MethodReturnTypeProviderEvent | AfterExpressionAnalysisEvent $from): Closure
     {
         $getType = self::getType($from);
 
@@ -74,5 +78,16 @@ final class Psalm
 
         return fn(Type\Union $union) => $asSingleAtomic($union)
             ->flatMap(fn(Type\Atomic $atomic) => proveOf($atomic, $class));
+    }
+
+    /**
+     * @template T
+     *
+     * @param class-string<T> $of
+     * @return Closure(string): Option<class-string<T>>
+     */
+    public static function asSubclass(string $of): Closure
+    {
+        return fn(string $class) => Option::some($class)->filter(fn($self) => is_subclass_of($self, $of));
     }
 }
