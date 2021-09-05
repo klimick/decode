@@ -27,8 +27,9 @@ use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\AfterFunctionLikeAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
 use Psalm\Plugin\EventHandler\Event\AfterFunctionLikeAnalysisEvent;
+use Psalm\Type\Atomic\TGenericObject;
+use Psalm\Type\Atomic\TLiteralString;
 use Psalm\Type\Atomic\TNamedObject;
-use function Fp\Collection\second;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
@@ -50,10 +51,11 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
         Option::do(function() use ($event) {
-            $test_class = yield self::getTestClass($event->getContext());
-            $test_method = yield self::getTestMethod($event->getContext());
-
             $assertion_call = yield proveOf($event->getExpr(), MethodCall::class);
+
+            $test_class = yield self::getTestClass($event->getContext());
+            $test_method = yield self::getTestMethod($event, $assertion_call);
+
             $assertion_name = yield self::getAssertionName($event, $assertion_call);
 
             $assertions = AssertionsStorage::get($test_class, $test_method);
@@ -67,6 +69,37 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
         });
 
         return null;
+    }
+
+    public static function afterStatementAnalysis(AfterFunctionLikeAnalysisEvent $event): ?bool
+    {
+        Option::do(function() use ($event) {
+            yield proveTrue($event->getStmt() instanceof ClassMethod);
+
+            $test_class = yield self::getTestClass($event->getContext());
+
+            foreach (AssertionsStorage::take(for: $test_class) as $assertions) {
+                self::reconcileAssertions($assertions);
+            }
+        });
+
+        return null;
+    }
+
+    private static function reconcileAssertions(Assertions $assertions): void
+    {
+        $handlers = [
+            SeeReturnTypeAssertionReconciler::class,
+            SeePsalmIssuesAssertionReconciler::class,
+        ];
+
+        foreach ($handlers as $handler) {
+            $issue = $handler::reconcile($assertions)->get();
+
+            if (null !== $issue) {
+                IssueBuffer::accepts($issue);
+            }
+        }
     }
 
     private static function collectAssertions(Assertions $assertions, AssertionCollectingContext $context): Assertions
@@ -83,26 +116,17 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
     }
 
     /**
-     * @psalm-return Option<AssertionName>
+     * @return Option<AssertionName>
      */
     private static function getAssertionName(AfterExpressionAnalysisEvent $event, MethodCall $method_call): Option
-    {
-        return self::filterAssertionCall($event, $method_call)
-            ->flatMap(fn($method_call) => proveOf($method_call->name, Identifier::class))
-            ->map(fn($id) => $id->name)
-            ->filter(fn($name) => in_array($name, self::SUPPORTED_ASSERTION_METHODS, true));
-    }
-
-    /**
-     * @return Option<MethodCall>
-     */
-    private static function filterAssertionCall(AfterExpressionAnalysisEvent $event, MethodCall $method_call): Option
     {
         return Option::some($method_call->var)
             ->flatMap(Psalm::getType($event))
             ->flatMap(Psalm::asSingleAtomicOf(TNamedObject::class))
             ->filter(fn($a) => $a->value === StaticTestCase::class || $a->value === PsalmCodeBlockFactory::class)
-            ->map(fn() => $method_call);
+            ->flatMap(fn() => proveOf($method_call->name, Identifier::class))
+            ->map(fn($id) => $id->name)
+            ->filter(fn($name) => in_array($name, self::SUPPORTED_ASSERTION_METHODS, true));
     }
 
     /**
@@ -117,45 +141,13 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
     /**
      * @return Option<lowercase-string>
      */
-    private static function getTestMethod(Context $context): Option
+    private static function getTestMethod(AfterExpressionAnalysisEvent $event, MethodCall $assertion_call): Option
     {
-        return Option::fromNullable($context->calling_method_id)
-            ->map(fn($method_id) => explode('::', $method_id))
-            ->flatMap(fn($method_id) => second($method_id));
-    }
-
-    public static function afterStatementAnalysis(AfterFunctionLikeAnalysisEvent $event): ?bool
-    {
-        Option::do(function() use ($event) {
-            yield proveTrue($event->getStmt() instanceof ClassMethod);
-
-            $test_class = yield self::getTestClass($event->getContext());
-            $test_method = yield self::getTestMethod($event->getContext());
-
-            $data = AssertionsStorage::get($test_class, $test_method);
-
-            $handlers = [
-                SeeReturnTypeAssertionReconciler::class,
-                SeePsalmIssuesAssertionReconciler::class,
-            ];
-
-            $issues = [];
-
-            foreach ($handlers as $handler) {
-                $issue = $handler::reconcile($data)->get();
-
-                if (null === $issue) {
-                    continue;
-                }
-
-                $issues[] = $issue;
-            }
-
-            foreach ($issues as $issue) {
-                IssueBuffer::accepts($issue);
-            }
-        });
-
-        return null;
+        return Option::some($assertion_call)
+            ->flatMap(Psalm::getType($event))
+            ->flatMap(Psalm::asSingleAtomicOf(class: TGenericObject::class))
+            ->flatMap(Psalm::getTypeParam(of: StaticTestCase::class, position: 0))
+            ->flatMap(Psalm::asSingleAtomicOf(class: TLiteralString::class))
+            ->map(fn($literal) => strtolower($literal->value));
     }
 }

@@ -12,11 +12,23 @@ final class AssertionsStorage
     private static array $data = [];
 
     /**
+     * @param class-string<PsalmTest> $for
      * @return array<non-empty-string, Assertions>
      */
-    public static function all(): array
+    public static function take(string $for): array
     {
-        return self::$data;
+        $take = [];
+        $notTake = [];
+
+        foreach (self::$data as $key => $data) {
+            str_starts_with($key, $for)
+                ? ($take[$key] = $data)
+                : ($notTake[$key] = $data);
+        }
+
+        self::$data = $notTake;
+
+        return $take;
     }
 
     /**
