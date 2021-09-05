@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Test\Runtime\Constraint;
+namespace Klimick\Decode\Test\Runtime\Constraint\String;
 
 use Klimick\Decode\Test\Helper\Gen;
 use Klimick\Decode\Test\Runtime\Constraint\Helper\Check;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\Constraint\maxLength;
+use function Klimick\Decode\Constraint\minLength;
 use function Klimick\Decode\Test\Helper\eris;
 
-final class MaxLengthTest extends TestCase
+final class MinLengthTest extends TestCase
 {
     public function testValid(): void
     {
@@ -21,22 +21,26 @@ final class MaxLengthTest extends TestCase
                 $length = mb_strlen($actual);
 
                 Check::isValid()
-                    ->forConstraint(maxLength(is: $length))
+                    ->forConstraint(minLength(is: $length))
                     ->withValue($actual);
+
+                Check::isValid()
+                    ->forConstraint(minLength(is: $length))
+                    ->withValue($actual . '_noise');
             });
     }
 
     public function testInvalid(): void
     {
         eris(repeat: 1000, ratio: 40)
-            ->forAll(Gen::nonEmptyString())
-            ->then(function(string $actual) {
+            ->forAll(Gen::string(), Gen::positiveInt())
+            ->then(function(string $actual, int $delta) {
                 /** @var positive-int $length */
-                $length = mb_strlen($actual);
+                $length = mb_strlen($actual) + $delta;
 
                 Check::isInvalid()
-                    ->forConstraint(maxLength(is: $length))
-                    ->withValue($actual . $actual);
+                    ->forConstraint(minLength(is: $length))
+                    ->withValue($actual);
             });
     }
 }

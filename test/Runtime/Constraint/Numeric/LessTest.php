@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Test\Runtime\Constraint;
+namespace Klimick\Decode\Test\Runtime\Constraint\Numeric;
 
 use Klimick\Decode\Test\Helper\Gen;
 use Klimick\Decode\Test\Runtime\Constraint\Helper\Check;

@@ -146,6 +146,17 @@ function maxLength(int $is): ConstraintInterface
 /**
  * @psalm-pure
  *
+ * @param non-empty-string $string
+ * @return ConstraintInterface<string>
+ */
+function startsWith(string $string): ConstraintInterface
+{
+    return new C\String\StartsWithConstraint($string);
+}
+
+/**
+ * @psalm-pure
+ *
  * @return ConstraintInterface<string>
  */
 function ipv4(): ConstraintInterface

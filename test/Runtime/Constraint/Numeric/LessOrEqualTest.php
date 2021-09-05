@@ -2,29 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Test\Runtime\Constraint;
+namespace Klimick\Decode\Test\Runtime\Constraint\Numeric;
 
 use Klimick\Decode\Test\Helper\Gen;
 use Klimick\Decode\Test\Runtime\Constraint\Helper\Check;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\Constraint\greaterOrEqual;
+use function Klimick\Decode\Constraint\lessOrEqual;
 use function Klimick\Decode\Test\Helper\eris;
 
-final class GreaterOrEqualTest extends TestCase
+final class LessOrEqualTest extends TestCase
 {
     public function testValid(): void
     {
         eris(repeat: 1000, ratio: 40)
-            ->forAll(Gen::int(), Gen::elements(0, 1))
+            ->forAll(Gen::int(), Gen::elements(0, 0.1, 1))
             ->then(fn(int $num, int|float $zeroOrOne) => Check::isValid()
-                ->forConstraint(greaterOrEqual(to: $num))
-                ->withValue($num + $zeroOrOne));
+                ->forConstraint(lessOrEqual(to: $num))
+                ->withValue($num - $zeroOrOne));
 
         eris(repeat: 1000, ratio: 40)
             ->forAll(Gen::float(), Gen::elements(0, 0.1, 1))
             ->then(fn(float $num, int|float $zeroOrOne) => Check::isValid()
-                ->forConstraint(greaterOrEqual(to: $num))
-                ->withValue($num + $zeroOrOne));
+                ->forConstraint(lessOrEqual(to: $num))
+                ->withValue($num - $zeroOrOne));
     }
 
     public function testInvalid(): void
@@ -32,13 +32,13 @@ final class GreaterOrEqualTest extends TestCase
         eris(repeat: 1000, ratio: 40)
             ->forAll(Gen::int(), Gen::elements(0.1, 1))
             ->then(fn(int $num, int|float $zeroOrOne) => Check::isInvalid()
-                ->forConstraint(greaterOrEqual(to: $num))
-                ->withValue($num - $zeroOrOne));
+                ->forConstraint(lessOrEqual(to: $num))
+                ->withValue($num + $zeroOrOne));
 
         eris(repeat: 1000, ratio: 40)
             ->forAll(Gen::float(), Gen::elements(0.1, 1))
-            ->then(fn(int $num, int|float $zeroOrOne) => Check::isInvalid()
-                ->forConstraint(greaterOrEqual(to: $num))
-                ->withValue($num - $zeroOrOne));
+            ->then(fn(float $num, int|float $zeroOrOne) => Check::isInvalid()
+                ->forConstraint(lessOrEqual(to: $num))
+                ->withValue($num + $zeroOrOne));
     }
 }
