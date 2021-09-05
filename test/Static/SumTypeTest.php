@@ -32,9 +32,9 @@ final class SumTypeTest extends PsalmTest
         return new Messenger(case: $telegram);
     }
 
-    public function testTypeErrorIssue(): void
+    public function __invoke(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Type error issue')
             ->haveCode(function() {
                 $invalidCase = new Telegram(
                     telegramId: '...',
@@ -54,11 +54,8 @@ final class SumTypeTest extends PsalmTest
                     'telegram' => Telegram::class,
                 ],
             );
-    }
 
-    public function testMatchTypeInference(): void
-    {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Match type inference')
             ->haveCode(function() {
                 return self::messenger()->match(
                     smpp: fn(SmppSms $_m) => 1,
@@ -71,11 +68,8 @@ final class SumTypeTest extends PsalmTest
                     t::literal(1), t::literal(2), t::literal(3)
                 ])
             );
-    }
 
-    public function testUnexhaustiveMatchIssue(): void
-    {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Unexhaustive match issue')
             ->haveCode(function() {
                 return self::messenger()->match(
                     smpp: fn() => 'is smpp sms',
@@ -86,11 +80,8 @@ final class SumTypeTest extends PsalmTest
                 type: 'UnexhaustiveMatchIssue',
                 message: 'Match with name "whatsapp" is not specified',
             );
-    }
 
-    public function testInvalidMatcherTypeIssue(): void
-    {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Invalid matcher type issue')
             ->haveCode(function() {
                 return self::messenger()->match(
                     smpp: fn(SmppSms $m) => get_debug_type($m),

@@ -10,9 +10,9 @@ use Klimick\PsalmTest\StaticTestCase;
 
 final class ProductTypeIssuesTest extends PsalmTest
 {
-    public function testUndefinedPropertyFetchIssue(): void
+    public function __invoke(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Undefined property fetch issue')
             ->haveCode(function(): mixed {
                 /** @var Message $message */
                 $message = null;
@@ -26,11 +26,8 @@ final class ProductTypeIssuesTest extends PsalmTest
                     'instance' => Message::class,
                 ],
             );
-    }
 
-    public function testTypeErrorIssue(): void
-    {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Type error issue')
             ->haveCode(function() {
                 return new Message(
                     id: '...',
@@ -42,11 +39,8 @@ final class ProductTypeIssuesTest extends PsalmTest
                 type: 'InvalidProductTypeInstantiationIssue',
                 message: 'Invalid type for "receiverId". Actual: "123456". Expected: "string".',
             );
-    }
 
-    public function testPropertyMissingIssue(): void
-    {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Less arguments issue')
             ->haveCode(function() {
                 return new Message(
                     id: '...',

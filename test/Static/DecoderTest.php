@@ -45,7 +45,7 @@ final class DecoderTest extends PsalmTest
 {
     public function testStringDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('String decoder')
             ->haveCode(fn() => string())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -57,7 +57,7 @@ final class DecoderTest extends PsalmTest
 
     public function testNonEmptyStringDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Non empty string decoder')
             ->haveCode(fn() => nonEmptyString())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -69,7 +69,7 @@ final class DecoderTest extends PsalmTest
 
     public function testIntDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Int decoder')
             ->haveCode(fn() => int())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -81,7 +81,7 @@ final class DecoderTest extends PsalmTest
 
     public function testPositiveIntDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Positive int decoder')
             ->haveCode(fn() => positiveInt())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -93,7 +93,7 @@ final class DecoderTest extends PsalmTest
 
     public function testFloatDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Float decoder')
             ->haveCode(fn() => float())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -105,7 +105,7 @@ final class DecoderTest extends PsalmTest
 
     public function testBoolDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Bool decoder')
             ->haveCode(fn() => bool())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -117,7 +117,7 @@ final class DecoderTest extends PsalmTest
 
     public function testNumericDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Numeric decoder')
             ->haveCode(fn() => numeric())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -129,7 +129,7 @@ final class DecoderTest extends PsalmTest
 
     public function testNumericStringDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Numeric string decoder')
             ->haveCode(fn() => numericString())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -141,7 +141,7 @@ final class DecoderTest extends PsalmTest
 
     public function testArrKeyDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Array key decoder')
             ->haveCode(fn() => arrKey())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -153,7 +153,7 @@ final class DecoderTest extends PsalmTest
 
     public function testNullDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Null decoder')
             ->haveCode(fn() => null())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -165,7 +165,7 @@ final class DecoderTest extends PsalmTest
 
     public function testMixedDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Mixed decoder')
             ->haveCode(fn() => mixed())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -177,7 +177,7 @@ final class DecoderTest extends PsalmTest
 
     public function testScalarDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Scalar decoder')
             ->haveCode(fn() => scalar())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -189,7 +189,7 @@ final class DecoderTest extends PsalmTest
 
     public function testConstantDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Constant decoder')
             ->haveCode(fn() => constant(1))
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -201,7 +201,7 @@ final class DecoderTest extends PsalmTest
 
     public function testDatetimeDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Datetime decoder')
             ->haveCode(fn() => datetime())
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -227,7 +227,7 @@ final class DecoderTest extends PsalmTest
             );
         });
 
-        StaticTestCase::describe()
+        StaticTestCase::describe('Recursive decoder')
             ->haveCode(fn() => $decoder)
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -239,7 +239,7 @@ final class DecoderTest extends PsalmTest
 
     public function testLiteralDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Literal decoder')
             ->haveCode(fn() => literal(1, 2, 3))
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -276,7 +276,7 @@ final class DecoderTest extends PsalmTest
             )
         ]);
 
-        StaticTestCase::describe()
+        StaticTestCase::describe('Union decoder')
             ->haveCode(fn() => union(
                 int(),
                 string(),
@@ -286,7 +286,7 @@ final class DecoderTest extends PsalmTest
 
     public function testObjectDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Object decoder')
             ->haveCode(fn() => object(Person::class)(
                 name: string(),
                 age: int(),
@@ -301,7 +301,7 @@ final class DecoderTest extends PsalmTest
 
     public function testObjectDecoderMissingPropertyIssue(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Object decoder: missing property issue')
             ->haveCode(fn() => object(Person::class)(
                 name: string(),
             ))
@@ -313,7 +313,7 @@ final class DecoderTest extends PsalmTest
 
     public function testObjectDecoderNonexistentPropertyObjectPropertyIssue(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Object decoder: nonexistent property')
             ->haveCode(fn() => object(Person::class)(
                 misspelled_name: string(),
                 age: int(),
@@ -330,7 +330,7 @@ final class DecoderTest extends PsalmTest
 
     public function testObjectDecoderInvalidDecoderForPropertyIssue(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Object decoder: invalid decoder for property')
             ->haveCode(fn() => object(Person::class)(
                 name: string(),
                 age: string(),
@@ -346,7 +346,7 @@ final class DecoderTest extends PsalmTest
 
     public function testPartialObjectDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Partial object decoder')
             ->haveCode(fn() => partialObject(PartialPerson::class)(
                 name: string(),
                 age: int(),
@@ -359,9 +359,9 @@ final class DecoderTest extends PsalmTest
             ));
     }
 
-    public function test(): void
+    public function testPartialObjectAllPropertiesMustBeNullable(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Partial object decoder: all properties must be nullable')
             ->haveCode(fn() => partialObject(Person::class)(
                 name: string(),
                 age: int(),
@@ -378,7 +378,7 @@ final class DecoderTest extends PsalmTest
 
     public function testTupleDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Tuple decoder')
             ->haveCode(fn() => tuple(
                 string(),
                 int(),
@@ -421,7 +421,7 @@ final class DecoderTest extends PsalmTest
             ),
         ]);
 
-        StaticTestCase::describe()
+        StaticTestCase::describe('Shape decoder')
             ->haveCode(fn() => shape(
                 name: string(),
                 age: int(),
@@ -461,7 +461,7 @@ final class DecoderTest extends PsalmTest
             ),
         ]);
 
-        StaticTestCase::describe()
+        StaticTestCase::describe('Intersection decoder')
             ->haveCode(fn() => intersection(
                 shape(prop1: string(), prop2: string()),
                 shape(prop3: string(), prop4: string()),
@@ -472,7 +472,7 @@ final class DecoderTest extends PsalmTest
 
     public function testIntersectionDecoderIntersectionCollisionIssue(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Intersection decoder: properties collision')
             ->haveCode(fn() => intersection(
                 shape(prop1: string(), prop2: string()),
                 shape(prop3: string(), prop2: string()),
@@ -485,7 +485,7 @@ final class DecoderTest extends PsalmTest
 
     public function testArrDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Array decoder')
             ->haveCode(fn() => arr(int(), string()))
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -497,7 +497,7 @@ final class DecoderTest extends PsalmTest
 
     public function testNonEmptyArrDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Non empty array decoder')
             ->haveCode(fn() => nonEmptyArr(
                 int(),
                 string()
@@ -512,7 +512,7 @@ final class DecoderTest extends PsalmTest
 
     public function testListDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('List decoder')
             ->haveCode(fn() => arrList(int()))
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,
@@ -524,7 +524,7 @@ final class DecoderTest extends PsalmTest
 
     public function testNonEmptyListDecoder(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Non empty list decoder')
             ->haveCode(fn() => nonEmptyArrList(int()))
             ->seeReturnType(t::generic(
                 ofType: AbstractDecoder::class,

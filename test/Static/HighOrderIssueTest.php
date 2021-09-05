@@ -13,9 +13,9 @@ use function Klimick\Decode\Decoder\string;
 
 final class HighOrderIssueTest extends PsalmTest
 {
-    public function testOptionalCallContradictionIssue(): void
+    public function __invoke(): void
     {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Optional call contradiction issue')
             ->haveCode(fn() => shape(
                 prop: int()->default(42)->optional(),
             ))
@@ -23,11 +23,8 @@ final class HighOrderIssueTest extends PsalmTest
                 type: 'OptionalCallContradictionIssue',
                 message: 'Using AbstractDecoder::default and AbstractDecoder::optional at the same time has no sense.',
             );
-    }
 
-    public function testInvalidPropertyAliasIssue(): void
-    {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Invalid property alias issue')
             ->haveCode(fn() => shape(
                 prop: int()->from('person_age'),
             ))
@@ -36,11 +33,8 @@ final class HighOrderIssueTest extends PsalmTest
                 message: 'Invalid argument for AbstractDecoder::from. ' .
                 'Argument must be non-empty-string literal with "$." prefix or just "$"'
             );
-    }
 
-    public function testBrandAlreadyDefinedIssueForOptionalCall(): void
-    {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Brand already defined issue for optional call')
             ->haveCode(fn() => shape(
                 prop: string()->optional()->optional(),
             ))
@@ -48,11 +42,8 @@ final class HighOrderIssueTest extends PsalmTest
                 type: 'BrandAlreadyDefinedIssue',
                 message: 'Method "optional" should not called multiple times.',
             );
-    }
 
-    public function testBrandAlreadyDefinedIssueForFromCall(): void
-    {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Brand already defined issue for from call')
             ->haveCode(fn() => shape(
                 prop: string()->from('$.another_prop')->from('$.another_prop'),
             ))
@@ -60,11 +51,8 @@ final class HighOrderIssueTest extends PsalmTest
                 type: 'BrandAlreadyDefinedIssue',
                 message: 'Method "from" should not called multiple times.',
             );
-    }
 
-    public function testIncompatibleConstraintIssue(): void
-    {
-        StaticTestCase::describe()
+        StaticTestCase::describe('Incompatible constraint issue')
             ->haveCode(
                 fn() => string()->constrained(greater(than: 10))
             )
