@@ -16,6 +16,9 @@ use function Klimick\Decode\Constraint\valid;
  */
 final class EndsWithConstraint implements ConstraintInterface
 {
+    /**
+     * @param non-empty-string $value
+     */
     public function __construct(public string $value) { }
 
     public function name(): string

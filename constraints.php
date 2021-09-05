@@ -157,6 +157,17 @@ function startsWith(string $string): ConstraintInterface
 /**
  * @psalm-pure
  *
+ * @param non-empty-string $string
+ * @return ConstraintInterface<string>
+ */
+function endsWith(string $string): ConstraintInterface
+{
+    return new C\String\EndsWithConstraint($string);
+}
+
+/**
+ * @psalm-pure
+ *
  * @return ConstraintInterface<string>
  */
 function ipv4(): ConstraintInterface
