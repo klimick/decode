@@ -1,4 +1,4 @@
-<?php /** @noinspection PhpUnusedAliasInspection */
+<?php
 
 declare(strict_types=1);
 
@@ -10,10 +10,8 @@ use Fp\Collections\Map;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Semigroup\Semigroup;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Internal\Shape\ShapePropertySemigroup;
 use Klimick\Decode\DecodeSemigroup;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
 use function Klimick\Decode\Decoder\valid;
