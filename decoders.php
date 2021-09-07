@@ -14,6 +14,7 @@ use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\ErrorInterface;
 use Klimick\Decode\Internal;
 use Klimick\Decode\Context;
+use Klimick\Decode\Report\DefaultReporter;
 use Klimick\PsalmDecode\ShapeDecoder\PartialShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
@@ -22,28 +23,46 @@ use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T> $decoder
+ * @psalm-param AbstractDecoder<T> $with
  * @psalm-return Either<Invalid, Valid<T>>
  */
-function decode(mixed $data, AbstractDecoder $decoder): Either
+function decode(mixed $value, AbstractDecoder $with): Either
 {
-    return $decoder->decode($data, Context::root($decoder->name(), $data));
+    return $with->decode($value, Context::root($with->name(), $value));
 }
 
 /**
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T> $decoder
+ * @psalm-param AbstractDecoder<T> $to
  * @psalm-return Option<T>
  */
-function cast(mixed $data, AbstractDecoder $decoder): Option
+function cast(mixed $value, AbstractDecoder $to): Option
 {
-    $decoded = decode($data, $decoder)->get();
+    $decoded = decode($value, $to)->get();
 
     return $decoded instanceof Invalid
         ? Option::none()
         : Option::some($decoded->value);
+}
+
+/**
+ * @template T
+ * @psalm-pure
+ *
+ * @param AbstractDecoder<T> $to
+ * @return T
+ *
+ * @throws CastException
+ */
+function tryCast(mixed $value, AbstractDecoder $to): mixed
+{
+    $decoded = decode($value, $to)->get();
+
+    return $decoded instanceof Invalid
+        ? throw new CastException(DefaultReporter::report($decoded), $to->name())
+        : $decoded->value;
 }
 
 /**
