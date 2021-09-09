@@ -102,7 +102,7 @@ $createdWithNamedArgs = new Library(
 );
 ```
 
-### Type atomics
+### Builtin type atomics
 
 | decoder          | php/psalm                 |
 | ---------------- | ------------------------- |
@@ -122,17 +122,147 @@ $createdWithNamedArgs = new Library(
 
 ### Generic types
 
-| decoder          | php/psalm                                                                        |
-| ---------------- | -------------------------------------------------------------------------------- |
-| `union(int(), string(), null())`                                  | int \| string \| null           |
-| `arr(int(), string())`                                            | array<int, string>              |
-| `nonEmptyArr(int(), string())`                                    | non-empty-array<int, string>    |
-| `arrList(string())`                                               | list<string>                    |
-| `nonEmptyArrList(string())`                                       | non-empty-list<string>          |
-| `shape(name: string(), age: int)`                                 | array{name: string, age: int}   |
-| `partialShape(name: string(), age: int)`                          | array{name?: string, age?: int} |
-| `tuple(string(), int())`                                          | array{string, int}              |
-| `object(Person::class)(name: string(), age: int())`               | Person                          |
-| `partialObject(PartialPerson::class)(name: string(), age: int())` | PartialPerson                   |
-| `rec(fn() => anyRecursiveType())`                                 | AnyRecursiveType                |
-| `fromJson(shape(name: string(), age: int))`                       | array{name: string, age: int}   |
+##### union(T1(), T2(), T3())
+Represents type whose value will be of a single type out of multiple types.
+
+```php
+// int | string
+$intOrString = union(int(), string());
+// float | null
+$floatOrNull = union(float(), null());
+// int | float | string | null
+$intOrFloatOrStringOrNull = union($intOrString, $floatOrNull);
+```
+
+##### arr(TK(), TV())
+Represent `array` with keys of type `TK()` and values of type `TV()`.
+
+```php
+// array<int, string>
+$arr = arr(int(), string());
+```
+
+##### nonEmptyArr(TK(), TV())
+Represent `non-empty-array` with keys of type `TK()` and values of type `TV()`.
+
+```php
+// non-empty-array<int, string>
+$nonEmptyArr = nonEmptyArr(int(), string());
+```
+
+##### arrList(TV())
+Represents `list` with values of type `TV()`.
+
+```php
+// list<string>
+$list = arrList(string());
+```
+
+##### nonEmptyArrList(TV())
+Represents `non-empty-list` with values of type `TV()`.
+
+```php
+// non-empty-list<string>
+$list = nonEmptyArrList(string());
+```
+
+##### shape(prop1: T(), prop2: T(), propN: T())
+Represent `array` with knows keys.
+
+```php
+// array{prop1: int, prop2: string, prop3: bool}
+$shape = shape(
+    prop1: int(),
+    prop2: string(),
+    prop3: bool(),
+);
+```
+
+##### partialShape(prop1: T(), prop2: T(), propN: T())
+Like `shape` represents `array` with knows keys, but each key is possibly undefined.
+
+```php
+// array{prop1?: int, prop2?: string, prop3?: bool}
+$shape = partialShape(
+    prop1: int(),
+    prop2: string(),
+    prop3: bool(),
+);
+```
+
+##### tuple(T(), T(), T())
+Represents array that indexed from zero with fixed items count.
+
+```php
+// array{int, string, bool}
+$tuple = tuple(int(), string(), bool());
+```
+
+##### object(SomeClass::class)(prop1: T(), prop2: T(), propN: T())
+Allows to create decoder for existed class. For each parameter of the constructor, you must explicitly specify corresponding a decoder. Definition example:
+```php
+final class SomeClass
+{
+    public function __construct(
+        public int $prop1,
+        public string $prop2,
+    ) {}
+    
+    /**
+     * @return AbstractDecoder<SomeClass>
+     */
+    public static function type(): AbstractDecoder
+    {
+        return object(self::class)(
+            prop1: int(),
+            prop2: string(),
+        );
+    }
+}
+```
+To avoid some boilerplate code you may consider `ProductType` or `SumType`.
+
+##### partialObject(SomeClass::class)(prop1: T(), prop2: T(), propN: T())
+Like `object` decoder, but each parameter of the constructor must be nullable.
+
+##### rec(fn() => T())
+Represents recursive type. Only objects can be recursive. Definition example:
+```php
+final class SomeClass
+{
+    /**
+     * @param list<SomeClass> $recursive
+     */
+    public function __construct(
+        public int $prop1,
+        public string $prop2,
+        public array $recursive = [],
+    ) {}
+
+    /**
+     * @return AbstractDecoder<SomeClass>
+     */
+    public static function type(): AbstractDecoder
+    {
+        $self = rec(fn() => self::type());
+
+        return object(self::class)(
+            prop1: int(),
+            prop2: string(),
+            recursive: arrList($self),
+        );
+    }
+}
+```
+
+##### fromJson(T())
+Combinator for type `T` which will be parsed from json representation.
+
+```php
+$shapeFromJson = fromJson(
+    shape(
+        prop1: string(),
+        prop2: string(),
+    )
+);
+```
