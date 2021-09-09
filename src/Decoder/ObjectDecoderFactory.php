@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Decoder;
 
-use Fp\Collections\HashMap;
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
 
@@ -34,10 +33,8 @@ final class ObjectDecoderFactory
     {
         /**
          * Validated via psalm plugin hook at this moment
-         * @var array<string, AbstractDecoder<mixed>> $mapDecoders
+         * @psalm-var array<string, AbstractDecoder<mixed>> $decoders
          */
-        $mapDecoders = $decoders;
-
-        return new ObjectDecoder($this->objectClass, HashMap::collectIterable($mapDecoders), $this->partial);
+        return new ObjectDecoder($this->objectClass, $decoders, $this->partial);
     }
 }

@@ -6,9 +6,6 @@ namespace Klimick\Decode\Decoder;
 
 use Closure;
 use DateTimeImmutable;
-use Fp\Collections\HashMap;
-use Fp\Collections\Map;
-use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\ErrorInterface;
@@ -253,9 +250,7 @@ function arrKey(): AbstractDecoder
  */
 function literal(mixed $head, mixed ...$tail): AbstractDecoder
 {
-    $literals = NonEmptyArrayList::collectNonEmpty([$head, ...$tail]);
-
-    return new Internal\LiteralDecoder($literals);
+    return new Internal\LiteralDecoder([$head, ...$tail]);
 }
 
 /**
@@ -334,10 +329,11 @@ function fromJson(AbstractDecoder $decoder): AbstractDecoder
  */
 function shape(AbstractDecoder ...$decoders): AbstractDecoder
 {
-    /** @psalm-var Map<string, AbstractDecoder> $decodersMap */
-    $decodersMap = HashMap::collectIterable($decoders);
-
-    return new Internal\Shape\ShapeDecoder($decodersMap);
+    /**
+     * Validated via psalm plugin hook at this moment
+     * @psalm-var array<string, AbstractDecoder> $decoders
+     */
+    return new Internal\Shape\ShapeDecoder($decoders);
 }
 
 /**
@@ -350,10 +346,11 @@ function shape(AbstractDecoder ...$decoders): AbstractDecoder
  */
 function partialShape(AbstractDecoder ...$decoders): AbstractDecoder
 {
-    /** @psalm-var HashMap<string, AbstractDecoder> $decodersMap */
-    $decodersMap = HashMap::collectIterable($decoders);
-
-    return new Internal\Shape\ShapeDecoder($decodersMap, partial: true);
+    /**
+     * Validated via psalm plugin hook at this moment
+     * @psalm-var array<string, AbstractDecoder> $decoders
+     */
+    return new Internal\Shape\ShapeDecoder($decoders, partial: true);
 }
 
 /**
@@ -404,9 +401,7 @@ function rec(callable $type): AbstractDecoder
  */
 function union(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest): AbstractDecoder
 {
-    $decoders = NonEmptyArrayList::collectNonEmpty([$first, $second, ...$rest]);
-
-    return new Internal\UnionDecoder($decoders);
+    return new Internal\UnionDecoder([$first, $second, ...$rest]);
 }
 
 /**
@@ -420,15 +415,11 @@ function union(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder 
  */
 function intersection(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest): AbstractDecoder
 {
-    $decoders = [];
+    $decoders = array_merge(
+        ...array_map(fn($decoder) => $decoder->decoders, [$first, $second, ...$rest])
+    );
 
-    foreach ([$first, $second, ...$rest] as $decoder) {
-        foreach ($decoder->decoders->toArray() as [$k, $d]) {
-            $decoders[$k] = $d;
-        }
-    }
-
-    return new Internal\Shape\ShapeDecoder(HashMap::collectIterable($decoders));
+    return new Internal\Shape\ShapeDecoder($decoders);
 }
 
 /**
@@ -443,7 +434,5 @@ function intersection(AbstractDecoder $first, AbstractDecoder $second, AbstractD
  */
 function tuple(AbstractDecoder $first, AbstractDecoder ...$rest): AbstractDecoder
 {
-    return new Internal\TupleDecoder(
-        HashMap::collectIterable([$first, ...$rest])
-    );
+    return new Internal\TupleDecoder([$first, ...$rest]);
 }

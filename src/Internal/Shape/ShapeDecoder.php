@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Shape;
 
-use Closure;
-use Fp\Collections\Entry;
-use Fp\Collections\Map;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Semigroup\Semigroup;
 use Klimick\Decode\Context;
@@ -14,6 +11,7 @@ use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\DecodeSemigroup;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
+use function Fp\Collection\every;
 use function Klimick\Decode\Decoder\valid;
 use function Klimick\Decode\Decoder\invalid;
 
@@ -28,60 +26,53 @@ use function Klimick\Decode\Decoder\invalid;
 final class ShapeDecoder extends AbstractDecoder
 {
     /**
-     * @param Map<string, AbstractDecoder<TVal>> $decoders
+     * @param array<string, AbstractDecoder<TVal>> $decoders
      */
     public function __construct(
-        public Map $decoders,
+        public array $decoders,
         public bool $partial = false,
     ) { }
 
     public function name(): string
     {
-        $properties = $this->decoders
-            ->map(fn($kv) => self::isOptional($this->partial, $kv->value)
-                ? "{$kv->key}?: {$kv->value->name()}"
-                : "{$kv->key}: {$kv->value->name()}")
-            ->values()
-            ->toArray();
+        $properties = implode(', ', array_map(
+            function(int|string $property, AbstractDecoder $decoder) {
+                if ($decoder instanceof HighOrderDecoder && $decoder->isOptional()) {
+                    return "{$property}?: {$decoder->name()}";
+                }
 
-        return 'array{' . implode(', ', $properties) . '}';
-    }
+                return "{$property}: {$decoder->name()}";
+            },
+            array_keys($this->decoders),
+            array_values($this->decoders),
+        ));
 
-    private static function isOptional(bool $partial, AbstractDecoder $decoder): bool
-    {
-        return $partial || $decoder instanceof HighOrderDecoder && $decoder->isOptional();
+        return "array{{$properties}}";
     }
 
     public function is(mixed $value): bool
     {
-        if (!is_array($value)) {
-            return false;
-        }
-
-        return $this->decoders->every(
-            fn($decoder, $key) => array_key_exists($key, $value) && $decoder->is($value[$key])
+        return is_array($value) && every(
+            $this->decoders,
+            fn(AbstractDecoder $d, string $key) => array_key_exists($key, $value) && $d->is($value[$key])
         );
     }
 
     public function decode(mixed $value, Context $context): Either
     {
-        return is_array($value)
-            ? $this->decoders->fold(valid([]), self::validate($context, $value))
-            : invalid($context);
-    }
+        if (!is_array($value)) {
+            return invalid($context);
+        }
 
-    /**
-     * @return Closure(ErrorsOrValidShape, Entry<string, AbstractDecoder>): ErrorsOrValidShape
-     * @psalm-pure
-     */
-    private static function validate(Context $context, array $shape): Closure
-    {
+        $decodedShape = valid([]);
         $S = self::shapeSemigroup();
 
-        return fn(Either $errorsOrValidShape, Entry $kv) => $S->combine(
-            $errorsOrValidShape,
-            ShapeAccessor::decodeProperty($context, $kv->value, $kv->key, $shape),
-        );
+        foreach ($this->decoders as $key => $decoder) {
+            $decodedKV = ShapeAccessor::decodeProperty($context, $decoder, $key, $value, $this->partial);
+            $decodedShape = $S->combine($decodedShape, $decodedKV);
+        }
+
+        return $decodedShape;
     }
 
     /**

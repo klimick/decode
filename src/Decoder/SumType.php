@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Decoder;
 
-use Fp\Collections\HashMap;
-use Fp\Collections\NonEmptyArrayList;
 use JsonSerializable;
 use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\ObjectDecoder;
@@ -70,20 +68,17 @@ abstract class SumType implements JsonSerializable
 
         $cases = static::definition();
 
-        /** @var NonEmptyArrayList<ObjectDecoder<static>> $decoders */
-        $decoders = NonEmptyArrayList::collectNonEmpty(
-            array_map(
-                fn($decoder, $case) => new ObjectDecoder(
-                    objectClass: static::class,
-                    decoders: HashMap::collect([
-                        ['instance', $decoder->from('$')],
-                        ['caseId', new ConstantDecoder($case)],
-                    ]),
-                    customConstructor: $constructor
-                ),
-                array_values($cases),
-                array_keys($cases),
-            )
+        $decoders = array_map(
+            fn($decoder, $case) => new ObjectDecoder(
+                objectClass: static::class,
+                decoders: [
+                    'instance' => $decoder->from('$'),
+                    'caseId' => new ConstantDecoder($case),
+                ],
+                customConstructor: $constructor
+            ),
+            array_values($cases),
+            array_keys($cases),
         );
 
         return new UnionDecoder($decoders);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal;
 
 use Closure;
-use Fp\Collections\Map;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
@@ -23,12 +22,12 @@ final class ObjectDecoder extends AbstractDecoder
 
     /**
      * @param class-string<T> $objectClass
-     * @param Map<string, AbstractDecoder<mixed>> $decoders
+     * @param array<string, AbstractDecoder<mixed>> $decoders
      * @param null|Closure(array): T $customConstructor
      */
     public function __construct(
         public string $objectClass,
-        public Map $decoders,
+        public array $decoders,
         public bool $partial = false,
         public null|Closure $customConstructor = null,
     ) {

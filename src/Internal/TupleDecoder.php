@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal;
 
-use Fp\Collections\Map;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\Invalid;
+use function Fp\Collection\every;
+use function Fp\Collection\map;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\mixed;
@@ -23,28 +24,22 @@ use function Klimick\Decode\Decoder\valid;
 final class TupleDecoder extends AbstractDecoder
 {
     /**
-     * @param Map<int, AbstractDecoder<T>> $decoders
+     * @param array<int, AbstractDecoder<T>> $decoders
      */
-    public function __construct(private Map $decoders) { }
+    public function __construct(private array $decoders) { }
 
     public function name(): string
     {
-        $types = $this->decoders
-            ->map(fn($kv) => $kv->value->name())
-            ->values()
-            ->toArray();
+        $types = map($this->decoders, fn(AbstractDecoder $d) => $d->name());
 
         return 'array{' . implode(', ', $types) . '}';
     }
 
     public function is(mixed $value): bool
     {
-        if (!is_array($value)) {
-            return false;
-        }
-
-        return $this->decoders->every(
-            fn($decoder, $index) => array_key_exists($index, $value) && $decoder->is($value[$index]),
+        return is_array($value) && every(
+            $this->decoders,
+            fn(AbstractDecoder $d, int $key) => array_key_exists($key, $value) && $d->is($value[$key]),
         );
     }
 
@@ -61,7 +56,7 @@ final class TupleDecoder extends AbstractDecoder
                 $decoded = [];
                 $errors = [];
 
-                foreach ($this->decoders->toArray() as [$k, $decoder]) {
+                foreach ($this->decoders as $k => $decoder) {
                     $result = $decoder
                         ->decode($tuple[$k], $context($decoder->name(), $tuple[$k], (string) $k))
                         ->get();
