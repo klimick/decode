@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmTest\Integration\Hook;
 
 use Fp\Collections\LinkedList;
+use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Option\Option;
 use Klimick\PsalmTest\Integration\Assertion\Assertions;
 use Klimick\PsalmTest\Integration\Assertion\AssertionsStorage;
@@ -88,17 +89,15 @@ final class TestCaseAnalysis implements AfterExpressionAnalysisInterface, AfterF
 
     private static function reconcileAssertions(Assertions $assertions): void
     {
-        $handlers = [
-            SeeReturnTypeAssertionReconciler::class,
-            SeePsalmIssuesAssertionReconciler::class,
-        ];
+        $issues = NonEmptyArrayList
+            ::collectNonEmpty([
+                SeeReturnTypeAssertionReconciler::class,
+                SeePsalmIssuesAssertionReconciler::class,
+            ])
+            ->filterMap(fn($handler) => $handler::reconcile($assertions));
 
-        foreach ($handlers as $handler) {
-            $issue = $handler::reconcile($assertions)->get();
-
-            if (null !== $issue) {
-                IssueBuffer::accepts($issue);
-            }
+        foreach ($issues as $issue) {
+            IssueBuffer::accepts($issue);
         }
     }
 
