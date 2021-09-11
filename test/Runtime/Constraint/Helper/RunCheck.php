@@ -25,6 +25,6 @@ final class RunCheck
             ->check(context: $context, value: $actual)
             ->get();
 
-        assertInstanceOf($this->isValid ? Valid::class : Invalid::class, $result);
+        assertInstanceOf($this->isValid ? Valid::class : Invalid::class, $result, json_encode(['actual' => $actual]));
     }
 }

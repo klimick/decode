@@ -170,29 +170,9 @@ function endsWith(string $string): ConstraintInterface
  *
  * @return ConstraintInterface<string>
  */
-function ipv4(): ConstraintInterface
-{
-    return new C\String\IPv4Constraint();
-}
-
-/**
- * @psalm-pure
- *
- * @return ConstraintInterface<string>
- */
 function uuid(): ConstraintInterface
 {
     return new C\String\UuidConstraint();
-}
-
-/**
- * @psalm-pure
- *
- * @return ConstraintInterface<string>
- */
-function url(): ConstraintInterface
-{
-    return new C\String\UrlConstraint();
 }
 
 /**
