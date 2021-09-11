@@ -266,7 +266,7 @@ $messengerD = shape(
 $personD = shape(
     name: string()->from('$.person'),
     street: string()->from('$.address.street'),
-    messenger: $messengerD->from('$'), // means "use the same data from this decoder"
+    messenger: $messengerD->from('$'), // means "use the same data for that decoder"
 );
 
 $untrustedData = [
