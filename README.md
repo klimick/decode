@@ -353,6 +353,8 @@ $createdWithNamedArgs = new Library(
 
 ### Sum type
 
+Represents closed union type for multiple [product types](#product-type) or sum type itself.
+
 ```php
 use Klimick\Decode\Decoder\SumType;
 use Klimick\Decode\Decoder\SumCases;
