@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder\ADT;
 
+use Klimick\Decode\Decoder\SumCases;
 use ReflectionMethod;
 use Psalm\Type;
 use Klimick\PsalmDecode\Psalm;
@@ -12,8 +13,6 @@ use Klimick\Decode\Decoder\SumType;
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Decoder\ProductType;
 use Fp\Functional\Option\Option;
-use function Fp\Evidence\proveOf;
-use function Fp\Evidence\proveString;
 
 final class RuntimeDecoder
 {
@@ -76,27 +75,15 @@ final class RuntimeDecoder
      */
     private static function getCasesWithReflection(string $union_runtime_data_class): Option
     {
-        return Option::do(function() use ($union_runtime_data_class) {
-            $result = yield Option
-                ::try(function() use ($union_runtime_data_class): mixed {
-                    $ref = new ReflectionMethod("{$union_runtime_data_class}::definition");
-                    $ref->setAccessible(true);
+        $definition = Option::try(function() use ($union_runtime_data_class): mixed {
+            $ref = new ReflectionMethod("{$union_runtime_data_class}::definition");
+            $ref->setAccessible(true);
 
-                    return $ref->invoke(null);
-                })
-                ->filter(fn(mixed $result) => is_array($result) && !empty($result));
-
-            $cases = [];
-
-            /** @psalm-suppress MixedAssignment */
-            foreach ($result as $k => $v) {
-                $case = yield proveString($k);
-                $decoder = yield proveOf($v, AbstractDecoder::class);
-
-                $cases[$case] = $decoder;
-            }
-
-            return $cases;
+            return $ref->invoke(null);
         });
+
+        return $definition
+            ->filter(fn($result) => $result instanceof SumCases)
+            ->map(fn($result) => $result->cases);
     }
 }

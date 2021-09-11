@@ -28,7 +28,7 @@ abstract class SumType implements JsonSerializable
 
     private static function getCaseIdByInstance(ProductType|SumType $instance): string
     {
-        foreach (static::definition() as $type => $decoder) {
+        foreach (static::definition()->cases as $type => $decoder) {
             if ($decoder->is($instance)) {
                 return $type;
             }
@@ -66,7 +66,7 @@ abstract class SumType implements JsonSerializable
             return $instance;
         };
 
-        $cases = static::definition();
+        $sumCases = static::definition();
 
         $decoders = array_map(
             fn($decoder, $case) => new ObjectDecoder(
@@ -77,8 +77,8 @@ abstract class SumType implements JsonSerializable
                 ],
                 customConstructor: $constructor
             ),
-            array_values($cases),
-            array_keys($cases),
+            array_values($sumCases->cases),
+            array_keys($sumCases->cases),
         );
 
         return new UnionDecoder($decoders);
@@ -89,8 +89,5 @@ abstract class SumType implements JsonSerializable
         return $this->instance;
     }
 
-    /**
-     * @psalm-return non-empty-array<non-empty-string, ObjectDecoder<ProductType> | UnionDecoder<SumType>>
-     */
-    abstract protected static function definition(): array;
+    abstract protected static function definition(): SumCases;
 }

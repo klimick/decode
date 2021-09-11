@@ -436,3 +436,9 @@ function tuple(AbstractDecoder $first, AbstractDecoder ...$rest): AbstractDecode
 {
     return new Internal\TupleDecoder([$first, ...$rest]);
 }
+
+function cases(Internal\ObjectDecoder|Internal\UnionDecoder ...$cases): SumCases
+{
+    /** @psalm-var non-empty-array<non-empty-string, Internal\ObjectDecoder<ProductType> | Internal\UnionDecoder<SumType>> $cases */
+    return new SumCases($cases);
+}
