@@ -2,7 +2,13 @@
 
 This library allow you to take untrusted data and check that they can be casted to type `T`.
 
-### Example
+- [Usage example](#example)
+- [Built in atomics](#builtin-type-atomics)
+- [Generic types](#generic-types)
+- [Class with runtime type safety (Product type)](#product-type)
+- [Closed union type with runtime type safety (Sum type)](#sum-type)
+
+## Example
 
 ```php
 <?php
@@ -52,54 +58,6 @@ $personOption = t\cast(
 );
 
 print_r($person);
-```
-
-### Example of class with runtime type safety
-
-```php
-use Klimick\Decode\Decoder\ProductType;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use Klimick\Decode\Decoder as t;
-
-final class Library extends ProductType
-{
-    protected static function definition(): ShapeDecoder
-    {
-        return shape(
-            id: t\int(),
-            name: t\string(),
-            meta: t\arrList(t\string()),
-        );
-    }
-}
-
-// Instance of Library created from untrusted data
-$fromUntrusted = t\tryCast(
-    value: '...any untrusted data...',
-    to: Library::type(),
-);
-
-// Psalm knows that 'id' property is existed and typed as int
-print_r($instance->id);
-
-// Statically type checked
-// Args order depends on definition of Library
-$createdWithNewExpr = new Library(42, 'Decode', [
-    "runtime type system",
-    "psalm integration",
-    "with whsv26/functional",
-]);
-
-// Named args also supported
-$createdWithNamedArgs = new Library(
-    id: 42,
-    name: 'Decode',
-    meta: [
-        "runtime type system",
-        "psalm integration",
-        "with whsv26/functional",
-    ],
-);
 ```
 
 ### Builtin type atomics
@@ -199,7 +157,7 @@ $tuple = tuple(int(), string(), bool());
 ```
 
 ##### object(SomeClass::class)(prop1: T(), prop2: T(), propN: T())
-Allows to create decoder for existed class. For each parameter of the constructor, you must explicitly specify corresponding a decoder. Definition example:
+Allows to create decoder for existed class. For each parameter of the constructor, you must explicitly specify a corresponding decoder.
 ```php
 final class SomeClass
 {
@@ -220,13 +178,14 @@ final class SomeClass
     }
 }
 ```
-To avoid some boilerplate code you may consider `ProductType` or `SumType`.
+To avoid some boilerplate code you may consider to use [product type](#product-type) or [sum type](#sum-type).
 
 ##### partialObject(SomeClass::class)(prop1: T(), prop2: T(), propN: T())
 Like `object` decoder, but each parameter of the constructor must be nullable.
 
 ##### rec(fn() => T())
-Represents recursive type. Only objects can be recursive. Definition example:
+Represents recursive type. Only objects can be recursive.
+
 ```php
 final class SomeClass
 {
@@ -264,5 +223,207 @@ $shapeFromJson = fromJson(
         prop1: string(),
         prop2: string(),
     )
+);
+```
+
+### High order decoders
+
+##### from('$.some_prop')
+Helper method `from` is defined for each decoder.
+It allows you to specify path for result property or rename one.
+
+```php
+$personD = shape(
+    name: string()->from('$.person'),
+    street: string()->from('$.address.street'),
+);
+
+$untrustedData = [
+    'person' => 'foo',
+    'address' => [
+        'street' => 'bar',
+    ],
+];
+
+// Inferred type: array{name: string, street: string}
+$personShape = tryCast($untrustedData, $personD);
+
+/* Decoded data looks different rather than source: [
+    'name' => 'foo',
+    'street' => 'bar',
+] */
+print_r($personShape);
+```
+
+`$` sign means root of object. You can use just `$` when you want to change decoded structure nesting:
+
+```php
+$messengerD = shape(
+    kind: string()->from('$.messenger_type'),
+    contact: string()->from('$.messenger_contact'),
+);
+
+$personD = shape(
+    name: string()->from('$.person'),
+    street: string()->from('$.address.street'),
+    messenger: $messengerD->from('$'), // means "use the same data from this decoder"
+);
+
+$untrustedData = [
+    'person' => 'foo',
+    'address' => [
+        'street' => 'bar',
+    ],
+    'messenger_type' => 'telegram',
+    'messenger_contact' => '@Klimick',
+];
+
+// inferred type: array{name: string, street: string, messenger: array{kind: string, messenger: string}}
+$personShape = tryCast($untrustedData, $personD);
+
+/* Decoded data looks different rather than source: [
+    'name' => 'foo',
+    'street' => 'bar',
+    'messenger' => [
+        'kind' => 'telegram',
+        'contact' => '@Klimick',
+    ]
+] */
+print_r($personShape);
+```
+
+### Product type
+
+Class with runtime type safety.
+Properties will be inferred from definition methods.
+
+```php
+use Klimick\Decode\Decoder\ProductType;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\Decode\Decoder as t;
+
+/**
+ * @psalm-immutable
+ */
+final class Library extends ProductType
+{
+    protected static function definition(): ShapeDecoder
+    {
+        return shape(
+            id: t\int(),
+            name: t\string(),
+            meta: t\arrList(t\string()),
+        );
+    }
+}
+
+// Instance of Library created from untrusted data
+$fromUntrusted = t\tryCast(
+    value: '...any untrusted data...',
+    to: Library::type(),
+);
+
+// Psalm knows that 'id' property is existed and typed as int
+print_r($instance->id);
+```
+
+This kind of class is not intended for creating from trusted data.
+But you can do it with the new expression.
+
+```php
+// Statically type checked
+// Args order depends on definition of Library
+$createdWithNewExpr = new Library(42, 'Decode', [
+    "runtime type system",
+    "psalm integration",
+    "with whsv26/functional",
+]);
+
+// Named args also supported
+$createdWithNamedArgs = new Library(
+    id: 42,
+    name: 'Decode',
+    meta: [
+        "runtime type system",
+        "psalm integration",
+        "with whsv26/functional",
+    ],
+);
+```
+
+### Sum type
+
+```php
+use Klimick\Decode\Decoder\SumType;
+use Klimick\Decode\Decoder\SumCases;
+use Klimick\Decode\Decoder\ProductType;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\Decode\Decoder as t;
+
+/**
+ * @psalm-immutable
+ */
+final class Messenger extends SumType
+{
+    protected static function definition(): SumCases
+    {
+        return t\cases(
+            telegram: Telegram::type(),
+            whatsapp: Whatsapp::type(),
+        );
+    }
+}
+
+/**
+ * @psalm-immutable
+ * Case of closed Messenger union
+ */
+final class Telegram extends ProductType
+{
+    protected static function definition(): ShapeDecoder
+    {
+        return t\shape(
+            telegramId: t\string(),
+            // ...rest
+        );
+    }
+}
+
+/**
+ * @psalm-immutable
+ * Case of closed Messenger union
+ */
+final class Whatsapp extends ProductType
+{
+    protected static function definition(): ShapeDecoder
+    {
+        return t\shape(
+            phone: t\string(),
+            // ...rest
+        );
+    }
+}
+
+// Instance of Messenger created from untrusted data
+$fromUntrusted = t\tryCast(
+    value: '...any untrusted data...',
+    to: Messenger::type(),
+);
+
+// The match method is only one possible way to work with SumType instances
+// Name of named arg depends on the definition method of the Messenger
+print_r($fromUntrusted->match(
+    telegram: fn(Telegram $m) => print_r($m->telegramId),
+    whatsapp: fn(Whatsapp $m) => print_r($m->phone),
+));
+```
+
+Like the [SumType](#product-type) this kind of class is not intended for creating from trusted data.
+But you can do it with the new expression.
+
+```php
+// A case must be wrapped within Messenger instance
+$createdWithNewExpr = new Messenger(
+    case: new Telegram('@Klimick'),
 );
 ```
