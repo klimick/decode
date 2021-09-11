@@ -1,14 +1,15 @@
 ## Decode
 
-This library allow you to take untrusted data and check that they can be casted to type `T`.
+This library allow you to take untrusted data and check that they can be represented as type `T`.
 
-- [Usage example](#example)
+- [Usage example](#usage-example)
 - [Built in atomics](#builtin-type-atomics)
 - [Generic types](#generic-types)
+- [Higher order helpers](#higher-order-helpers)
 - [Class with runtime type safety (Product type)](#product-type)
 - [Closed union type with runtime type safety (Sum type)](#sum-type)
 
-## Example
+## Usage example
 
 ```php
 <?php
@@ -226,11 +227,57 @@ $shapeFromJson = fromJson(
 );
 ```
 
-### High order decoders
+### Higher order helpers
+
+##### optional
+Allows you to mark property as possibly undefined.
+
+```php
+$personD = shape(
+    name: string(),
+    additional: arrList(string())->optional(),
+);
+
+// inferred type: array{name: string, additional?: list<string>}
+$firstShape = tryCast(['name' => 'foo'], $personD);
+
+// No additional field
+// ['name' => 'foo']
+print_r($firstShape);
+
+// inferred type: array{name: string, additional?: list<string>}
+$secondShape = tryCast(['name' => 'foo', 'additional' => ['bar']], $personD);
+
+// ['name' => 'foo', 'additional' => ['bar']]
+print_r($secondShape);
+```
+
+##### default(SOME_VAL)
+Allows you to define a fallback value if an untrusted source does not present one.
+
+```php
+$personD = shape(
+    name: string(),
+    isEmployed: bool()->default(false),
+);
+
+// inferred type: array{name: string, isEmployed: bool}
+$firstShape = tryCast(['name' => 'foo'], $personD);
+
+// With default ['isEmployed' => false]
+// ['name' => 'foo', 'isEmployed' => false]
+print_r($firstShape);
+
+// inferred type: array{name: string, isEmployed: bool}
+$secondShape = tryCast(['name' => 'foo', 'isEmployed' => true], $personD);
+
+// ['name' => 'foo', 'isEmployed' => true]
+print_r($secondShape);
+```
 
 ##### from('$.some_prop')
 Helper method `from` is defined for each decoder.
-It allows you to specify path for result property or rename one.
+It allows you to specify a path for a result property or rename one.
 
 ```php
 $personD = shape(
