@@ -6,6 +6,7 @@ This library allow you to take untrusted data and check that they can be represe
 - [Built in atomics](#builtin-type-atomics)
 - [Generic types](#generic-types)
 - [Higher order helpers](#higher-order-helpers)
+- [Constraints](#constraints)
 - [Class with runtime type safety (Product type)](#product-type)
 - [Closed union type with runtime type safety (Sum type)](#sum-type)
 
@@ -328,6 +329,24 @@ $secondShape = tryCast(['name' => 'foo', 'isEmployed' => true], $personD);
 print_r($secondShape);
 ```
 
+##### constrained(...$constraints)
+All decoders additionally can be constrained.
+
+```php
+$personD = shape(
+    name: string()->constrained(
+        minSize(is: 1),
+        maxSize(is: 255),
+    ),
+    street: string()->constrained(
+        minSize(is: 1),
+        maxSize(is: 255),
+    ),
+);
+```
+
+[List of builtin constraints](#constraints)
+
 ##### from('$.some_prop')
 Helper method `from` is defined for each decoder.
 It allows you to specify a path for a result property or rename one.
@@ -391,6 +410,190 @@ $personShape = tryCast($untrustedData, $personD);
 ] */
 print_r($personShape);
 ```
+
+### Constraints
+
+Constraints can be attached to decoder with the [constrained](#constrainedconstraints) higher order helper.
+
+##### equal (all types)
+Checks that a numeric value is equal to the given one.
+
+```php
+$fooString = string()
+    ->constrained(equal('foo'));
+```
+
+##### greater (int, float, numeric)
+Checks that a numeric value is greater than the given one.
+
+```php
+$greaterThan10 = int()
+    ->constrained(greater(10));
+```
+
+##### greaterOrEqual (int, float, numeric)
+Checks that a numeric value is greater or equal to the given one.
+
+```php
+$greaterOrEqualTo10 = int()
+    ->constrained(greaterOrEqual(10));
+```
+
+##### less (int, float, numeric)
+Checks that a numeric value is less than the given one.
+
+```php
+$lessThan10 = int()
+    ->constrained(less(10));
+```
+
+##### lessOrEqual (int, float, numeric)
+Checks that a numeric value is less or equal to the given one.
+
+```php
+$lessOrEqualTo10 = int()
+    ->constrained(lessOrEqual(10));
+```
+
+##### inRange (int, float, numeric)
+Checks that a numeric value is in the given range
+
+```php
+$from10to20 = int()
+    ->constrained(inRange(10, 20));
+```
+
+##### minLength (string, non-empty-string)
+Checks that a string value size is not less than given one.
+
+```php
+$min10char = string()
+    ->constrained(minLength(10));
+```
+
+##### maxLength (string, non-empty-string)
+Checks that a string value size is not greater than given one.
+
+```php
+$max10char = string()
+    ->constrained(maxLength(10));
+```
+
+##### startsWith (string, non-empty-string)
+Checks that a string value starts with the given value.
+
+```php
+$startsWithFoo = string()
+    ->constrained(startsWith('foo'));
+```
+
+##### endsWith (string, non-empty-string)
+Checks that a string value ends with the given value.
+
+```php
+$endsWithFoo = string()
+    ->constrained(endsWith('foo'));
+```
+
+##### uuid (string, non-empty-string)
+Checks that a string value is a valid UUID.
+
+```php
+$uuidString = string()
+    ->constrained(uuid());
+```
+
+##### trimmed (string, non-empty-string)
+Checks that a string value has no leading or trailing whitespace.
+
+```php
+$noLeadingOrTrailingSpaces = string()
+    ->constrained(trimmed());
+```
+
+##### matchesRegex (string, non-empty-string)
+Checks that a string value matches the given regular expression.
+
+```php
+$stringWithNumbers = string()
+    ->constrained(matchesRegex('/^[0-9]{1,3}$/'));
+```
+
+##### forall (array<array-key, T>)
+Checks that the given constraint holds for all elements of an array value.
+
+```php
+$allNumbersGreaterThan10 = forall(greater(than: 10));
+
+$numbersGreaterThan10 = arrList(int())
+    ->constrained($allNumbersGreaterThan10);
+```
+
+##### exists (array<array-key, T>)
+Checks that the given constraint holds for some elements of an array value.
+
+```php
+$hasNumbersGreaterThan10 = exists(greater(than: 10));
+
+$withNumberGreaterThan10 = arrList(int())
+    ->constrained($hasNumbersGreaterThan10);
+```
+
+##### inCollection (array<array-key, T>)
+Checks that an array value contains a value equal to the given one.
+
+```php
+$listWith10 = arrList(int())
+    ->constrained(inCollection(10));
+```
+
+##### maxSize (array<array-key, T>)
+Checks that an array value size is not greater than the given one.
+
+```php
+$max10numbers = arrList(int())
+    ->constrained(maxSize(is: 10));
+````
+
+##### minSize (array<array-key, T>)
+Checks that an array value size is not less than the given one.
+
+```php
+$atLeast10numbers = arrList(int())
+    ->constrained(minSize(is: 10));
+````
+
+##### allOf (any type)
+Conjunction of all constraints.
+
+```php
+$from100to200 = allOf(
+    greaterOrEqual(to: 100),
+    lessOrEqual(to: 200),
+);
+
+$numbersFrom100to200 = arrList(int())
+    ->constrained($from100to200);
+```
+
+##### anyOf (any type)
+Disjunction of all constraints.
+
+```php
+$from100to200 = allOf(
+    greaterOrEqual(to: 100),
+    lessOrEqual(to: 200),
+);
+
+$from300to400 = allOf(
+    greaterOrEqual(to: 300),
+    lessOrEqual(to: 400),
+);
+
+$numbersFrom100to200orFrom300to400 = arrList(int())
+    ->constrained(anyOf($from100to200, $from300to400));
+```
+
 
 ### Product type
 
