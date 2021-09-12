@@ -224,9 +224,9 @@ function scalar(): AbstractDecoder
  *
  * @return AbstractDecoder<DateTimeImmutable>
  */
-function datetime(string $timezone = 'UTC'): AbstractDecoder
+function datetime(string $timezone = 'UTC', null|string $fromFormat = null): AbstractDecoder
 {
-    return new Internal\DatetimeDecoder($timezone);
+    return new Internal\DatetimeDecoder($timezone, $fromFormat);
 }
 
 /**
