@@ -14,6 +14,7 @@ use Klimick\Decode\Decoder\TypeError;
 use Klimick\Decode\Decoder\ConstraintsError;
 use Klimick\Decode\Decoder\UndefinedError;
 use Klimick\Decode\Constraint\ConstraintError;
+use function Fp\Collection\tail;
 
 final class DefaultReporter
 {
@@ -63,6 +64,23 @@ final class DefaultReporter
         return new ErrorReport($typeErrors, $unionTypeErrors, $constraintErrors, $undefinedErrors);
     }
 
+    /**
+     * @param list<string> $tail
+     */
+    private static function getConstraintNameRec(string $head, array $tail): string
+    {
+        return !empty($tail)
+            ? self::getConstraintNameRec("{$tail[0]}[{$head}]", tail($tail))
+            : $head;
+    }
+
+    private static function getConstraintName(Context $context): string
+    {
+        $constraintNames = array_reverse(array_map(fn($e) => $e->name, $context->entries));
+
+        return self::getConstraintNameRec($constraintNames[0], tail($constraintNames));
+    }
+
     private static function reportConstraintError(ConstraintError $error): ConstraintErrorReport
     {
         $lastErr = $error->context->entries[count($error->context->entries) - 1];
@@ -70,7 +88,7 @@ final class DefaultReporter
 
         return new ConstraintErrorReport(
             path: $propertyPath,
-            constraint: $error->constraint,
+            constraint: self::getConstraintName($error->context),
             value: self::actualValue($lastErr),
             payload: $error->payload,
         );
