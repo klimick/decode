@@ -8,7 +8,7 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 
 /**
- * @template T
+ * @template-covariant T
  * @psalm-immutable
  */
 interface ConstraintInterface

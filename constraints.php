@@ -257,3 +257,31 @@ function minSize(int $is): ConstraintInterface
 {
     return new C\Collection\MinSizeConstraint($is);
 }
+
+/**
+ * @template T
+ * @psalm-pure
+ * @no-named-arguments
+ *
+ * @param ConstraintInterface<T> $head
+ * @param ConstraintInterface<T> ...$tail
+ * @return ConstraintInterface<T>
+ */
+function allOf(ConstraintInterface $head, ConstraintInterface ...$tail): ConstraintInterface
+{
+    return new C\Boolean\AllOfConstraint([$head, ...$tail]);
+}
+
+/**
+ * @template T
+ * @psalm-pure
+ * @no-named-arguments
+ *
+ * @param ConstraintInterface<T> $head
+ * @param ConstraintInterface<T> ...$tail
+ * @return ConstraintInterface<T>
+ */
+function anyOf(ConstraintInterface $head, ConstraintInterface ...$tail): ConstraintInterface
+{
+    return new C\Boolean\AnyOfConstraint([$head, ...$tail]);
+}
