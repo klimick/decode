@@ -118,7 +118,7 @@ $datetime = datetime(timezone: 'Moscow/Europe');
 
 ### Generic types
 
-##### union(T1(), T2(), T3())
+##### union(T1, T2, T3)
 Represents type whose value will be of a single type out of multiple types.
 
 ```php
@@ -130,39 +130,39 @@ $floatOrNull = union(float(), null());
 $intOrFloatOrStringOrNull = union($intOrString, $floatOrNull);
 ```
 
-##### arr(TK(), TV())
-Represent `array` with keys of type `TK()` and values of type `TV()`.
+##### arr(TK, TV)
+Represent `array` with keys of type `TK` and values of type `TV`.
 
 ```php
 // array<int, string>
 $arr = arr(int(), string());
 ```
 
-##### nonEmptyArr(TK(), TV())
-Represent `non-empty-array` with keys of type `TK()` and values of type `TV()`.
+##### nonEmptyArr(TK, TV)
+Represent `non-empty-array` with keys of type `TK` and values of type `TV`.
 
 ```php
 // non-empty-array<int, string>
 $nonEmptyArr = nonEmptyArr(int(), string());
 ```
 
-##### arrList(TV())
-Represents `list` with values of type `TV()`.
+##### arrList(TV)
+Represents `list` with values of type `TV`.
 
 ```php
 // list<string>
 $list = arrList(string());
 ```
 
-##### nonEmptyArrList(TV())
-Represents `non-empty-list` with values of type `TV()`.
+##### nonEmptyArrList(TV)
+Represents `non-empty-list` with values of type `TV`.
 
 ```php
 // non-empty-list<string>
 $list = nonEmptyArrList(string());
 ```
 
-##### shape(prop1: T(), prop2: T(), propN: T())
+##### shape(prop1: T, prop2: T, propN: T)
 Represent `array` with knows keys.
 
 ```php
@@ -174,7 +174,7 @@ $shape = shape(
 );
 ```
 
-##### partialShape(prop1: T(), prop2: T(), propN: T())
+##### partialShape(prop1: T, prop2: T, propN: T)
 Like `shape` represents `array` with knows keys, but each key is possibly undefined.
 
 ```php
@@ -186,7 +186,7 @@ $shape = partialShape(
 );
 ```
 
-##### intersection(T(), T(), T())
+##### intersection(T1, T2, T3)
 Decoder that allows to combine multiple `shape` or `partialShape` into the one.
 
 ```php
@@ -203,7 +203,7 @@ $intersection = intersection(
 );
 ```
 
-##### tuple(T(), T(), T())
+##### tuple(T1, T2, T3)
 Represents array that indexed from zero with fixed items count.
 
 ```php
@@ -211,7 +211,7 @@ Represents array that indexed from zero with fixed items count.
 $tuple = tuple(int(), string(), bool());
 ```
 
-##### object(SomeClass::class)(prop1: T(), prop2: T(), propN: T())
+##### object(SomeClass::class)(prop1: T1, prop2: T2, propN: TN)
 Allows to create decoder for existed class. For each parameter of the constructor, you must explicitly specify a corresponding decoder.
 ```php
 final class SomeClass
@@ -235,10 +235,10 @@ final class SomeClass
 ```
 To avoid some boilerplate code you may consider to use [product type](#product-type) or [sum type](#sum-type).
 
-##### partialObject(SomeClass::class)(prop1: T(), prop2: T(), propN: T())
+##### partialObject(SomeClass::class)(prop1: T1, prop2: T2, propN: T3)
 Like `object` decoder, but each parameter of the constructor must be nullable.
 
-##### rec(fn() => T())
+##### rec(fn() => T)
 Represents recursive type. Only objects can be recursive.
 
 ```php
@@ -269,8 +269,8 @@ final class SomeClass
 }
 ```
 
-##### fromJson(T())
-Combinator for type `T` which will be parsed from json representation.
+##### fromJson(T)
+Combinator for decoder of type `T` which will be parsed from json representation.
 
 ```php
 $shapeFromJson = fromJson(
@@ -306,7 +306,7 @@ $secondShape = tryCast(['name' => 'foo', 'additional' => ['bar']], $personD);
 print_r($secondShape);
 ```
 
-##### default(SOME_VAL)
+##### default
 Allows you to define a fallback value if an untrusted source does not present one.
 
 ```php
@@ -329,7 +329,7 @@ $secondShape = tryCast(['name' => 'foo', 'isEmployed' => true], $personD);
 print_r($secondShape);
 ```
 
-##### constrained(...$constraints)
+##### constrained
 All decoders additionally can be constrained.
 
 ```php
@@ -347,7 +347,7 @@ $personD = shape(
 
 [List of builtin constraints](#constraints)
 
-##### from('$.some_prop')
+##### from
 Helper method `from` is defined for each decoder.
 It allows you to specify a path for a result property or rename one.
 
@@ -374,7 +374,7 @@ $personShape = tryCast($untrustedData, $personD);
 print_r($personShape);
 ```
 
-`$` sign means root of object. You can use just `$` when you want to change decoded structure nesting:
+The `$` sign means root of object. You can use just `$` when you want to change decoded structure nesting:
 
 ```php
 $messengerD = shape(
@@ -413,7 +413,7 @@ print_r($personShape);
 
 ### Constraints
 
-Constraints can be attached to decoder with the [constrained](#constrainedconstraints) higher order helper.
+Constraints can be attached to decoder with the [constrained](#constrained) higher order helper.
 
 ##### equal (all types)
 Checks that a numeric value is equal to the given one.
