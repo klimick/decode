@@ -34,7 +34,7 @@ final class AllOfConstraint implements ConstraintInterface
 
         foreach ($this->constraints as $constraint) {
             $result = $constraint
-                ->check($context, $value)
+                ->check($context($constraint->name(), $value), $value)
                 ->get();
 
             if ($result instanceof Invalid) {
