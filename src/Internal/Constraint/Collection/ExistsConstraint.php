@@ -19,9 +19,9 @@ use function Klimick\Decode\Constraint\valid;
 final class ExistsConstraint implements ConstraintInterface
 {
     /**
-     * @param non-empty-list<ConstraintInterface<TVal>> $constraints
+     * @param ConstraintInterface<TVal> $constraint
      */
-    public function __construct(public array $constraints) { }
+    public function __construct(public ConstraintInterface $constraint) { }
 
     public function name(): string
     {
@@ -33,17 +33,15 @@ final class ExistsConstraint implements ConstraintInterface
         $errors = [];
 
         foreach ($value as $k => $v) {
-            foreach ($this->constraints as $constraint) {
-                $result = $constraint
-                    ->check($context($constraint->name(), $v, (string) $k), $v)
-                    ->get();
+            $result = $this->constraint
+                ->check($context($this->constraint->name(), $v, (string) $k), $v)
+                ->get();
 
-                if ($result instanceof Valid) {
-                    return valid();
-                }
-
-                $errors = [...$errors, ...$result->errors];
+            if ($result instanceof Valid) {
+                return valid();
             }
+
+            $errors = [...$errors, ...$result->errors];
         }
 
         return !empty($errors) ? invalids($errors) : valid();

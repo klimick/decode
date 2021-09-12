@@ -199,29 +199,25 @@ function matchesRegex(string $regex): ConstraintInterface
 /**
  * @template T
  * @psalm-pure
- * @no-named-arguments
  *
- * @param ConstraintInterface<T> $first
- * @param ConstraintInterface<T> ...$rest
+ * @param ConstraintInterface<T> $constraint
  * @return ConstraintInterface<array<array-key, T>>
  */
-function forall(ConstraintInterface $first, ConstraintInterface ...$rest): ConstraintInterface
+function forall(ConstraintInterface $constraint): ConstraintInterface
 {
-    return new C\Collection\ForallConstraint([$first, ...$rest]);
+    return new C\Collection\ForallConstraint($constraint);
 }
 
 /**
  * @template T
  * @psalm-pure
- * @no-named-arguments
  *
- * @param ConstraintInterface<T> $first
- * @param ConstraintInterface<T> ...$rest
+ * @param ConstraintInterface<T> $constraint
  * @return ConstraintInterface<array<array-key, T>>
  */
-function exists(ConstraintInterface $first, ConstraintInterface ...$rest): ConstraintInterface
+function exists(ConstraintInterface $constraint): ConstraintInterface
 {
-    return new C\Collection\ExistsConstraint([$first, ...$rest]);
+    return new C\Collection\ExistsConstraint($constraint);
 }
 
 /**
