@@ -14,7 +14,6 @@ This library allow you to take untrusted data and check that they can be represe
 ```php
 <?php
 
-use Klimick\Decode\Decoder\CastException;
 use Klimick\Decode\Decoder as t;
 
 // Describes runtime type for array{name: string, age: int, meta: list<string>}
@@ -57,27 +56,64 @@ $personOption = t\cast(
     value: $json,
     to: t\fromJson($libraryDefinition),
 );
-
-print_r($person);
 ```
 
 ### Builtin type atomics
 
-| decoder          | php/psalm                 |
-| ---------------- | ------------------------- |
-| `mixed`          | mixed                     |
-| `null`           | null                      |
-| `int`            | int                       |
-| `positiveInt`    | positive-int              |
-| `float`          | float                     |
-| `numeric`        | numeric                   |
-| `numericString`  | numeric-string            |
-| `bool`           | bool                      |
-| `string`         | string                    |
-| `nonEmptyString` | non-empty-string          |
-| `scalar`         | scalar                    |
-| `datetime`       | DateTimeImmutable         |
-| `arrKey`         | array-key                 |
+##### mixed()
+Represents value of any possible type.
+
+##### null()
+Represents type for null value.
+Suitable for nullable types.
+```php
+$nullOrInt = union(null(), int())
+```
+
+##### int()
+Represents integer number.
+
+##### positiveInt()
+Represents positive integer number.
+
+##### float()
+Represents number with floating point.
+
+##### numeric()
+Represents either integer or float numbers.
+
+##### numericString()
+Like `numeric()` but represents also string numbers.
+
+#### bool()
+Represents boolean value.
+
+#### string()
+Represents string value.
+
+#### nonEmptyString()
+Represents string that cannot be empty.
+
+#### scalar()
+Any scalar value.
+
+#### arrKey()
+Represents array key (int | string)
+
+#### datetime()
+Represents decoder that can create `DateTimeImmutable` from string.
+It uses the constructor of `DateTimeImmutable` by default.
+
+You can specify a format, and then the decoder will be use `DateTimeImmutable::createFromFormat`:
+```php
+$datetime = datetime(fromFormat: 'Y-m-d H:i:s');
+```
+
+It uses UTC timezone by default.
+You can pass different time zone during decoder instantiation:
+```php
+$datetime = datetime(timezone: 'Moscow/Europe');
+```
 
 ### Generic types
 
@@ -146,6 +182,23 @@ $shape = partialShape(
     prop1: int(),
     prop2: string(),
     prop3: bool(),
+);
+```
+
+##### intersection(T(), T(), T())
+Decoder that allows to combine multiple `shape` or `partialShape` into the one.
+
+```php
+// array{prop1: string, prop2: string, prop3?: string, prop4?: string}
+$intersection = intersection(
+    shape(
+        prop1: string(),
+        prop2: string(),
+    ),
+    partialShape(
+        prop3: string(),
+        prop4: string(),
+    ),
 );
 ```
 
@@ -313,7 +366,7 @@ $messengerD = shape(
 $personD = shape(
     name: string()->from('$.person'),
     street: string()->from('$.address.street'),
-    messenger: $messengerD->from('$'), // means "use the same data for that decoder"
+    messenger: $messengerD->from('$'), // means "use the same data for this decoder"
 );
 
 $untrustedData = [
