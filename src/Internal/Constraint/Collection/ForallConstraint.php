@@ -25,7 +25,7 @@ final class ForallConstraint implements ConstraintInterface
 
     public function name(): string
     {
-        return 'FOR_ALL';
+        return 'FORALL';
     }
 
     public function check(Context $context, mixed $value): Either
