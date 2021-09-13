@@ -281,3 +281,16 @@ function anyOf(ConstraintInterface $head, ConstraintInterface ...$tail): Constra
 {
     return new C\Boolean\AnyOfConstraint([$head, ...$tail]);
 }
+
+/**
+ * @template T
+ * @psalm-pure
+ * @no-named-arguments
+ *
+ * @param ConstraintInterface<T> $constraint
+ * @return ConstraintInterface<T>
+ */
+function not(ConstraintInterface $constraint): ConstraintInterface
+{
+    return new C\Boolean\NotConstraint($constraint);
+}
