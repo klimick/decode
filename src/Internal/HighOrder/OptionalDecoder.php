@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\HighOrder;
 
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 
 /**
  * @template T
@@ -14,9 +14,9 @@ use Klimick\Decode\Decoder\AbstractDecoder;
 final class OptionalDecoder extends HighOrderDecoder
 {
     /**
-     * @param AbstractDecoder<T> $decoder
+     * @param DecoderInterface<T> $decoder
      */
-    public function __construct(AbstractDecoder $decoder)
+    public function __construct(DecoderInterface $decoder)
     {
         parent::__construct($decoder);
     }

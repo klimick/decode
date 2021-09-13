@@ -8,6 +8,7 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use function Klimick\Decode\Decoder\arr;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\invalid;
@@ -21,9 +22,9 @@ use function Klimick\Decode\Decoder\valid;
 final class ArrListDecoder extends AbstractDecoder
 {
     /**
-     * @param AbstractDecoder<A> $decoder
+     * @param DecoderInterface<A> $decoder
      */
-    public function __construct(public AbstractDecoder $decoder) { }
+    public function __construct(public DecoderInterface $decoder) { }
 
     public function name(): string
     {

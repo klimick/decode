@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Static;
 
 use DateTimeImmutable;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\Decode\Internal\UnionDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Department;
@@ -48,7 +48,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('String decoder')
             ->haveCode(fn() => string())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::string(),
                 ],
@@ -60,7 +60,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Non empty string decoder')
             ->haveCode(fn() => nonEmptyString())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::nonEmptyString(),
                 ],
@@ -72,7 +72,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Int decoder')
             ->haveCode(fn() => int())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::int(),
                 ],
@@ -84,7 +84,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Positive int decoder')
             ->haveCode(fn() => positiveInt())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::positiveInt(),
                 ],
@@ -96,7 +96,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Float decoder')
             ->haveCode(fn() => float())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::float(),
                 ],
@@ -108,7 +108,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Bool decoder')
             ->haveCode(fn() => bool())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::bool(),
                 ],
@@ -120,7 +120,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Numeric decoder')
             ->haveCode(fn() => numeric())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::numeric(),
                 ],
@@ -132,7 +132,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Numeric string decoder')
             ->haveCode(fn() => numericString())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::numericString(),
                 ],
@@ -144,7 +144,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Array key decoder')
             ->haveCode(fn() => arrKey())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::arrayKey(),
                 ],
@@ -156,7 +156,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Null decoder')
             ->haveCode(fn() => null())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::null(),
                 ],
@@ -168,7 +168,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Mixed decoder')
             ->haveCode(fn() => mixed())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::mixed(),
                 ],
@@ -180,7 +180,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Scalar decoder')
             ->haveCode(fn() => scalar())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::scalar(),
                 ],
@@ -192,7 +192,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Constant decoder')
             ->haveCode(fn() => constant(1))
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::literal(1),
                 ],
@@ -204,7 +204,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Datetime decoder')
             ->haveCode(fn() => datetime())
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::object(DateTimeImmutable::class),
                 ],
@@ -218,7 +218,7 @@ final class DecoderTest extends PsalmTest
     public function testRecDecoder(): void
     {
         $decoder = rec(function() use (&$decoder) {
-            /** @var AbstractDecoder<Department> $self */
+            /** @var DecoderInterface<Department> $self */
             $self = &$decoder;
 
             return object(Department::class)(
@@ -230,7 +230,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Recursive decoder')
             ->haveCode(fn() => $decoder)
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::object(Department::class),
                 ],
@@ -242,7 +242,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Literal decoder')
             ->haveCode(fn() => literal(1, 2, 3))
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::union([
                         t::literal(1),
@@ -257,7 +257,7 @@ final class DecoderTest extends PsalmTest
     {
         $expected_decoder_type = t::intersection([
             t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::union([
                         t::int(),
@@ -292,7 +292,7 @@ final class DecoderTest extends PsalmTest
                 age: int(),
             ))
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::object(Person::class)
                 ],
@@ -339,7 +339,7 @@ final class DecoderTest extends PsalmTest
                 type: 'InvalidDecoderForPropertyIssue',
                 message: 'Invalid decoder for property "age". Expected: #[decoder]<int>. Actual: #[decoder]<string>.',
                 args: [
-                    'decoder' => AbstractDecoder::class,
+                    'decoder' => DecoderInterface::class,
                 ],
             );
     }
@@ -352,7 +352,7 @@ final class DecoderTest extends PsalmTest
                 age: int(),
             ))
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::object(PartialPerson::class),
                 ],
@@ -385,7 +385,7 @@ final class DecoderTest extends PsalmTest
                 bool()->optional()
             ))
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::shape([
                         t::string(),
@@ -400,7 +400,7 @@ final class DecoderTest extends PsalmTest
     {
         $expected_decoder_type = t::intersection([
             t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::shape([
                         'name' => t::string(),
@@ -434,7 +434,7 @@ final class DecoderTest extends PsalmTest
     {
         $expected_decoder_type = t::intersection([
             t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::shape([
                         'prop1' => t::string(),
@@ -488,7 +488,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Array decoder')
             ->haveCode(fn() => arr(int(), string()))
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::array(t::int(), t::string()),
                 ],
@@ -503,7 +503,7 @@ final class DecoderTest extends PsalmTest
                 string()
             ))
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::nonEmptyArray(t::int(), t::string()),
                 ],
@@ -515,7 +515,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('List decoder')
             ->haveCode(fn() => arrList(int()))
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::list(t::int()),
                 ],
@@ -527,7 +527,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Non empty list decoder')
             ->haveCode(fn() => nonEmptyArrList(int()))
             ->seeReturnType(t::generic(
-                ofType: AbstractDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::nonEmptyList(t::int()),
                 ],

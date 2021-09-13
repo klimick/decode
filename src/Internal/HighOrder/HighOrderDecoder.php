@@ -7,6 +7,7 @@ namespace Klimick\Decode\Internal\HighOrder;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\HighOrder\Brand\FromBrand;
 use Klimick\Decode\HighOrder\Brand\ConstrainedBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
@@ -21,10 +22,10 @@ abstract class HighOrderDecoder extends AbstractDecoder
     implements OptionalBrand, ConstrainedBrand, FromBrand, DefaultBrand
 {
     /**
-     * @param AbstractDecoder<T> $decoder
+     * @param DecoderInterface<T> $decoder
      */
     public function __construct(
-        public AbstractDecoder $decoder,
+        public DecoderInterface $decoder,
     ) { }
 
     public function name(): string

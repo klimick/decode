@@ -6,7 +6,7 @@ namespace Klimick\PsalmDecode\ShapeDecoder;
 
 use Psalm\Type;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use function Fp\Cast\asList;
 use function Fp\Collection\first;
 use function Fp\Collection\firstOf;
@@ -25,7 +25,7 @@ final class ShapePropertiesExtractor
             yield proveTrue(1 === count($atomics));
 
             $decoder = yield firstOf($atomics, Type\Atomic\TGenericObject::class);
-            yield proveTrue(AbstractDecoder::class === $decoder->value);
+            yield proveTrue(DecoderInterface::class === $decoder->value);
             yield proveTrue(1 === count($decoder->type_params));
 
             $decoder_type_param = yield first($decoder->type_params);

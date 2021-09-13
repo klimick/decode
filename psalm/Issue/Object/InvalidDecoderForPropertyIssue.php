@@ -23,8 +23,8 @@ final class InvalidDecoderForPropertyIssue extends CodeIssue
 
         $message = implode(' ', [
             "Invalid decoder for property \"{$property}\".",
-            "Expected: Klimick\Decode\Decoder\AbstractDecoder<{$expected_type->getId()}>.",
-            "Actual: Klimick\Decode\Decoder\AbstractDecoder<{$actual_type_decoder_type_param}>.",
+            "Expected: Klimick\Decode\Decoder\DecoderInterface<{$expected_type->getId()}>.",
+            "Actual: Klimick\Decode\Decoder\DecoderInterface<{$actual_type_decoder_type_param}>.",
         ]);
 
         parent::__construct($message, $code_location);

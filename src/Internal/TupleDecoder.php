@@ -7,6 +7,7 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Invalid;
 use function Fp\Collection\every;
 use function Fp\Collection\map;
@@ -24,13 +25,13 @@ use function Klimick\Decode\Decoder\valid;
 final class TupleDecoder extends AbstractDecoder
 {
     /**
-     * @param array<int, AbstractDecoder<T>> $decoders
+     * @param array<int, DecoderInterface<T>> $decoders
      */
     public function __construct(private array $decoders) { }
 
     public function name(): string
     {
-        $types = map($this->decoders, fn(AbstractDecoder $d) => $d->name());
+        $types = map($this->decoders, fn(DecoderInterface $d) => $d->name());
 
         return 'array{' . implode(', ', $types) . '}';
     }
@@ -39,7 +40,7 @@ final class TupleDecoder extends AbstractDecoder
     {
         return is_array($value) && every(
             $this->decoders,
-            fn(AbstractDecoder $d, int $key) => array_key_exists($key, $value) && $d->is($value[$key]),
+            fn(DecoderInterface $d, int $key) => array_key_exists($key, $value) && $d->is($value[$key]),
         );
     }
 

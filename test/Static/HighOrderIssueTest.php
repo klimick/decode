@@ -21,7 +21,7 @@ final class HighOrderIssueTest extends PsalmTest
             ))
             ->seePsalmIssue(
                 type: 'OptionalCallContradictionIssue',
-                message: 'Using AbstractDecoder::default and AbstractDecoder::optional at the same time has no sense.',
+                message: 'Using DecoderInterface::default and DecoderInterface::optional at the same time has no sense.',
             );
 
         StaticTestCase::describe('Invalid property alias issue')
@@ -30,7 +30,7 @@ final class HighOrderIssueTest extends PsalmTest
             ))
             ->seePsalmIssue(
                 type: 'InvalidPropertyAliasIssue',
-                message: 'Invalid argument for AbstractDecoder::from. ' .
+                message: 'Invalid argument for DecoderInterface::from. ' .
                 'Argument must be non-empty-string literal with "$." prefix or just "$"'
             );
 

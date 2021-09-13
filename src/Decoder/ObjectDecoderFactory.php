@@ -24,16 +24,16 @@ final class ObjectDecoderFactory
     ) { }
 
     /**
-     * @psalm-param AbstractDecoder ...$decoders
-     * @return AbstractDecoder<TObjectClass>
+     * @psalm-param DecoderInterface ...$decoders
+     * @return DecoderInterface<TObjectClass>
      *
      * @see ObjectDecoderFactoryReturnTypeProvider
      */
-    public function __invoke(AbstractDecoder ...$decoders): AbstractDecoder
+    public function __invoke(DecoderInterface ...$decoders): DecoderInterface
     {
         /**
          * Validated via psalm plugin hook at this moment
-         * @psalm-var array<string, AbstractDecoder<mixed>> $decoders
+         * @psalm-var array<string, DecoderInterface<mixed>> $decoders
          */
         return new ObjectDecoder($this->objectClass, $decoders, $this->partial);
     }

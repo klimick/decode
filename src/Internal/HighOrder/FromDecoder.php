@@ -6,7 +6,7 @@ namespace Klimick\Decode\Internal\HighOrder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 
 /**
  * @template T
@@ -17,9 +17,9 @@ final class FromDecoder extends HighOrderDecoder
 {
     /**
      * @param non-empty-string $alias
-     * @param AbstractDecoder<T> $decoder
+     * @param DecoderInterface<T> $decoder
      */
-    public function __construct(public string $alias, AbstractDecoder $decoder)
+    public function __construct(public string $alias, DecoderInterface $decoder)
     {
         parent::__construct($decoder);
     }

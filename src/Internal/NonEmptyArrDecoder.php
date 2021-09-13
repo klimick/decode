@@ -7,6 +7,7 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use function Klimick\Decode\Decoder\arr;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\valid;
@@ -20,12 +21,12 @@ use function Klimick\Decode\Decoder\valid;
 final class NonEmptyArrDecoder extends AbstractDecoder
 {
     /**
-     * @param AbstractDecoder<TKey> $keyDecoder
-     * @param AbstractDecoder<TVal> $valDecoder
+     * @param DecoderInterface<TKey> $keyDecoder
+     * @param DecoderInterface<TVal> $valDecoder
      */
     public function __construct(
-        public AbstractDecoder $keyDecoder,
-        public AbstractDecoder $valDecoder,
+        public DecoderInterface $keyDecoder,
+        public DecoderInterface $valDecoder,
     ) { }
 
     public function name(): string

@@ -7,6 +7,7 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use function Klimick\Decode\Decoder\arrList;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\valid;
@@ -19,9 +20,9 @@ use function Klimick\Decode\Decoder\valid;
 final class NonEmptyArrListDecoder extends AbstractDecoder
 {
     /**
-     * @param AbstractDecoder<T> $decoder
+     * @param DecoderInterface<T> $decoder
      */
-    public function __construct(public AbstractDecoder $decoder) { }
+    public function __construct(public DecoderInterface $decoder) { }
 
     public function name(): string
     {

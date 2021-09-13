@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\HighOrder;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmDecode\Issue\HighOrder\InvalidPropertyAliasIssue;
 use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node\Expr\MethodCall;
@@ -32,7 +32,7 @@ final class FromArgumentAnalysis implements AfterMethodCallAnalysisInterface
             yield proveTrue(2 === count($method_id));
             [$class_name, $method_name] = $method_id;
 
-            yield proveTrue($class_name === AbstractDecoder::class);
+            yield proveTrue($class_name === DecoderInterface::class);
             yield proveTrue($method_name === 'from');
 
             $method_call = yield proveOf($event->getExpr(), MethodCall::class);

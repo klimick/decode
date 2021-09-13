@@ -7,6 +7,7 @@ namespace Klimick\Decode\Internal;
 use Closure;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Context;
 
 /**
@@ -17,26 +18,26 @@ use Klimick\Decode\Context;
 final class RecursionDecoder extends AbstractDecoder
 {
     /**
-     * @var null|AbstractDecoder<T>
+     * @var null|DecoderInterface<T>
      * @psalm-allow-private-mutation
      */
-    private ?AbstractDecoder $cache = null;
+    private ?DecoderInterface $cache = null;
 
     /**
-     * @param Closure(): AbstractDecoder<T> $type
+     * @param Closure(): DecoderInterface<T> $type
      */
     public function __construct(private Closure $type) {}
 
     /**
-     * @return AbstractDecoder<T>
+     * @return DecoderInterface<T>
      */
-    private function type(): AbstractDecoder
+    private function type(): DecoderInterface
     {
         if (null === $this->cache) {
             $this->cache = ($this->type)();
         }
 
-        /** @var AbstractDecoder<T> */
+        /** @var DecoderInterface<T> */
         return $this->cache;
     }
 

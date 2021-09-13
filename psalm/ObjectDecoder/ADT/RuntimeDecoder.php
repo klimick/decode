@@ -8,7 +8,7 @@ use Klimick\Decode\Decoder\SumCases;
 use ReflectionMethod;
 use Psalm\Type;
 use Klimick\PsalmDecode\Psalm;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\SumType;
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Decoder\ProductType;
@@ -71,7 +71,7 @@ final class RuntimeDecoder
 
     /**
      * @param class-string<SumType> $union_runtime_data_class
-     * @return Option<non-empty-array<string, AbstractDecoder>>
+     * @return Option<non-empty-array<string, DecoderInterface>>
      */
     private static function getCasesWithReflection(string $union_runtime_data_class): Option
     {

@@ -43,9 +43,9 @@ abstract class SumType implements JsonSerializable
     }
 
     /**
-     * @psalm-return AbstractDecoder<static> & UnionDecoder<static>
+     * @psalm-return DecoderInterface<static> & UnionDecoder<static>
      */
-    final public static function type(): AbstractDecoder
+    final public static function type(): DecoderInterface
     {
         $constructor = static function(array $properties): static {
             $classReflection = new ReflectionClass(static::class);

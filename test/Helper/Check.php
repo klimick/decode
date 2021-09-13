@@ -7,7 +7,7 @@ namespace Klimick\Decode\Test\Helper;
 use Closure;
 use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use function Klimick\Decode\Decoder\decode;
 use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertInstanceOf;
@@ -16,10 +16,10 @@ use function PHPUnit\Framework\assertTrue;
 final class Check
 {
     /**
-     * @param AbstractDecoder<mixed> $decoder
+     * @param DecoderInterface<mixed> $decoder
      * @return Closure(mixed): void
      */
-    public static function thatValidFor(AbstractDecoder $decoder): Closure
+    public static function thatValidFor(DecoderInterface $decoder): Closure
     {
         return function(mixed $value) use ($decoder): void {
             $testData = json_encode([
@@ -33,10 +33,10 @@ final class Check
     }
 
     /**
-     * @param AbstractDecoder<mixed> $decoderOrCallable
+     * @param DecoderInterface<mixed> $decoder
      * @return Closure(mixed): void
      */
-    public static function thatInvalidFor(AbstractDecoder $decoder): Closure
+    public static function thatInvalidFor(DecoderInterface $decoder): Closure
     {
         return function(mixed $value) use ($decoder): void {
             $testData = json_encode([

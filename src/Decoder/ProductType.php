@@ -74,9 +74,9 @@ abstract class ProductType implements JsonSerializable
     }
 
     /**
-     * @psalm-return AbstractDecoder<static> & ObjectDecoder<static>
+     * @psalm-return DecoderInterface<static> & ObjectDecoder<static>
      */
-    public static function type(): AbstractDecoder
+    public static function type(): DecoderInterface
     {
         $shapeDecoder = static::definition();
 

@@ -20,10 +20,10 @@ use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T> $with
+ * @psalm-param DecoderInterface<T> $with
  * @psalm-return Either<Invalid, Valid<T>>
  */
-function decode(mixed $value, AbstractDecoder $with): Either
+function decode(mixed $value, DecoderInterface $with): Either
 {
     return $with->decode($value, Context::root($with->name(), $value));
 }
@@ -32,10 +32,10 @@ function decode(mixed $value, AbstractDecoder $with): Either
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T> $to
+ * @psalm-param DecoderInterface<T> $to
  * @psalm-return Option<T>
  */
-function cast(mixed $value, AbstractDecoder $to): Option
+function cast(mixed $value, DecoderInterface $to): Option
 {
     $decoded = decode($value, $to)->get();
 
@@ -48,12 +48,12 @@ function cast(mixed $value, AbstractDecoder $to): Option
  * @template T
  * @psalm-pure
  *
- * @param AbstractDecoder<T> $to
+ * @param DecoderInterface<T> $to
  * @return T
  *
  * @throws CastException
  */
-function tryCast(mixed $value, AbstractDecoder $to): mixed
+function tryCast(mixed $value, DecoderInterface $to): mixed
 {
     $decoded = decode($value, $to)->get();
 
@@ -100,9 +100,9 @@ function valid(mixed $value): Either
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<mixed>
+ * @return DecoderInterface<mixed>
  */
-function mixed(): AbstractDecoder
+function mixed(): DecoderInterface
 {
     return new Internal\MixedDecoder();
 }
@@ -112,9 +112,9 @@ function mixed(): AbstractDecoder
  * @psalm-pure
  *
  * @param T $value
- * @return AbstractDecoder<T>
+ * @return DecoderInterface<T>
  */
-function constant(mixed $value): AbstractDecoder
+function constant(mixed $value): DecoderInterface
 {
     return new Internal\ConstantDecoder($value);
 }
@@ -122,9 +122,9 @@ function constant(mixed $value): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<null>
+ * @return DecoderInterface<null>
  */
-function null(): AbstractDecoder
+function null(): DecoderInterface
 {
     return new Internal\NullDecoder();
 }
@@ -132,9 +132,9 @@ function null(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<int>
+ * @return DecoderInterface<int>
  */
-function int(): AbstractDecoder
+function int(): DecoderInterface
 {
     return new Internal\IntDecoder();
 }
@@ -142,9 +142,9 @@ function int(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<positive-int>
+ * @return DecoderInterface<positive-int>
  */
-function positiveInt(): AbstractDecoder
+function positiveInt(): DecoderInterface
 {
     return new Internal\PositiveIntDecoder();
 }
@@ -152,9 +152,9 @@ function positiveInt(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<float>
+ * @return DecoderInterface<float>
  */
-function float(): AbstractDecoder
+function float(): DecoderInterface
 {
     return new Internal\FloatDecoder();
 }
@@ -162,9 +162,9 @@ function float(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<numeric>
+ * @return DecoderInterface<numeric>
  */
-function numeric(): AbstractDecoder
+function numeric(): DecoderInterface
 {
     return new Internal\NumericDecoder();
 }
@@ -172,9 +172,9 @@ function numeric(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<numeric-string>
+ * @return DecoderInterface<numeric-string>
  */
-function numericString(): AbstractDecoder
+function numericString(): DecoderInterface
 {
     return new Internal\NumericStringDecoder();
 }
@@ -182,9 +182,9 @@ function numericString(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<bool>
+ * @return DecoderInterface<bool>
  */
-function bool(): AbstractDecoder
+function bool(): DecoderInterface
 {
     return new Internal\BoolDecoder();
 }
@@ -192,9 +192,9 @@ function bool(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<string>
+ * @return DecoderInterface<string>
  */
-function string(): AbstractDecoder
+function string(): DecoderInterface
 {
     return new Internal\StringDecoder();
 }
@@ -202,9 +202,9 @@ function string(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<non-empty-string>
+ * @return DecoderInterface<non-empty-string>
  */
-function nonEmptyString(): AbstractDecoder
+function nonEmptyString(): DecoderInterface
 {
     return new Internal\NonEmptyStringDecoder();
 }
@@ -212,9 +212,9 @@ function nonEmptyString(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<scalar>
+ * @return DecoderInterface<scalar>
  */
-function scalar(): AbstractDecoder
+function scalar(): DecoderInterface
 {
     return new Internal\ScalarDecoder();
 }
@@ -222,9 +222,9 @@ function scalar(): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<DateTimeImmutable>
+ * @return DecoderInterface<DateTimeImmutable>
  */
-function datetime(string $timezone = 'UTC', null|string $fromFormat = null): AbstractDecoder
+function datetime(string $timezone = 'UTC', null|string $fromFormat = null): DecoderInterface
 {
     return new Internal\DatetimeDecoder($timezone, $fromFormat);
 }
@@ -232,9 +232,9 @@ function datetime(string $timezone = 'UTC', null|string $fromFormat = null): Abs
 /**
  * @psalm-pure
  *
- * @return AbstractDecoder<array-key>
+ * @return DecoderInterface<array-key>
  */
-function arrKey(): AbstractDecoder
+function arrKey(): DecoderInterface
 {
     return new Internal\ArrKeyDecoder();
 }
@@ -246,9 +246,9 @@ function arrKey(): AbstractDecoder
  *
  * @param T $head
  * @param T ...$tail
- * @return AbstractDecoder<T>
+ * @return DecoderInterface<T>
  */
-function literal(mixed $head, mixed ...$tail): AbstractDecoder
+function literal(mixed $head, mixed ...$tail): DecoderInterface
 {
     return new Internal\LiteralDecoder([$head, ...$tail]);
 }
@@ -257,10 +257,10 @@ function literal(mixed $head, mixed ...$tail): AbstractDecoder
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T> $decoder
- * @return AbstractDecoder<list<T>>
+ * @psalm-param DecoderInterface<T> $decoder
+ * @return DecoderInterface<list<T>>
  */
-function arrList(AbstractDecoder $decoder): AbstractDecoder
+function arrList(DecoderInterface $decoder): DecoderInterface
 {
     return new Internal\ArrListDecoder($decoder);
 }
@@ -269,10 +269,10 @@ function arrList(AbstractDecoder $decoder): AbstractDecoder
  * @template T
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<T> $decoder
- * @return AbstractDecoder<non-empty-list<T>>
+ * @psalm-param DecoderInterface<T> $decoder
+ * @return DecoderInterface<non-empty-list<T>>
  */
-function nonEmptyArrList(AbstractDecoder $decoder): AbstractDecoder
+function nonEmptyArrList(DecoderInterface $decoder): DecoderInterface
 {
     return new Internal\NonEmptyArrListDecoder($decoder);
 }
@@ -282,12 +282,12 @@ function nonEmptyArrList(AbstractDecoder $decoder): AbstractDecoder
  * @template V
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<K> $keyDecoder
- * @psalm-param AbstractDecoder<V> $valDecoder
+ * @psalm-param DecoderInterface<K> $keyDecoder
+ * @psalm-param DecoderInterface<V> $valDecoder
  *
- * @return AbstractDecoder<array<K, V>>
+ * @return DecoderInterface<array<K, V>>
  */
-function arr(AbstractDecoder $keyDecoder, AbstractDecoder $valDecoder): AbstractDecoder
+function arr(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): DecoderInterface
 {
     return new Internal\ArrDecoder($keyDecoder, $valDecoder);
 }
@@ -297,12 +297,12 @@ function arr(AbstractDecoder $keyDecoder, AbstractDecoder $valDecoder): Abstract
  * @template V
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder<K> $keyDecoder
- * @psalm-param AbstractDecoder<V> $valDecoder
+ * @psalm-param DecoderInterface<K> $keyDecoder
+ * @psalm-param DecoderInterface<V> $valDecoder
  *
- * @return AbstractDecoder<non-empty-array<K, V>>
+ * @return DecoderInterface<non-empty-array<K, V>>
  */
-function nonEmptyArr(AbstractDecoder $keyDecoder, AbstractDecoder $valDecoder): AbstractDecoder
+function nonEmptyArr(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): DecoderInterface
 {
     return new Internal\NonEmptyArrDecoder($keyDecoder, $valDecoder);
 }
@@ -311,10 +311,10 @@ function nonEmptyArr(AbstractDecoder $keyDecoder, AbstractDecoder $valDecoder): 
  * @template T
  * @psalm-pure
  *
- * @param AbstractDecoder<T> $decoder
- * @return AbstractDecoder<T>
+ * @param DecoderInterface<T> $decoder
+ * @return DecoderInterface<T>
  */
-function fromJson(AbstractDecoder $decoder): AbstractDecoder
+function fromJson(DecoderInterface $decoder): DecoderInterface
 {
     return new Internal\FromJsonDecoder($decoder);
 }
@@ -322,16 +322,16 @@ function fromJson(AbstractDecoder $decoder): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder ...$decoders
- * @return AbstractDecoder<array<string, mixed>>
+ * @psalm-param DecoderInterface ...$decoders
+ * @return DecoderInterface<array<string, mixed>>
  *
  * @see ShapeReturnTypeProvider
  */
-function shape(AbstractDecoder ...$decoders): AbstractDecoder
+function shape(DecoderInterface ...$decoders): DecoderInterface
 {
     /**
      * Validated via psalm plugin hook at this moment
-     * @psalm-var array<string, AbstractDecoder> $decoders
+     * @psalm-var array<string, DecoderInterface> $decoders
      */
     return new Internal\Shape\ShapeDecoder($decoders);
 }
@@ -339,16 +339,16 @@ function shape(AbstractDecoder ...$decoders): AbstractDecoder
 /**
  * @psalm-pure
  *
- * @psalm-param AbstractDecoder ...$decoders
- * @return AbstractDecoder<array<string, mixed>>
+ * @psalm-param DecoderInterface ...$decoders
+ * @return DecoderInterface<array<string, mixed>>
  *
  * @see PartialShapeReturnTypeProvider
  */
-function partialShape(AbstractDecoder ...$decoders): AbstractDecoder
+function partialShape(DecoderInterface ...$decoders): DecoderInterface
 {
     /**
      * Validated via psalm plugin hook at this moment
-     * @psalm-var array<string, AbstractDecoder> $decoders
+     * @psalm-var array<string, DecoderInterface> $decoders
      */
     return new Internal\Shape\ShapeDecoder($decoders, partial: true);
 }
@@ -381,10 +381,10 @@ function partialObject(string $objectClass): ObjectDecoderFactory
  * @template T of object
  * @psalm-pure
  *
- * @param callable(): AbstractDecoder<T> $type
- * @return AbstractDecoder<T>
+ * @param callable(): DecoderInterface<T> $type
+ * @return DecoderInterface<T>
  */
-function rec(callable $type): AbstractDecoder
+function rec(callable $type): DecoderInterface
 {
     return new Internal\RecursionDecoder(Closure::fromCallable($type));
 }
@@ -394,12 +394,12 @@ function rec(callable $type): AbstractDecoder
  * @psalm-pure
  * @no-named-arguments
  *
- * @psalm-param AbstractDecoder<T> $first
- * @psalm-param AbstractDecoder<T> $second
- * @psalm-param AbstractDecoder<T> ...$rest
- * @psalm-return AbstractDecoder<T> & Internal\UnionDecoder<T>
+ * @psalm-param DecoderInterface<T> $first
+ * @psalm-param DecoderInterface<T> $second
+ * @psalm-param DecoderInterface<T> ...$rest
+ * @psalm-return DecoderInterface<T> & Internal\UnionDecoder<T>
  */
-function union(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest): AbstractDecoder
+function union(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): DecoderInterface
 {
     return new Internal\UnionDecoder([$first, $second, ...$rest]);
 }
@@ -413,7 +413,7 @@ function union(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder 
  * @psalm-param Internal\Shape\ShapeDecoder<T> $second
  * @psalm-param Internal\Shape\ShapeDecoder<T> ...$rest
  */
-function intersection(AbstractDecoder $first, AbstractDecoder $second, AbstractDecoder ...$rest): AbstractDecoder
+function intersection(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): DecoderInterface
 {
     $decoders = array_merge(
         ...array_map(fn($decoder) => $decoder->decoders, [$first, $second, ...$rest])
@@ -426,13 +426,13 @@ function intersection(AbstractDecoder $first, AbstractDecoder $second, AbstractD
  * @psalm-pure
  * @no-named-arguments
  *
- * @psalm-param AbstractDecoder $first
- * @psalm-param AbstractDecoder ...$rest
- * @return AbstractDecoder<list<mixed>>
+ * @psalm-param DecoderInterface $first
+ * @psalm-param DecoderInterface ...$rest
+ * @return DecoderInterface<list<mixed>>
  *
  * @see TupleReturnTypeProvider
  */
-function tuple(AbstractDecoder $first, AbstractDecoder ...$rest): AbstractDecoder
+function tuple(DecoderInterface $first, DecoderInterface ...$rest): DecoderInterface
 {
     return new Internal\TupleDecoder([$first, ...$rest]);
 }

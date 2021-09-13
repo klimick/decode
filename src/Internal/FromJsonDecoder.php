@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal;
 
-use Fp\Functional\Either\Either;
 use JsonException;
+use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use function Klimick\Decode\Decoder\invalid;
 
 /**
@@ -17,8 +18,11 @@ use function Klimick\Decode\Decoder\invalid;
  */
 final class FromJsonDecoder extends AbstractDecoder
 {
+    /**
+     * @param DecoderInterface<T> $decoder
+     */
     public function __construct(
-        public AbstractDecoder $decoder,
+        public DecoderInterface $decoder,
     ) { }
 
     public function name(): string

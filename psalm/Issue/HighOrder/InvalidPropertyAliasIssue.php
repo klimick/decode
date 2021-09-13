@@ -13,7 +13,7 @@ final class InvalidPropertyAliasIssue extends CodeIssue
     {
         parent::__construct(
             message: implode(' ', [
-                'Invalid argument for AbstractDecoder::from.',
+                'Invalid argument for DecoderInterface::from.',
                 'Argument must be non-empty-string literal with "$." prefix or just "$"',
             ]),
             code_location: $code_location,

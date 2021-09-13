@@ -9,6 +9,7 @@ use Fp\Functional\Semigroup\Semigroup;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\DecodeSemigroup;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
 use function Fp\Collection\every;
@@ -26,7 +27,7 @@ use function Klimick\Decode\Decoder\invalid;
 final class ShapeDecoder extends AbstractDecoder
 {
     /**
-     * @param array<string, AbstractDecoder<TVal>> $decoders
+     * @param array<string, DecoderInterface<TVal>> $decoders
      */
     public function __construct(
         public array $decoders,
@@ -36,7 +37,7 @@ final class ShapeDecoder extends AbstractDecoder
     public function name(): string
     {
         $properties = implode(', ', array_map(
-            function(int|string $property, AbstractDecoder $decoder) {
+            function(int|string $property, DecoderInterface $decoder) {
                 if ($decoder instanceof HighOrderDecoder && $decoder->isOptional()) {
                     return "{$property}?: {$decoder->name()}";
                 }
@@ -54,7 +55,7 @@ final class ShapeDecoder extends AbstractDecoder
     {
         return is_array($value) && every(
             $this->decoders,
-            fn(AbstractDecoder $d, string $key) => array_key_exists($key, $value) && $d->is($value[$key])
+            fn(DecoderInterface $d, string $key) => array_key_exists($key, $value) && $d->is($value[$key])
         );
     }
 

@@ -8,6 +8,7 @@ use Closure;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use function Klimick\Decode\Decoder\valid;
 
@@ -22,7 +23,7 @@ final class ObjectDecoder extends AbstractDecoder
 
     /**
      * @param class-string<T> $objectClass
-     * @param array<string, AbstractDecoder<mixed>> $decoders
+     * @param array<string, DecoderInterface<mixed>> $decoders
      * @param null|Closure(array): T $customConstructor
      */
     public function __construct(

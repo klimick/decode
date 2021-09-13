@@ -10,8 +10,8 @@ use Klimick\Decode\Constraint\Invalid;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use Klimick\Decode\ContextEntry;
-use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\ConstraintsError;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Valid;
 use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\valid;
@@ -24,10 +24,10 @@ use function Klimick\Decode\Decoder\valid;
 final class ConstrainedDecoder extends HighOrderDecoder
 {
     /**
-     * @param AbstractDecoder $decoder
+     * @param DecoderInterface<T> $decoder
      * @param non-empty-list<ConstraintInterface> $constraints
      */
-    public function __construct(public array $constraints, AbstractDecoder $decoder)
+    public function __construct(public array $constraints, DecoderInterface $decoder)
     {
         parent::__construct($decoder);
     }

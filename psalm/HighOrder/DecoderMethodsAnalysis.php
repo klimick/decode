@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\HighOrder;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\HighOrder\Brand\FromBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
@@ -38,7 +38,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
 
     public static function getClassLikeNames(): array
     {
-        return [AbstractDecoder::class];
+        return [DecoderInterface::class];
     }
 
     public static function afterMethodCallAnalysis(AfterMethodCallAnalysisEvent $event): void
@@ -52,7 +52,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
             yield proveTrue(2 === count($method_id));
             [$class_name, $method_name] = $method_id;
 
-            yield proveTrue($class_name === AbstractDecoder::class);
+            yield proveTrue($class_name === DecoderInterface::class);
             yield proveTrue(in_array($method_name, array_keys(self::METHODS_TO_BRANDS), true));
 
             $method_call = yield proveOf($event->getExpr(), MethodCall::class);
@@ -80,7 +80,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
             yield proveTrue(1 === count($atomics));
 
             $decoder_atomic = yield proveOf($atomics[0], Type\Atomic\TGenericObject::class);
-            yield proveTrue($decoder_atomic->value === AbstractDecoder::class);
+            yield proveTrue($decoder_atomic->value === DecoderInterface::class);
             yield proveTrue(1 === count($decoder_atomic->type_params));
 
             return $decoder_atomic;

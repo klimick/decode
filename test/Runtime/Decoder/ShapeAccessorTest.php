@@ -6,7 +6,7 @@ namespace Klimick\Decode\Test\Runtime\Decoder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\UndefinedError;
 use Klimick\Decode\Decoder\Valid;
@@ -19,7 +19,7 @@ use function PHPUnit\Framework\assertEquals;
 /**
  * @psalm-type CaseName = string
  * @psalm-type CaseData = array{
- *     decoder: AbstractDecoder,
+ *     decoder: DecoderInterface,
  *     field: string,
  *     shape: array,
  *     expected: Either,
@@ -30,7 +30,7 @@ final class ShapeAccessorTest extends TestCase
     /**
      * @dataProvider provideCases
      */
-    public function testShapeAccessor(AbstractDecoder $decoder, string $key, array $shape, Either $expected): void
+    public function testShapeAccessor(DecoderInterface $decoder, string $key, array $shape, Either $expected): void
     {
         $context = Context::root($decoder->name(), $shape);
 
