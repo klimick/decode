@@ -131,13 +131,29 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
     private static function literalAtomicToNonLiteralAtomic(Type\Atomic $a): Type\Atomic
     {
         return match (true) {
-            $a instanceof Type\Atomic\TLiteralString,
-                $a instanceof Type\Atomic\TLiteralClassString => new Type\Atomic\TString(),
+            $a instanceof Type\Atomic\TLiteralClassString => new Type\Atomic\TNonEmptyString(),
+            $a instanceof Type\Atomic\TLiteralString => empty($a->value)
+                ? new Type\Atomic\TString()
+                : new Type\Atomic\TNonEmptyString(),
             $a instanceof Type\Atomic\TLiteralInt => new Type\Atomic\TInt(),
             $a instanceof Type\Atomic\TLiteralFloat => new Type\Atomic\TFloat(),
             $a instanceof Type\Atomic\TKeyedArray => new Type\Atomic\TNonEmptyArray([
                 self::literalTypeToNonLiteralType($a->getGenericKeyType()),
                 self::literalTypeToNonLiteralType($a->getGenericValueType()),
+            ]),
+            $a instanceof Type\Atomic\TNonEmptyList => new Type\Atomic\TNonEmptyList(
+                self::literalTypeToNonLiteralType($a->type_param),
+            ),
+            $a instanceof Type\Atomic\TList => new Type\Atomic\TList(
+                self::literalTypeToNonLiteralType($a->type_param),
+            ),
+            $a instanceof Type\Atomic\TNonEmptyArray => new Type\Atomic\TNonEmptyArray([
+                self::literalTypeToNonLiteralType($a->type_params[0]),
+                self::literalTypeToNonLiteralType($a->type_params[1]),
+            ]),
+            $a instanceof Type\Atomic\TArray => new Type\Atomic\TArray([
+                self::literalTypeToNonLiteralType($a->type_params[0]),
+                self::literalTypeToNonLiteralType($a->type_params[1]),
             ]),
             default => $a,
         };
