@@ -85,7 +85,7 @@ final class DefaultReporterTest extends TestCase
 
         assertEquals(
             [
-                new ConstraintErrorReport('$.address.postcode', 'MIN_LENGTH', "'12345'", ['expected' => 6])
+                new ConstraintErrorReport('$.address.postcode', 'MIN_LENGTH', "'12345'", ['minLengthMustBe' => 6])
             ],
             $errorReport->constraintErrors,
         );
