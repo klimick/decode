@@ -26,17 +26,19 @@ final class MinSizeConstraint implements ConstraintInterface
         return 'MIN_SIZE';
     }
 
+    public function payload(): array
+    {
+        return [
+            'expected' => $this->minSize,
+        ];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
-        $actualSize = count($value);
-
-        if ($actualSize >= $this->minSize) {
+        if (count($value) >= $this->minSize) {
             return valid();
         }
 
-        return invalid($context, $this, [
-            'expected' => $this->minSize,
-            'actual' => $actualSize,
-        ]);
+        return invalid($context, $this, $this->payload());
     }
 }

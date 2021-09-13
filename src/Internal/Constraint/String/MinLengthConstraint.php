@@ -26,15 +26,19 @@ final class MinLengthConstraint implements ConstraintInterface
         return 'MIN_LENGTH';
     }
 
+    public function payload(): array
+    {
+        return [
+            'expected' => $this->minLength,
+        ];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         if (mb_strlen($value) >= $this->minLength) {
             return valid();
         }
 
-        return invalid($context, $this, [
-            'expected' => $this->minLength,
-            'actual' => mb_strlen($value),
-        ]);
+        return invalid($context, $this, $this->payload());
     }
 }

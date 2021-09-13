@@ -19,6 +19,11 @@ interface ConstraintInterface
     public function name(): string;
 
     /**
+     * @return array<string, mixed>
+     */
+    public function payload(): array;
+
+    /**
      * @param T $value
      * @return Either<Invalid, Valid>
      */

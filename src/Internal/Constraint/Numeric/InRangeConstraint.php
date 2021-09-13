@@ -30,15 +30,20 @@ final class InRangeConstraint implements ConstraintInterface
         return 'IN_RANGE';
     }
 
+    public function payload(): array
+    {
+        return [
+            'from' => $this->from,
+            'to' => $this->to,
+        ];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         if ($this->from <= $value && $value <= $this->to) {
             return valid();
         }
 
-        return invalid($context, $this, [
-            'from' => $this->from,
-            'to' => $this->to,
-        ]);
+        return invalid($context, $this, $this->payload());
     }
 }

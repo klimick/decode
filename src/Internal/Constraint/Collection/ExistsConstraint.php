@@ -28,6 +28,11 @@ final class ExistsConstraint implements ConstraintInterface
         return 'EXISTS';
     }
 
+    public function payload(): array
+    {
+        return $this->constraint->payload();
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         $errors = [];

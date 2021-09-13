@@ -23,6 +23,11 @@ final class UuidConstraint implements ConstraintInterface
         return 'UUID';
     }
 
+    public function payload(): array
+    {
+        return [];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         return 1 !== preg_match(self::UUID_REGEX, $value)

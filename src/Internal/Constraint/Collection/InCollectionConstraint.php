@@ -27,6 +27,11 @@ final class InCollectionConstraint implements ConstraintInterface
         return 'IN_COLLECTION';
     }
 
+    public function payload(): array
+    {
+        return ['notInCollection' => $this->item];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         foreach ($value as $v) {

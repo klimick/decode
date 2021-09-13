@@ -27,6 +27,11 @@ final class EqualConstraint implements ConstraintInterface
         return 'EQUAL';
     }
 
+    public function payload(): array
+    {
+        return ['expected' => $this->equalTo];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         return $value !== $this->equalTo

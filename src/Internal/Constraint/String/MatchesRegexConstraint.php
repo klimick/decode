@@ -23,6 +23,11 @@ final class MatchesRegexConstraint implements ConstraintInterface
         return 'MATCHES_REGEX';
     }
 
+    public function payload(): array
+    {
+        return ['expected' => $this->regex];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         return 1 !== preg_match($this->regex, $value, $m)

@@ -21,6 +21,11 @@ final class TrimmedConstraint implements ConstraintInterface
         return 'TRIMMED';
     }
 
+    public function payload(): array
+    {
+        return [];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         return trim($value) !== $value

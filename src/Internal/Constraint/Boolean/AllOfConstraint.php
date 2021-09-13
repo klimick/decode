@@ -28,6 +28,11 @@ final class AllOfConstraint implements ConstraintInterface
         return 'ALL_OF';
     }
 
+    public function payload(): array
+    {
+        return [];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         $errors = [];

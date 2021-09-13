@@ -26,17 +26,19 @@ final class MaxSizeConstraint implements ConstraintInterface
         return 'MAX_SIZE';
     }
 
+    public function payload(): array
+    {
+        return [
+            'expected' => $this->maxSize,
+        ];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
-        $actualSize = count($value);
-
-        if ($actualSize <= $this->maxSize) {
+        if (count($value) <= $this->maxSize) {
             return valid();
         }
 
-        return invalid($context, $this, [
-            'expected' => $this->maxSize,
-            'actual' => $actualSize,
-        ]);
+        return invalid($context, $this, $this->payload());
     }
 }

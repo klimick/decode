@@ -28,6 +28,11 @@ final class AnyOfConstraint implements ConstraintInterface
         return 'ANY_OF';
     }
 
+    public function payload(): array
+    {
+        return [];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         $errors = [];

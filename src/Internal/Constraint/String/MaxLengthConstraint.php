@@ -21,6 +21,13 @@ final class MaxLengthConstraint implements ConstraintInterface
      */
     public function __construct(public int $maxLength) { }
 
+    public function payload(): array
+    {
+        return [
+            'expected' => $this->maxLength,
+        ];
+    }
+
     public function name(): string
     {
         return 'MAX_LENGTH';
@@ -32,9 +39,6 @@ final class MaxLengthConstraint implements ConstraintInterface
             return valid();
         }
 
-        return invalid($context, $this, [
-            'expected' => $this->maxLength,
-            'actual' => mb_strlen($value),
-        ]);
+        return invalid($context, $this, $this->payload());
     }
 }

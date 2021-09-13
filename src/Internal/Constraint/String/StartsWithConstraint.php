@@ -26,10 +26,15 @@ final class StartsWithConstraint implements ConstraintInterface
         return 'STARTS_WITH';
     }
 
+    public function payload(): array
+    {
+        return ['expected' => $this->value];
+    }
+
     public function check(Context $context, mixed $value): Either
     {
         return !str_starts_with($value, $this->value)
-            ? invalid($context, $this, ['expected' => $this->value])
+            ? invalid($context, $this, $this->payload())
             : valid();
     }
 }
