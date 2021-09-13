@@ -15,5 +15,8 @@
             <directory>src</directory>
             <directory>modules</directory>
         </include>
+        <report>
+            <clover outputFile="build/logs/clover.xml"/>
+        </report>
     </coverage>
 </phpunit>

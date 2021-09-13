@@ -1,5 +1,9 @@
 ## Decode
 
+![psalm level](https://shepherd.dev/github/klimick/decode/level.svg)
+![psalm type coverage](https://shepherd.dev/github/klimick/decode/coverage.svg)
+[![phpunit coverage](https://coveralls.io/repos/github/klimick/decode/badge.svg)](https://coveralls.io/github/klimick/decode)
+
 This library allow you to take untrusted data and check that they can be represented as type `T`.
 
 - [Usage example](#usage-example)
