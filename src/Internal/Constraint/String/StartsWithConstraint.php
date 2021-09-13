@@ -34,7 +34,7 @@ final class StartsWithConstraint implements ConstraintInterface
     public function check(Context $context, mixed $value): Either
     {
         return !str_starts_with($value, $this->value)
-            ? invalid($context, $this, $this->payload())
+            ? invalid($context, $this)
             : valid();
     }
 }

@@ -23,10 +23,10 @@ function valid(): Either
  *
  * @return Either<Invalid, empty>
  */
-function invalid(Context $context, ConstraintInterface $constraint, array $payload = []): Either
+function invalid(Context $context, ConstraintInterface $constraint): Either
 {
     return invalids([
-        new ConstraintError($context, $constraint->name(), $payload)
+        new ConstraintError($context, $constraint->name(), $constraint->payload())
     ]);
 }
 

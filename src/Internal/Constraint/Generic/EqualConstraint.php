@@ -35,7 +35,7 @@ final class EqualConstraint implements ConstraintInterface
     public function check(Context $context, mixed $value): Either
     {
         return $value !== $this->equalTo
-            ? invalid($context, $this, $this->payload())
+            ? invalid($context, $this)
             : valid();
     }
 }

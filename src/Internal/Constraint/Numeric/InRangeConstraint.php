@@ -44,6 +44,6 @@ final class InRangeConstraint implements ConstraintInterface
             return valid();
         }
 
-        return invalid($context, $this, $this->payload());
+        return invalid($context, $this);
     }
 }

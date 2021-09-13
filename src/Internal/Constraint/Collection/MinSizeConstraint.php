@@ -39,6 +39,6 @@ final class MinSizeConstraint implements ConstraintInterface
             return valid();
         }
 
-        return invalid($context, $this, $this->payload());
+        return invalid($context, $this);
     }
 }

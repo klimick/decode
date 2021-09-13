@@ -31,7 +31,7 @@ final class MatchesRegexConstraint implements ConstraintInterface
     public function check(Context $context, mixed $value): Either
     {
         return 1 !== preg_match($this->regex, $value, $m)
-            ? invalid($context, $this, $this->payload())
+            ? invalid($context, $this)
             : valid();
     }
 }

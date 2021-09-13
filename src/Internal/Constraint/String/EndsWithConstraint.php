@@ -34,7 +34,7 @@ final class EndsWithConstraint implements ConstraintInterface
     public function check(Context $context, mixed $value): Either
     {
         return !str_ends_with($value, $this->value)
-            ? invalid($context, $this, $this->payload())
+            ? invalid($context, $this)
             : valid();
     }
 }

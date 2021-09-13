@@ -44,7 +44,7 @@ final class ComparisonConstraint implements ConstraintInterface
     public function check(Context $context, mixed $value): Either
     {
         return !(self::getOp($this->type))($value, $this->value)
-            ? invalid($context, $this, $this->payload())
+            ? invalid($context, $this)
             : valid();
     }
 

@@ -36,14 +36,13 @@ final class NotConstraint implements ConstraintInterface
     public function check(Context $context, mixed $value): Either
     {
         $result = $this->constraint
-            ->check($context, $value)
+            ->check($context($this->constraint->name(), $value), $value)
             ->get();
 
         return $result instanceof Valid
             ? invalid(
                 context: $context($this->constraint->name(), $value),
                 constraint: $this->constraint,
-                payload: $this->constraint->payload(),
             )
             : valid();
     }
