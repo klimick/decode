@@ -4,7 +4,7 @@
 ![psalm type coverage](https://shepherd.dev/github/klimick/decode/coverage.svg)
 [![phpunit coverage](https://coveralls.io/repos/github/klimick/decode/badge.svg)](https://coveralls.io/github/klimick/decode)
 
-This library allow you to take untrusted data and check that they can be represented as type `T`.
+This library allow you to take untrusted data and check that it can be represented as type `T`.
 
 - [Usage example](#usage-example)
 - [Built in atomics](#builtin-type-atomics)
@@ -135,7 +135,7 @@ $intOrFloatOrStringOrNull = union($intOrString, $floatOrNull);
 ```
 
 ##### arr(TK, TV)
-Represent `array` with keys of type `TK` and values of type `TV`.
+Represents `array` with keys of type `TK` and values of type `TV`.
 
 ```php
 // array<int, string>
@@ -143,7 +143,7 @@ $arr = arr(int(), string());
 ```
 
 ##### nonEmptyArr(TK, TV)
-Represent `non-empty-array` with keys of type `TK` and values of type `TV`.
+Represents `non-empty-array` with keys of type `TK` and values of type `TV`.
 
 ```php
 // non-empty-array<int, string>
@@ -167,7 +167,7 @@ $list = nonEmptyArrList(string());
 ```
 
 ##### shape(prop1: T, prop2: T, propN: T)
-Represent `array` with knows keys.
+Represents `array` with knows keys.
 
 ```php
 // array{prop1: int, prop2: string, prop3: bool}
