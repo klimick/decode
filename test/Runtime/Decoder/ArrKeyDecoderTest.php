@@ -6,6 +6,7 @@ namespace Klimick\Decode\Test\Runtime\Decoder;
 
 use Klimick\Decode\Test\Helper\Gen;
 use Klimick\Decode\Test\Helper\Check;
+use Klimick\Decode\Test\Helper\Predicate;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Decoder\arrKey;
 use function Klimick\Decode\Test\Helper\forAll;
@@ -21,8 +22,7 @@ final class ArrKeyDecoderTest extends TestCase
     {
         forAll(Gen::mixed())
             ->withMaxSize(50)
-            ->when(fn(mixed $value) => !is_int($value))
-            ->when(fn(mixed $value) => !is_string($value))
+            ->when(fn(mixed $value) => !Predicate::isArrKey($value))
             ->then(Check::thatInvalidFor(arrKey()));
     }
 }

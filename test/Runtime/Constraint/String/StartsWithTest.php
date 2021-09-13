@@ -31,7 +31,7 @@ final class StartsWithTest extends TestCase
                 /** @psalm-var non-empty-string $leftString */
 
                 Check::isInvalid()
-                    ->forConstraint(startsWith(string: $leftString))
+                    ->forConstraint(startsWith(string: $leftString . $leftString))
                     ->withValue('never_' . $rightString . $leftString);
             });
     }

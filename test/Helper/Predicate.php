@@ -30,6 +30,11 @@ final class Predicate
         return self::isList($value) && !empty($value);
     }
 
+    public static function isArrKey(mixed $value): bool
+    {
+        return is_int($value) || is_string($value);
+    }
+
     /**
      * @psalm-assert-if-true non-empty-array $value
      */
