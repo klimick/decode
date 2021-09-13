@@ -29,7 +29,7 @@ final class MaxSizeConstraint implements ConstraintInterface
     public function payload(): array
     {
         return [
-            'expected' => $this->maxSize,
+            'maxSizeMustBe' => $this->maxSize,
         ];
     }
 

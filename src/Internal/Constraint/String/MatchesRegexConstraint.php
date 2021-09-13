@@ -25,7 +25,7 @@ final class MatchesRegexConstraint implements ConstraintInterface
 
     public function payload(): array
     {
-        return ['expected' => $this->regex];
+        return ['mustMatchesTo' => $this->regex];
     }
 
     public function check(Context $context, mixed $value): Either

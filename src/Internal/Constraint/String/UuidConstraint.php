@@ -25,7 +25,9 @@ final class UuidConstraint implements ConstraintInterface
 
     public function payload(): array
     {
-        return [];
+        return [
+            'message' => 'Value must be valid uuid string',
+        ];
     }
 
     public function check(Context $context, mixed $value): Either

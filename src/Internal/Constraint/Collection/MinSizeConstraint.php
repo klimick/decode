@@ -29,7 +29,7 @@ final class MinSizeConstraint implements ConstraintInterface
     public function payload(): array
     {
         return [
-            'expected' => $this->minSize,
+            'minSizeMustBe' => $this->minSize,
         ];
     }
 

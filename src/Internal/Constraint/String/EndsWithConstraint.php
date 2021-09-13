@@ -28,7 +28,7 @@ final class EndsWithConstraint implements ConstraintInterface
 
     public function payload(): array
     {
-        return ['expected' => $this->value];
+        return ['mustEndsWith' => $this->value];
     }
 
     public function check(Context $context, mixed $value): Either

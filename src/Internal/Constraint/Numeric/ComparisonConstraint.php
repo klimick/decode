@@ -38,7 +38,14 @@ final class ComparisonConstraint implements ConstraintInterface
 
     public function payload(): array
     {
-        return ['expected' => $this->value];
+        $prop = match ($this->type) {
+            self::OP_LESS => 'mustBeLessThan',
+            self::OP_GREATER => 'mustBeGreaterThan',
+            self::OP_LESS_OR_EQUAL => 'mustBeLessOrEqualTo',
+            self::OP_GREATER_OR_EQUAL => 'mustBeGreaterOrEqualTo',
+        };
+
+        return [$prop => $this->value];
     }
 
     public function check(Context $context, mixed $value): Either

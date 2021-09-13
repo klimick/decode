@@ -33,8 +33,8 @@ final class InRangeConstraint implements ConstraintInterface
     public function payload(): array
     {
         return [
-            'from' => $this->from,
-            'to' => $this->to,
+            'mustBeGreaterOrEqualTo' => $this->from,
+            'mustBeLessOrEqualTo' => $this->to,
         ];
     }
 

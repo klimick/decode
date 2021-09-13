@@ -23,7 +23,9 @@ final class TrimmedConstraint implements ConstraintInterface
 
     public function payload(): array
     {
-        return [];
+        return [
+            'message' => 'Value must not contain leading or trailing whitespaces',
+        ];
     }
 
     public function check(Context $context, mixed $value): Either

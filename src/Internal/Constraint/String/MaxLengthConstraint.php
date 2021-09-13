@@ -21,16 +21,16 @@ final class MaxLengthConstraint implements ConstraintInterface
      */
     public function __construct(public int $maxLength) { }
 
-    public function payload(): array
-    {
-        return [
-            'expected' => $this->maxLength,
-        ];
-    }
-
     public function name(): string
     {
         return 'MAX_LENGTH';
+    }
+
+    public function payload(): array
+    {
+        return [
+            'maxLengthMustBe' => $this->maxLength,
+        ];
     }
 
     public function check(Context $context, mixed $value): Either

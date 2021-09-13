@@ -29,7 +29,7 @@ final class EqualConstraint implements ConstraintInterface
 
     public function payload(): array
     {
-        return ['expected' => $this->equalTo];
+        return ['mustBeEqualTo' => $this->equalTo];
     }
 
     public function check(Context $context, mixed $value): Either

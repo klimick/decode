@@ -29,7 +29,7 @@ final class InCollectionConstraint implements ConstraintInterface
 
     public function payload(): array
     {
-        return ['notInCollection' => $this->item];
+        return ['mustBePresent' => $this->item];
     }
 
     public function check(Context $context, mixed $value): Either

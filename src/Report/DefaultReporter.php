@@ -70,7 +70,7 @@ final class DefaultReporter
     private static function getConstraintNameRec(string $head, array $tail): string
     {
         return !empty($tail)
-            ? self::getConstraintNameRec("{$tail[0]}[{$head}]", tail($tail))
+            ? self::getConstraintNameRec("{$tail[0]}.{$head}", tail($tail))
             : $head;
     }
 
