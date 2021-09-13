@@ -226,9 +226,9 @@ final class SomeClass
     ) {}
     
     /**
-     * @return AbstractDecoder<SomeClass>
+     * @return DecoderInterface<SomeClass>
      */
-    public static function type(): AbstractDecoder
+    public static function type(): DecoderInterface
     {
         return object(self::class)(
             prop1: int(),
@@ -255,12 +255,12 @@ final class SomeClass
         public int $prop1,
         public string $prop2,
         public array $recursive = [],
-    ) {}
+    ) { }
 
     /**
-     * @return AbstractDecoder<SomeClass>
+     * @return DecoderInterface<SomeClass>
      */
-    public static function type(): AbstractDecoder
+    public static function type(): DecoderInterface
     {
         $self = rec(fn() => self::type());
 
