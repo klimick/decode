@@ -40,6 +40,6 @@ final class InCollectionConstraint implements ConstraintInterface
             }
         }
 
-        return invalid($context, $this, ['notInCollection' => $this->item]);
+        return invalid($context, $this, $this->payload());
     }
 }
