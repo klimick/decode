@@ -11,7 +11,7 @@ use function Klimick\Decode\Constraint\invalid;
 use function Klimick\Decode\Constraint\valid;
 
 /**
- * @implements ConstraintInterface<array<array-key, mixed>>
+ * @implements ConstraintInterface<array>
  * @psalm-immutable
  */
 final class MinSizeConstraint implements ConstraintInterface

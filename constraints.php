@@ -236,7 +236,7 @@ function inCollection(mixed $value): ConstraintInterface
  * @psalm-pure
  *
  * @param positive-int $is
- * @return ConstraintInterface<array<array-key, mixed>>
+ * @return ConstraintInterface<array>
  */
 function maxSize(int $is): ConstraintInterface
 {
@@ -247,7 +247,7 @@ function maxSize(int $is): ConstraintInterface
  * @psalm-pure
  *
  * @param positive-int $is
- * @return ConstraintInterface<array<array-key, mixed>>
+ * @return ConstraintInterface<array>
  */
 function minSize(int $is): ConstraintInterface
 {
