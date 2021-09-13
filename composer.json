@@ -42,6 +42,7 @@
         "psalm/plugin-phpunit": "^0.15.1",
         "giorgiosironi/eris": "^0.12.0",
         "phpunit/phpunit": "^9.5",
-        "php-coveralls/php-coveralls": "^2.4"
+        "php-coveralls/php-coveralls": "^2.4",
+        "rregeer/phpunit-coverage-check": "^0.3.1"
     }
 }
