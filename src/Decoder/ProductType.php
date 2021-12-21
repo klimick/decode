@@ -14,6 +14,7 @@ use RuntimeException;
 
 /**
  * @psalm-immutable
+ * @psalm-seal-properties
  */
 abstract class ProductType implements JsonSerializable
 {

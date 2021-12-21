@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
 use Klimick\PsalmDecode\Issue\Object\IntersectionCollisionIssue;
-use Klimick\PsalmDecode\Psalm;
+use Klimick\PsalmTest\Integration\Psalm;
 use Psalm\Type;
 use Psalm\IssueBuffer;
-use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
 use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
 use Fp\Functional\Option\Option;
-use function Fp\Evidence\proveOf;
 
 final class IntersectionReturnTypeProvider implements FunctionReturnTypeProviderInterface
 {
@@ -25,17 +23,13 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
     public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
     {
         $type = Option::do(function() use ($event) {
-            $source = yield proveOf($event->getStatementsSource(), StatementsAnalyzer::class);
-            $provider = $source->getNodeTypeProvider();
-
             $properties = [];
             $collisions = [];
 
             foreach ($event->getCallArgs() as $arg) {
-                $arg_type = yield Psalm::getType($provider, $arg->value);
-
-                $decoder_type_param = yield DecoderTypeParamExtractor::extract($arg_type);
-                $shape_type = yield ShapePropertiesExtractor::fromDecoderTypeParam($decoder_type_param);
+                $shape_type = yield Psalm::getType($event, $arg->value)
+                    ->flatMap(fn($type) => DecoderTypeParamExtractor::extract($type))
+                    ->flatMap(fn($type_param) => ShapePropertiesExtractor::fromDecoderTypeParam($type_param));
 
                 foreach ($shape_type as $property => $type) {
                     if (array_key_exists($property, $properties)) {
@@ -47,6 +41,8 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
             }
 
             if (!empty($collisions)) {
+                $source = $event->getStatementsSource();
+
                 $issue = new IntersectionCollisionIssue($collisions, $event->getCodeLocation());
                 IssueBuffer::accepts($issue, $source->getSuppressedIssues());
             }

@@ -4,6 +4,8 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns="https://getpsalm.org/schema/config"
        cacheDirectory="/tmp/decode-psalm"
+       ensureArrayStringOffsetsExist="true"
+       ensureArrayIntOffsetsExist="true"
        xsi:schemaLocation="https://getpsalm.org/schema/config vendor/vimeo/psalm/config.xsd">
     <projectFiles>
         <directory name="src"/>
@@ -15,13 +17,11 @@
         <InternalClass>
             <errorLevel type="suppress">
                 <directory name="psalm"/>
-                <directory name="psalm-test"/>
             </errorLevel>
         </InternalClass>
         <InternalMethod>
             <errorLevel type="suppress">
                 <directory name="psalm"/>
-                <directory name="psalm-test"/>
             </errorLevel>
         </InternalMethod>
     </issueHandlers>

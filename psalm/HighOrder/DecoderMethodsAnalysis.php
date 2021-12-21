@@ -11,7 +11,7 @@ use Klimick\Decode\HighOrder\Brand\DefaultBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
 use Klimick\PsalmDecode\Issue\HighOrder\BrandAlreadyDefinedIssue;
 use Klimick\PsalmDecode\Issue\HighOrder\OptionalCallContradictionIssue;
-use Klimick\PsalmDecode\Psalm;
+use Klimick\PsalmTest\Integration\Psalm;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
@@ -32,9 +32,9 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
         self::METHOD_DEFAULT => DefaultBrand::class,
     ];
 
-    private const METHOD_OPTIONAL = 'optional';
-    private const METHOD_FROM = 'from';
-    private const METHOD_DEFAULT = 'default';
+    private const METHOD_OPTIONAL = DecoderInterface::class . '::' . 'optional';
+    private const METHOD_FROM = DecoderInterface::class . '::' . 'from';
+    private const METHOD_DEFAULT = DecoderInterface::class . '::' . 'default';
 
     public static function getClassLikeNames(): array
     {
@@ -45,25 +45,16 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
     {
         Option::do(function() use ($event) {
             $source = $event->getStatementsSource();
-            $type_provider = $source->getNodeTypeProvider();
+            $method_name = $event->getAppearingMethodId();
 
-            $method_id = explode('::', $event->getAppearingMethodId());
-
-            yield proveTrue(2 === count($method_id));
-            [$class_name, $method_name] = $method_id;
-
-            yield proveTrue($class_name === DecoderInterface::class);
             yield proveTrue(in_array($method_name, array_keys(self::METHODS_TO_BRANDS), true));
 
             $method_call = yield proveOf($event->getExpr(), MethodCall::class);
-            $current_type = yield Psalm::getType($type_provider, $method_call->var);
-
             $code_location = new CodeLocation($event->getStatementsSource(), $method_call->name);
 
-            $return_type = yield Option::fromNullable($current_type)
+            $return_type = yield Psalm::getType($event, $method_call->var)
                 ->flatMap(fn($decoder_type) => self::simplifyToAtomic($decoder_type))
                 ->map(fn($decoder_atomic) => self::withBrand($source, $code_location, $decoder_atomic, $method_name))
-                ->map(fn($branded_decoder_atomic) => self::possiblyUndefinedIfHasOptionalBrand($branded_decoder_atomic))
                 ->map(fn($branded_decoder_atomic) => new Type\Union([$branded_decoder_atomic]));
 
             $event->setReturnTypeCandidate($return_type);
@@ -75,16 +66,8 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
      */
     private static function simplifyToAtomic(Type\Union $decoder_type): Option
     {
-        return Option::do(function() use ($decoder_type) {
-            $atomics = asList($decoder_type->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            $decoder_atomic = yield proveOf($atomics[0], Type\Atomic\TGenericObject::class);
-            yield proveTrue($decoder_atomic->value === DecoderInterface::class);
-            yield proveTrue(1 === count($decoder_atomic->type_params));
-
-            return $decoder_atomic;
-        });
+        return Psalm::asSingleAtomicOf(Type\Atomic\TGenericObject::class, $decoder_type)
+            ->filter(fn($atomic) => $atomic->value === DecoderInterface::class);
     }
 
     /**
@@ -97,7 +80,6 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
         string $method_name,
     ): Type\Atomic\TGenericObject
     {
-        $with_brand = clone $atomic;
         $current_brands = map(asList($atomic->getIntersectionTypes() ?? []), fn(Type\Atomic $a) => $a->getId());
         $brand = self::METHODS_TO_BRANDS[$method_name];
 
@@ -114,9 +96,10 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
         $brand_type = new Type\Atomic\TNamedObject($brand);
         $brand_type->from_docblock = true;
 
+        $with_brand = clone $atomic;
         $with_brand->addIntersectionType($brand_type);
 
-        return $with_brand;
+        return self::possiblyUndefinedIfHasOptionalBrand($with_brand);
     }
 
     private static function possiblyUndefinedIfHasOptionalBrand(Type\Atomic\TGenericObject $atomic): Type\Atomic\TGenericObject

@@ -67,7 +67,7 @@ final class ProductTypeTest extends TestCase
 
         $bot = new Bot('token-val', apiVersion: 'v3');
 
-        /** @psalm-suppress UndefinedPropertyFetchIssue */
+        /** @psalm-suppress UndefinedMagicPropertyFetch */
         $_ = $bot->nonexistent;
     }
 
@@ -76,7 +76,7 @@ final class ProductTypeTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Invalid data');
 
-        /** @psalm-suppress InvalidProductTypeInstantiationIssue */
+        /** @psalm-suppress InvalidArgument */
         new Bot('token-val', apiVersion: 'v4');
     }
 }

@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\NamedArguments;
 
 use Psalm\Type;
-use Fp\Functional\Option\Option;
+use Klimick\PsalmTest\Integration\Psalm;
 use Klimick\Decode\Decoder\DecoderInterface;
-use function Fp\Cast\asList;
+use Fp\Functional\Option\Option;
 use function Fp\Collection\first;
-use function Fp\Collection\firstOf;
-use function Fp\Evidence\proveTrue;
 
 final class DecoderTypeParamExtractor
 {
@@ -19,16 +17,9 @@ final class DecoderTypeParamExtractor
      */
     public static function extract(Type\Union $named_arg_type): Option
     {
-        return Option::do(function() use ($named_arg_type) {
-            $atomics = asList($named_arg_type->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            $generic_object = yield firstOf($atomics, Type\Atomic\TGenericObject::class);
-
-            yield proveTrue($generic_object->value === DecoderInterface::class);
-            yield proveTrue(1 === count($generic_object->type_params));
-
-            return yield first($generic_object->type_params);
-        });
+        return Option::some($named_arg_type)
+            ->flatMap(fn($type) => Psalm::asSingleAtomicOf(Type\Atomic\TGenericObject::class, $type))
+            ->filter(fn($generic) => DecoderInterface::class === $generic->value)
+            ->flatMap(fn($generic) => first($generic->type_params));
     }
 }

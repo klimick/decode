@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\ObjectDecoder;
 
 use Klimick\PsalmDecode\Issue\Object\NotPartialPropertyIssue;
+use Klimick\PsalmTest\Integration\Psalm;
 use Psalm\Type;
 use Psalm\Codebase;
 use Psalm\IssueBuffer;
@@ -19,9 +20,7 @@ use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
 use Fp\Functional\Option\Option;
 use function Fp\Cast\asList;
 use function Fp\Collection\first;
-use function Fp\Collection\firstOf;
 use function Fp\Collection\second;
-use function Fp\Evidence\proveTrue;
 
 final class ObjectVerifier
 {
@@ -31,18 +30,16 @@ final class ObjectVerifier
             $source = $event->getSource();
             $codebase = $source->getCodebase();
 
-            $actual_shape = yield NamedArgumentsMapper::map(
-                call_args: $event->getCallArgs(),
-                provider: $source->getNodeTypeProvider(),
-            );
+            $actual_shape = yield NamedArgumentsMapper::map($event->getCallArgs(), $source->getNodeTypeProvider())
+                ->flatMap(fn($shape_decoder) => ShapePropertiesExtractor::fromDecoder($shape_decoder));
 
             $call_info = yield self::extractCallInfo($event);
 
             self::compareSideBySide(
                 codebase: $codebase,
                 source: $source,
-                actual_decoder_type: $actual_shape,
-                expected_decoder_type: $call_info['expected_shape'],
+                actual_shape: $actual_shape,
+                expected_shape: $call_info['expected_shape'],
                 method_code_location: $call_info['call_location'],
                 arg_code_locations: $call_info['arg_locations'],
             );
@@ -51,7 +48,7 @@ final class ObjectVerifier
 
     /**
      * @psalm-type CallInfo = array{
-     *     expected_shape: Type\Union,
+     *     expected_shape: array<string, Type\Union>,
      *     arg_locations: array<string, CodeLocation>,
      *     call_location: CodeLocation
      * }
@@ -65,7 +62,6 @@ final class ObjectVerifier
             $codebase = $source->getCodebase();
 
             $params = asList($event->getTemplateTypeParameters() ?? []);
-            yield proveTrue(2 === count($params));
 
             $object_class_type_param = yield first($params);
             $partial_type_param = yield second($params);
@@ -76,11 +72,12 @@ final class ObjectVerifier
 
             $call_location = $event->getCodeLocation();
             $decoder_type = self::inferDecoderType($codebase, $source, $class_storage, $call_location, $arg_locations, $is_partial);
+            $expected_shape = yield ShapePropertiesExtractor::fromDecoder($decoder_type);
 
             return [
                 'call_location' => $call_location,
                 'arg_locations' => $arg_locations,
-                'expected_shape' => $decoder_type,
+                'expected_shape' => $expected_shape,
             ];
         });
     }
@@ -155,16 +152,11 @@ final class ObjectVerifier
      */
     private static function extractPartialityInfo(Type\Union $partial_type_param): Option
     {
-        return Option::do(function() use ($partial_type_param) {
-            $atomics = asList($partial_type_param->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            return yield firstOf($atomics, Type\Atomic\TBool::class)
-                ->map(fn($bool) => match (true) {
-                    ($bool instanceof Type\Atomic\TTrue) => true,
-                    ($bool instanceof Type\Atomic\TFalse) => false,
-                });
-        });
+        return Psalm::asSingleAtomicOf(Type\Atomic\TBool::class, $partial_type_param)
+            ->map(fn($bool) => match (true) {
+                ($bool instanceof Type\Atomic\TTrue) => true,
+                ($bool instanceof Type\Atomic\TFalse) => false,
+            });
     }
 
     /**
@@ -172,37 +164,27 @@ final class ObjectVerifier
      */
     private static function extractClassStorage(Type\Union $object_class, Codebase $codebase): Option
     {
-        return Option::do(function() use ($object_class, $codebase) {
-            $atomics = asList($object_class->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            $named_object = yield firstOf($atomics, Type\Atomic\TNamedObject::class);
-
-            return yield Option::try(
-                fn() => $codebase->classlike_storage_provider->get($named_object->value)
-            );
-        });
+        return Psalm::asSingleAtomicOf(Type\Atomic\TNamedObject::class, $object_class)->flatMap(
+            fn($named_object) => Option::try(fn() => $codebase->classlike_storage_provider->get($named_object->value))
+        );
     }
 
     /**
+     * @param array<string, Type\Union> $actual_shape
+     * @param array<string, Type\Union> $expected_shape
      * @param array<string, CodeLocation> $arg_code_locations
      */
     private static function compareSideBySide(
         Codebase $codebase,
         StatementsSource $source,
-        Type\Union $actual_decoder_type,
-        Type\Union $expected_decoder_type,
+        array $actual_shape,
+        array $expected_shape,
         CodeLocation $method_code_location,
         array $arg_code_locations,
     ): void
     {
-        Option::do(function() use ($actual_decoder_type, $expected_decoder_type, $method_code_location, $arg_code_locations, $codebase, $source) {
-            $actual_shape = yield ShapePropertiesExtractor::fromDecoder($actual_decoder_type);
-            $expected_shape = yield ShapePropertiesExtractor::fromDecoder($expected_decoder_type);
-
-            ObjectPropertiesValidator::checkPropertyTypes($codebase, $source, $method_code_location, $arg_code_locations, $expected_shape, $actual_shape);
-            ObjectPropertiesValidator::checkNonexistentProperties($actual_shape, $expected_shape, $arg_code_locations, $source, $method_code_location);
-            ObjectPropertiesValidator::checkMissingProperties($source, $method_code_location, $expected_shape, $actual_shape);
-        });
+        ObjectPropertiesValidator::checkPropertyTypes($codebase, $source, $method_code_location, $arg_code_locations, $expected_shape, $actual_shape);
+        ObjectPropertiesValidator::checkNonexistentProperties($actual_shape, $expected_shape, $arg_code_locations, $source, $method_code_location);
+        ObjectPropertiesValidator::checkMissingProperties($source, $method_code_location, $expected_shape, $actual_shape);
     }
 }

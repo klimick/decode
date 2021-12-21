@@ -43,12 +43,13 @@ final class SumTypeTest extends PsalmTest
                     ),
                 );
 
-                return new Owner(case: $invalidCase);
+                return new Owner($invalidCase);
             })
             ->seePsalmIssue(
-                type: 'InvalidSumTypeInstantiationIssue',
-                message: 'Expected type: #[bot]|#[customer]. Actual type: #[telegram].',
+                type: 'InvalidArgument',
+                message: 'Argument 1 of #[owner]::__construct expects #[bot]|#[customer], #[telegram] provided',
                 args: [
+                    'owner' => Owner::class,
                     'bot' => Bot::class,
                     'customer' => Customer::class,
                     'telegram' => Telegram::class,
@@ -77,30 +78,35 @@ final class SumTypeTest extends PsalmTest
                 );
             })
             ->seePsalmIssue(
-                type: 'UnexhaustiveMatchIssue',
-                message: 'Match with name "whatsapp" is not specified',
+                type: 'TooFewArguments',
+                message: 'Too few arguments for method #[messenger]::match saw 2',
+                args: [
+                    'messenger' => Messenger::class,
+                ]
             );
 
         StaticTestCase::describe('Invalid matcher type issue')
             ->haveCode(function() {
                 return self::messenger()->match(
                     smpp: fn(SmppSms $m) => get_debug_type($m),
-                    telegram: fn(Whatsapp $m) => get_debug_type($m),
                     whatsapp: fn(Telegram $m) => get_debug_type($m),
+                    telegram: fn(Whatsapp $m) => get_debug_type($m),
                 );
             })
             ->seePsalmIssue(
-                type: 'InvalidMatcherTypeIssue',
-                message: 'Invalid matcher type given. Expected type: #[telegram]. Actual type: pure-Closure(#[whatsapp]):string.',
+                type: 'InvalidArgument',
+                message: 'Argument 3 of #[messenger]::match expects callable(#[telegram]):mixed, pure-Closure(#[whatsapp]):string provided',
                 args: [
+                    'messenger' => Messenger::class,
                     'telegram' => Telegram::class,
                     'whatsapp' => Whatsapp::class,
                 ],
             )
             ->seePsalmIssue(
-                type: 'InvalidMatcherTypeIssue',
-                message: 'Invalid matcher type given. Expected type: #[whatsapp]. Actual type: pure-Closure(#[telegram]):string.',
+                type: 'InvalidArgument',
+                message: 'Argument 2 of #[messenger]::match expects callable(#[whatsapp]):mixed, pure-Closure(#[telegram]):string provided',
                 args: [
+                    'messenger' => Messenger::class,
                     'telegram' => Telegram::class,
                     'whatsapp' => Whatsapp::class,
                 ],

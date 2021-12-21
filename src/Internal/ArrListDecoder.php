@@ -33,7 +33,12 @@ final class ArrListDecoder extends AbstractDecoder
 
     public function is(mixed $value): bool
     {
-        return arr(int(), $this->decoder)->is($value) && self::isList($value);
+        if (!arr(int(), $this->decoder)->is($value)) {
+            return false;
+        }
+
+        /** @var array<int, A> $value */
+        return self::isList($value);
     }
 
     /**

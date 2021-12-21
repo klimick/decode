@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test\Static;
 
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmTest\PsalmTest;
 use Klimick\PsalmTest\StaticTestCase;
 use function Klimick\Decode\Constraint\greater;
@@ -40,7 +41,10 @@ final class HighOrderIssueTest extends PsalmTest
             ))
             ->seePsalmIssue(
                 type: 'BrandAlreadyDefinedIssue',
-                message: 'Method "optional" should not called multiple times.',
+                message: 'Method #[decoder]::optional should not called multiple times.',
+                args: [
+                    'decoder' => DecoderInterface::class,
+                ],
             );
 
         StaticTestCase::describe('Brand already defined issue for from call')
@@ -49,7 +53,10 @@ final class HighOrderIssueTest extends PsalmTest
             ))
             ->seePsalmIssue(
                 type: 'BrandAlreadyDefinedIssue',
-                message: 'Method "from" should not called multiple times.',
+                message: 'Method #[decoder]::from should not called multiple times.',
+                args: [
+                    'decoder' => DecoderInterface::class,
+                ],
             );
 
         StaticTestCase::describe('Incompatible constraint issue')

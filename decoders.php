@@ -8,11 +8,9 @@ use Closure;
 use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\ErrorInterface;
 use Klimick\Decode\Internal;
 use Klimick\Decode\Context;
 use Klimick\Decode\Report\DefaultReporter;
-use Klimick\PsalmDecode\ShapeDecoder\PartialShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
 
@@ -441,4 +439,38 @@ function cases(Internal\ObjectDecoder|Internal\UnionDecoder ...$cases): SumCases
 {
     /** @psalm-var non-empty-array<non-empty-string, Internal\ObjectDecoder<ProductType> | Internal\UnionDecoder<SumType>> $cases */
     return new SumCases($cases);
+}
+
+/**
+ * @template T
+ *
+ * @param class-string<T> $class
+ * @return Internal\ObjectDecoder<T> | Internal\UnionDecoder<T>
+ * @psalm-return (DecoderInterface<T> & Internal\ObjectDecoder<T>) | (DecoderInterface<T> & Internal\UnionDecoder<T>)
+ */
+function sumType(string $class): DecoderInterface
+{
+    /**
+     * @todo: fix
+     * @psalm-suppress MixedMethodCall, MixedReturnStatement
+     * @var (DecoderInterface<T> & Internal\ObjectDecoder<T>) | (DecoderInterface<T> & Internal\UnionDecoder<T>)
+     */
+    return $class::type();
+}
+
+/**
+ * @template T
+ *
+ * @param class-string<T> $class
+ * @return Internal\ObjectDecoder<T>
+ * @psalm-return DecoderInterface<T> & Internal\ObjectDecoder<T>
+ */
+function productType(string $class): DecoderInterface
+{
+    /**
+     * @todo: fix
+     * @psalm-suppress MixedMethodCall, MixedReturnStatement
+     * @var DecoderInterface<T> & Internal\ObjectDecoder<T>
+     */
+    return $class::type();
 }

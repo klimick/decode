@@ -10,6 +10,7 @@ use Psalm\Type;
 use Fp\Functional\Option\Option;
 use Psalm\NodeTypeProvider;
 use function Fp\Cast\asList;
+use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
 final class Psalm
@@ -26,24 +27,10 @@ final class Psalm
     }
 
     /**
-     * @return Option<Type\Atomic>
+     * @return Option<string>
      */
-    public static function asSingleAtomic(Type\Union $union): Option
+    public static function getArgName(Node\Arg $arg): Option
     {
-        return Option::do(function() use ($union) {
-            $atomics = asList($union->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            return $atomics[0];
-        });
-    }
-
-    public static function classExtends(string $class, string $from, AfterExpressionAnalysisEvent $event): bool
-    {
-        $isSubclass = fn(): bool => $event
-            ->getCodebase()->classlikes
-            ->classExtends($class, $from);
-
-        return Option::try($isSubclass)->getOrElse(false);
+        return proveOf($arg->name, Node\Identifier::class)->map(fn($id) => $id->name);
     }
 }

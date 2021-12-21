@@ -69,7 +69,7 @@ final class SumTypeTest extends TestCase
             ),
         );
 
-        /** @psalm-suppress InvalidSumTypeInstantiationIssue */
+        /** @psalm-suppress InvalidArgument */
         new Owner(case: $invalidCase);
     }
 }

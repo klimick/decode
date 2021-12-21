@@ -17,7 +17,7 @@ final class DecoderType
     {
         $properties_atomic = new Type\Union([
             empty($properties)
-                ? new Type\Atomic\TArray([Type::getEmpty(), Type::getEmpty()])
+                ? new Type\Atomic\TArray([Type::getNever(), Type::getNever()])
                 : new Type\Atomic\TKeyedArray($properties)
         ]);
 

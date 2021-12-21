@@ -20,8 +20,8 @@ final class ProductTypeIssuesTest extends PsalmTest
                 return $message->misspelledReceiverId;
             })
             ->seePsalmIssue(
-                type: 'UndefinedPropertyFetchIssue',
-                message: 'Property "misspelledReceiverId" is not present in "#[instance]" instance.',
+                type: 'UndefinedMagicPropertyFetch',
+                message: 'Magic instance property #[instance]::$misspelledReceiverId is not defined',
                 args: [
                     'instance' => Message::class,
                 ],
@@ -36,8 +36,11 @@ final class ProductTypeIssuesTest extends PsalmTest
                 );
             })
             ->seePsalmIssue(
-                type: 'InvalidProductTypeInstantiationIssue',
-                message: 'Invalid type for "receiverId". Actual: "123456". Expected: "string".',
+                type: 'InvalidScalarArgument',
+                message: 'Argument 3 of #[message]::__construct expects string, 123456 provided',
+                args: [
+                    'message' => Message::class,
+                ],
             );
 
         StaticTestCase::describe('Less arguments issue')
@@ -48,8 +51,11 @@ final class ProductTypeIssuesTest extends PsalmTest
                 );
             })
             ->seePsalmIssue(
-                type: 'InvalidProductTypeInstantiationIssue',
-                message: 'Expected args 3. Actual count 2.',
+                type: 'TooFewArguments',
+                message: 'Too few arguments for #[message]::__construct - expecting 3 but saw 2',
+                args: [
+                    'message' => Message::class,
+                ],
             );
     }
 }

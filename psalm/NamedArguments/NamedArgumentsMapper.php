@@ -8,6 +8,7 @@ use Klimick\PsalmDecode\Psalm;
 use PhpParser\Node;
 use Psalm\Type;
 use Psalm\NodeTypeProvider;
+use Fp\Collections\ArrayList;
 use Fp\Functional\Option\Option;
 use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
 use function Fp\Evidence\proveString;
@@ -20,33 +21,29 @@ final class NamedArgumentsMapper
      */
     public static function map(array $call_args, NodeTypeProvider $provider, bool $partial = false): Option
     {
-        return Option::do(function() use ($call_args, $provider, $partial) {
-            $properties = [];
-
-            foreach ($call_args as $arg) {
-                $info = yield self::getPropertyInfo($arg, $provider);
-
-                $properties[$info['property']] = $partial
-                    ? self::asPossiblyUndefined($info['type'])
-                    : $info['type'];
-            }
-
-            return DecoderType::createShape($properties);
-        });
+        return ArrayList::collect($call_args)
+            ->everyMap(fn($arg) => self::getPropertyInfo($arg, $provider, $partial))
+            ->flatMap(
+                fn($properties) => $properties
+                    ->toHashMap(fn($info) => [$info['property'], $info['type']])
+                    ->toAssocArray()
+            )
+            ->map(fn($properties) => DecoderType::createShape($properties));
     }
 
     /**
      * @return Option<array{property: string, type: Type\Union}>
      */
-    private static function getPropertyInfo(Node\Arg $named_arg, NodeTypeProvider $provider): Option
+    private static function getPropertyInfo(Node\Arg $named_arg, NodeTypeProvider $provider, bool $partial = false): Option
     {
-        return Option::do(function() use ($named_arg, $provider) {
-            $named_arg_type = yield Psalm::getType($provider, $named_arg->value);
+        return Option::do(function() use ($named_arg, $provider, $partial) {
+            $named_arg_type = yield Option::fromNullable($provider->getType($named_arg->value));
             $arg_identifier = yield Option::fromNullable($named_arg->name);
 
             return [
                 'property' => yield proveString($arg_identifier->name),
-                'type' => yield DecoderTypeParamExtractor::extract($named_arg_type),
+                'type' => yield DecoderTypeParamExtractor::extract($named_arg_type)
+                    ->map(fn($type) => $partial ? self::asPossiblyUndefined($type) : $type),
             ];
         });
     }

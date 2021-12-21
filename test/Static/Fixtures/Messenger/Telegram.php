@@ -11,20 +11,20 @@ use function Klimick\Decode\Constraint\maxLength;
 use function Klimick\Decode\Constraint\minLength;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
+use function Klimick\Decode\Decoder\sumType;
 
-/**
- * @psalm-immutable
- */
 final class Telegram extends ProductType
 {
     protected static function definition(): ShapeDecoder
     {
         return shape(
-            telegramId: string()->constrained(
-                minLength(is: 2),
-                maxLength(is: 10),
-            ),
-            owner: Owner::type(),
+            telegramId: string()
+                ->default('no-id')
+                ->constrained(
+                    minLength(is: 2),
+                    maxLength(is: 10),
+                ),
+            owner: sumType(Owner::class),
         );
     }
 }

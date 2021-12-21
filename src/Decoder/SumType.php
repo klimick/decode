@@ -50,20 +50,26 @@ abstract class SumType implements JsonSerializable
         $constructor = static function(array $properties): static {
             $classReflection = new ReflectionClass(static::class);
 
-            /** @var static $instance */
-            $instance = $classReflection->newInstanceWithoutConstructor();
+            /** @var static $sumType */
+            $sumType = $classReflection->newInstanceWithoutConstructor();
+
+            /** @var mixed $instance */
+            $instance = $properties['instance'] ?? new RuntimeException();
+
+            /** @var mixed $caseId */
+            $caseId = $properties['caseId'] ?? new RuntimeException();
 
             $instanceReflection = new ReflectionProperty(SumType::class, 'instance');
             $instanceReflection->setAccessible(true);
-            $instanceReflection->setValue($instance, $properties['instance']);
+            $instanceReflection->setValue($sumType, $instance);
             $instanceReflection->setAccessible(false);
 
             $caseIdReflection = new ReflectionProperty(SumType::class, 'caseId');
             $caseIdReflection->setAccessible(true);
-            $caseIdReflection->setValue($instance, $properties['caseId']);
+            $caseIdReflection->setValue($sumType, $caseId);
             $caseIdReflection->setAccessible(false);
 
-            return $instance;
+            return $sumType;
         };
 
         $sumCases = static::definition();

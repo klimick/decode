@@ -10,10 +10,8 @@ use Klimick\Decode\Test\Static\Fixtures\Messenger\Owner\Owner;
 use function Klimick\Decode\Decoder\nonEmptyString;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
+use function Klimick\Decode\Decoder\sumType;
 
-/**
- * @psalm-immutable
- */
 final class SmppSms extends ProductType
 {
     protected static function definition(): ShapeDecoder
@@ -21,7 +19,7 @@ final class SmppSms extends ProductType
         return shape(
             login: nonEmptyString(),
             password: string(),
-            owner: Owner::type(),
+            owner: sumType(Owner::class),
         );
     }
 }

@@ -9,17 +9,15 @@ use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Messenger\Owner\Owner;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
+use function Klimick\Decode\Decoder\sumType;
 
-/**
- * @psalm-immutable
- */
 final class Whatsapp extends ProductType
 {
     protected static function definition(): ShapeDecoder
     {
         return shape(
             phone: string(),
-            owner: Owner::type(),
+            owner: sumType(Owner::class),
         );
     }
 }

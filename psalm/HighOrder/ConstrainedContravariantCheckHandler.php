@@ -4,24 +4,33 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\HighOrder;
 
+use Fp\Collections\NonEmptyArrayList;
 use Klimick\PsalmDecode\Issue\HighOrder\IncompatibleConstraintIssue;
-use Klimick\PsalmDecode\Psalm;
-use PhpParser\Node;
-use Psalm\Codebase;
-use Psalm\CodeLocation;
+use Klimick\PsalmTest\Integration\CallArg;
+use Klimick\PsalmTest\Integration\Psalm;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Psalm\IssueBuffer;
 use Psalm\StatementsSource;
-use Psalm\Type;
-use Psalm\NodeTypeProvider;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Fp\Functional\Option\Option;
-use function Fp\Cast\asList;
-use function Fp\Collection\map;
-use function Fp\Evidence\proveOf;
+use Psalm\Type\Atomic\TArray;
+use Psalm\Type\Atomic\TFloat;
+use Psalm\Type\Atomic\TGenericObject;
+use Psalm\Type\Atomic\TInt;
+use Psalm\Type\Atomic\TKeyedArray;
+use Psalm\Type\Atomic\TList;
+use Psalm\Type\Atomic\TLiteralClassString;
+use Psalm\Type\Atomic\TLiteralFloat;
+use Psalm\Type\Atomic\TLiteralInt;
+use Psalm\Type\Atomic\TLiteralString;
+use Psalm\Type\Atomic\TNonEmptyArray;
+use Psalm\Type\Atomic\TNonEmptyList;
+use Psalm\Type\Atomic\TNonEmptyString;
+use Psalm\Type\Atomic\TString;
+use Psalm\Type\Union;
 use function Fp\Evidence\proveTrue;
 
 final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProviderInterface
@@ -31,7 +40,76 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
         return [DecoderInterface::class];
     }
 
-    private static function withoutUndefined(Type\Union $type): Type\Union
+    public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Union
+    {
+        Option::do(function() use ($event) {
+            yield proveTrue('constrained' === $event->getMethodNameLowercase());
+
+            self::contravariantCheck(
+                source: $event->getSource(),
+                constrained_call_args: yield Psalm::getNonEmptyCallArgs($event)
+                    ->flatMap(fn($call_args) => self::mapCallArgs($call_args)),
+                decoder_type_param: yield Psalm::getTemplates($event)
+                    ->firstElement()
+                    ->map(fn($type) => self::withoutUndefined($type)),
+            );
+        });
+
+        return null;
+    }
+
+    /**
+     * @param NonEmptyArrayList<CallArg> $call_args
+     * @return Option<NonEmptyArrayList<CallArg>>
+     */
+    private static function mapCallArgs(NonEmptyArrayList $call_args): Option
+    {
+        $arg_type_to_constraint_type_param =
+            fn(Union $type): Option => Psalm::asSingleAtomicOf(TGenericObject::class, $type)
+                ->flatMap(fn($object) => Psalm::getTypeParam($object, ConstraintInterface::class, position: 0))
+                ->map(fn($type_param) => self::toNonLiteralType($type_param));
+
+        return $call_args->everyMap(
+            fn($call_arg) => $call_arg->flatMap($arg_type_to_constraint_type_param)
+        );
+    }
+
+    private static function toNonLiteralType(Union $type): Union
+    {
+        return new Union(
+            NonEmptyArrayList::collectNonEmpty($type->getAtomicTypes())
+                ->map(fn($a) => match (true) {
+                    $a instanceof TLiteralClassString => new TNonEmptyString(),
+                    $a instanceof TLiteralString => empty($a->value)
+                        ? new TString()
+                        : new TNonEmptyString(),
+                    $a instanceof TLiteralInt => new TInt(),
+                    $a instanceof TLiteralFloat => new TFloat(),
+                    $a instanceof TKeyedArray => new TNonEmptyArray([
+                        self::toNonLiteralType($a->getGenericKeyType()),
+                        self::toNonLiteralType($a->getGenericValueType()),
+                    ]),
+                    $a instanceof TNonEmptyList => new TNonEmptyList(
+                        self::toNonLiteralType($a->type_param),
+                    ),
+                    $a instanceof TList => new TList(
+                        self::toNonLiteralType($a->type_param),
+                    ),
+                    $a instanceof TNonEmptyArray => new TNonEmptyArray([
+                        self::toNonLiteralType($a->type_params[0]),
+                        self::toNonLiteralType($a->type_params[1]),
+                    ]),
+                    $a instanceof TArray => new TArray([
+                        self::toNonLiteralType($a->type_params[0]),
+                        self::toNonLiteralType($a->type_params[1]),
+                    ]),
+                    default => $a,
+                })
+                ->toArray()
+        );
+    }
+
+    private static function withoutUndefined(Union $type): Union
     {
         if ($type->possibly_undefined) {
             $without_undefined = clone $type;
@@ -43,159 +121,30 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
         return $type;
     }
 
-    public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Type\Union
-    {
-        Option::do(function() use ($event) {
-            $source = $event->getSource();
-            $codebase = $source->getCodebase();
-            $type_provider = $source->getNodeTypeProvider();
-
-            $args = yield self::getArgFromConstrainedMethod($event);
-
-            $constraint_types = yield self::getConstraintTypes($args, $type_provider);
-            $decoder_type_parameter = yield self::getDecoderTypeParameter($event);
-
-            self::contravariantCheck(
-                codebase: $codebase,
-                source: $source,
-                call_args: $args,
-                constraint_types: $constraint_types,
-                decoder_type_parameter: self::withoutUndefined($decoder_type_parameter),
-            );
-        });
-
-        return null;
-    }
-
     /**
-     * @return Option<non-empty-list<Node\Arg>>
-     */
-    private static function getArgFromConstrainedMethod(MethodReturnTypeProviderEvent $event): Option
-    {
-        return Option::do(function() use ($event) {
-            yield proveTrue('constrained' === $event->getMethodNameLowercase());
-
-            $call_args = $event->getCallArgs();
-            yield proveTrue(count($call_args) >= 1);
-
-            return $call_args;
-        });
-    }
-
-    /**
-     * @return Option<Type\Union>
-     */
-    private static function getTypeFromConstraintInterface(Type\Union $type): Option
-    {
-        return Option::do(function() use ($type) {
-            $atomics = asList($type->getAtomicTypes());
-            yield proveTrue(1 === count($atomics));
-
-            $generic_object = yield proveOf($atomics[0], Type\Atomic\TGenericObject::class);
-            yield proveTrue($generic_object->value === ConstraintInterface::class);
-            yield proveTrue(1 === count($generic_object->type_params));
-
-            return $generic_object->type_params[0];
-        });
-    }
-
-    /**
-     * @param non-empty-list<Node\Arg> $args
-     * @return Option<non-empty-list<Type\Union>>
-     */
-    private static function getConstraintTypes(array $args, NodeTypeProvider $type_provider): Option
-    {
-        return Option::do(function() use ($args, $type_provider) {
-            $types = [];
-
-            foreach ($args as $arg) {
-                $constraint_type = yield Psalm::getType($type_provider, $arg->value);
-                $constraint_type_param = yield self::getTypeFromConstraintInterface($constraint_type);
-
-                $types[] = self::literalTypeToNonLiteralType($constraint_type_param);
-            }
-
-            return $types;
-        });
-    }
-
-    private static function literalTypeToNonLiteralType(Type\Union $type): Type\Union
-    {
-        $non_literal_atomics = array_values(
-            map($type->getAtomicTypes(), fn(Type\Atomic $a) => self::literalAtomicToNonLiteralAtomic($a))
-        );
-
-        return new Type\Union($non_literal_atomics);
-    }
-
-    private static function literalAtomicToNonLiteralAtomic(Type\Atomic $a): Type\Atomic
-    {
-        return match (true) {
-            $a instanceof Type\Atomic\TLiteralClassString => new Type\Atomic\TNonEmptyString(),
-            $a instanceof Type\Atomic\TLiteralString => empty($a->value)
-                ? new Type\Atomic\TString()
-                : new Type\Atomic\TNonEmptyString(),
-            $a instanceof Type\Atomic\TLiteralInt => new Type\Atomic\TInt(),
-            $a instanceof Type\Atomic\TLiteralFloat => new Type\Atomic\TFloat(),
-            $a instanceof Type\Atomic\TKeyedArray => new Type\Atomic\TNonEmptyArray([
-                self::literalTypeToNonLiteralType($a->getGenericKeyType()),
-                self::literalTypeToNonLiteralType($a->getGenericValueType()),
-            ]),
-            $a instanceof Type\Atomic\TNonEmptyList => new Type\Atomic\TNonEmptyList(
-                self::literalTypeToNonLiteralType($a->type_param),
-            ),
-            $a instanceof Type\Atomic\TList => new Type\Atomic\TList(
-                self::literalTypeToNonLiteralType($a->type_param),
-            ),
-            $a instanceof Type\Atomic\TNonEmptyArray => new Type\Atomic\TNonEmptyArray([
-                self::literalTypeToNonLiteralType($a->type_params[0]),
-                self::literalTypeToNonLiteralType($a->type_params[1]),
-            ]),
-            $a instanceof Type\Atomic\TArray => new Type\Atomic\TArray([
-                self::literalTypeToNonLiteralType($a->type_params[0]),
-                self::literalTypeToNonLiteralType($a->type_params[1]),
-            ]),
-            default => $a,
-        };
-    }
-
-    /**
-     * @return Option<Type\Union>
-     */
-    private static function getDecoderTypeParameter(MethodReturnTypeProviderEvent $event): Option
-    {
-        return Option::do(function() use ($event) {
-            $type_parameters = asList($event->getTemplateTypeParameters() ?? []);
-            yield proveTrue(1 === count($type_parameters));
-
-            return $type_parameters[0];
-        });
-    }
-
-    /**
-     * @param Codebase $codebase
-     * @param StatementsSource $source
-     * @param non-empty-list<Node\Arg> $call_args
-     * @param non-empty-list<Type\Union> $constraint_types
-     * @param Type\Union $decoder_type_parameter
+     * @param NonEmptyArrayList<CallArg> $constrained_call_args
      */
     private static function contravariantCheck(
-        Codebase $codebase,
         StatementsSource $source,
-        array $call_args,
-        array $constraint_types,
-        Type\Union $decoder_type_parameter,
+        NonEmptyArrayList $constrained_call_args,
+        Union $decoder_type_param,
     ): void
     {
-        foreach ($constraint_types as $idx => $constraint_type) {
-            if (UnionTypeComparator::isContainedBy($codebase, $decoder_type_parameter, $constraint_type)) {
+        foreach ($constrained_call_args as $call_arg) {
+            $is_contained_by = UnionTypeComparator::isContainedBy(
+                codebase: $source->getCodebase(),
+                input_type: $decoder_type_param,
+                container_type: $call_arg->type,
+            );
+
+            if ($is_contained_by) {
                 continue;
             }
 
-            $code_location = new CodeLocation($source, $call_args[$idx]);
-            $issue = new IncompatibleConstraintIssue($constraint_type, $decoder_type_parameter, $code_location);
-
-            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+            IssueBuffer::accepts(
+                new IncompatibleConstraintIssue($call_arg->type, $decoder_type_param, $call_arg->location),
+                $source->getSuppressedIssues(),
+            );
         }
     }
 }
