@@ -24,6 +24,11 @@
                 <directory name="psalm"/>
             </errorLevel>
         </InternalMethod>
+        <InternalProperty>
+            <errorLevel type="suppress">
+                <directory name="psalm"/>
+            </errorLevel>
+        </InternalProperty>
     </issueHandlers>
     <plugins>
         <pluginClass class="Klimick\PsalmDecode\Plugin"/>
