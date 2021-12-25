@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ShapeDecoder;
+namespace Klimick\PsalmDecode\Helper;
 
-use Klimick\PsalmDecode\NamedArguments\ClassTypeUpcast;
-use Klimick\PsalmTest\Integration\Psalm;
-use Psalm\Type;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\PsalmTest\Integration\Psalm;
+use Psalm\Type;
 use function Fp\Collection\first;
 use function Fp\Collection\reindex;
 

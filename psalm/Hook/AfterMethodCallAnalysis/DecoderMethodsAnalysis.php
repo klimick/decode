@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\HighOrder;
+namespace Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\HighOrder\Brand\FromBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;

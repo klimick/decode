@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Klimick\Decode\Internal\ObjectDecoder;
-use Klimick\PsalmDecode\ObjectDecoder\ObjectDecoderFactoryReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturnTypeProvider;
 
 /**
  * @template TObjectClass of object

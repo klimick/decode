@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ShapeDecoder;
+namespace Klimick\PsalmDecode\Helper;
 
 use Psalm\Type;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use Klimick\Decode\Decoder\DecoderInterface;
 
 final class DecoderType
 {

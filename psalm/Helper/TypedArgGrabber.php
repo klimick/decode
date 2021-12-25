@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Visit;
+namespace Klimick\PsalmDecode\Helper;
 
 use Fp\Collections\ArrayList;
 use Fp\Collections\NonEmptyArrayList;
+use Fp\Functional\Option\Option;
 use Fp\Functional\Unit;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\PsalmDecode\NamedArguments\ClassTypeUpcast;
 use PhpParser\Node;
-use Fp\Functional\Option\Option;
-use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use Psalm\Context;

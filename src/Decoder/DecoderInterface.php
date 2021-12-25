@@ -7,6 +7,7 @@ namespace Klimick\Decode\Decoder;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
+use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
 
 /**
  * @template-covariant T
@@ -38,7 +39,7 @@ interface DecoderInterface
      * @return DecoderInterface<T>
      * @psalm-mutation-free
      *
-     * @see ConstrainedContravariantCheckHandler Contravariant check happens via plugin
+     * @see ConstrainedMethodReturnTypeProvider Contravariant check happens via plugin
      */
     public function constrained(ConstraintInterface $first, ConstraintInterface ...$rest): DecoderInterface;
 

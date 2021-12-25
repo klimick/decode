@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Visit;
+namespace Klimick\PsalmDecode\Helper;
 
 use Psalm\Internal\MethodIdentifier;
 use Psalm\Storage\ClassLikeStorage;

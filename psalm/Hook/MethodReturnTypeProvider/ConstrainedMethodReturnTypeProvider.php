@@ -2,24 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\HighOrder;
+namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
 
 use Fp\Collections\NonEmptyArrayList;
+use Fp\Functional\Option\Option;
+use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Internal\StringDecoder;
+use Klimick\PsalmDecode\Helper\DecoderTypeParamExtractor;
 use Klimick\PsalmDecode\Issue\HighOrder\IncompatibleConstraintIssue;
-use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
 use Klimick\PsalmTest\Integration\CallArg;
 use Klimick\PsalmTest\Integration\Psalm;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Psalm\IssueBuffer;
-use Psalm\StatementsSource;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
-use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Decoder\DecoderInterface;
-use Fp\Functional\Option\Option;
+use Psalm\StatementsSource;
 use Psalm\Type\Atomic\TArray;
 use Psalm\Type\Atomic\TFloat;
 use Psalm\Type\Atomic\TGenericObject;
@@ -30,7 +28,6 @@ use Psalm\Type\Atomic\TLiteralClassString;
 use Psalm\Type\Atomic\TLiteralFloat;
 use Psalm\Type\Atomic\TLiteralInt;
 use Psalm\Type\Atomic\TLiteralString;
-use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Atomic\TNonEmptyArray;
 use Psalm\Type\Atomic\TNonEmptyList;
 use Psalm\Type\Atomic\TNonEmptyString;
@@ -39,7 +36,7 @@ use Psalm\Type\Union;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
-final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProviderInterface
+final class ConstrainedMethodReturnTypeProvider implements MethodReturnTypeProviderInterface
 {
     public static function getClassLikeNames(): array
     {

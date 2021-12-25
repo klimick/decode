@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ObjectDecoder;
+namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
 
-use Psalm\Type;
+use Klimick\Decode\Decoder\ObjectDecoderFactory;
+use Klimick\PsalmDecode\Helper\ObjectVerifier;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
-use Klimick\Decode\Decoder\ObjectDecoderFactory;
+use Psalm\Type;
 
 final class ObjectDecoderFactoryReturnTypeProvider implements MethodReturnTypeProviderInterface
 {

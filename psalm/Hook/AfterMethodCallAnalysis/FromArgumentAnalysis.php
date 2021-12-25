@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\HighOrder;
+namespace Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmDecode\Issue\HighOrder\InvalidPropertyAliasIssue;
 use Klimick\PsalmTest\Integration\Psalm;
 use PhpParser\Node\Arg;

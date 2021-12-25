@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\NamedArguments;
+namespace Klimick\PsalmDecode\Helper;
 
 use Fp\Collections\ArrayList;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\PsalmTest\Integration\Psalm;
 use Psalm\Internal\Analyzer\ProjectAnalyzer;
 use Psalm\Internal\Type\TemplateResult;
 use Psalm\Internal\Type\TemplateStandinTypeReplacer;

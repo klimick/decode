@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ObjectDecoder;
+namespace Klimick\PsalmDecode\Helper;
 
 use Klimick\PsalmDecode\Issue\Object\InvalidDecoderForPropertyIssue;
 use Klimick\PsalmDecode\Issue\Object\NonexistentPropertyObjectPropertyIssue;
 use Klimick\PsalmDecode\Issue\Object\RequiredObjectPropertyMissingIssue;
-use Psalm\StatementsSource;
-use Psalm\Type;
 use Psalm\Codebase;
-use Psalm\IssueBuffer;
 use Psalm\CodeLocation;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
+use Psalm\IssueBuffer;
+use Psalm\StatementsSource;
+use Psalm\Type;
 
 final class ObjectPropertiesValidator
 {

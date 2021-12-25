@@ -2,17 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Visit;
+namespace Klimick\PsalmDecode\Hook\AfterClassLikeVisit;
 
-use Klimick\Decode\Decoder\SumType;
 use Fp\Functional\Option\Option;
+use Klimick\Decode\Decoder\SumType;
+use Klimick\PsalmDecode\Helper\StorageManager;
+use Klimick\PsalmDecode\Helper\TypedArg;
+use Klimick\PsalmDecode\Helper\TypedArgGrabber;
 use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
 use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Storage\FunctionLikeParameter;
 use Psalm\Type;
 
-final class VisitSumType implements AfterClassLikeVisitInterface
+final class SumTypeAfterClassLikeVisit implements AfterClassLikeVisitInterface
 {
     private static function matchTemplateId(ClassLikeStorage $storage): string
     {

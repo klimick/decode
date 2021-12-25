@@ -2,23 +2,20 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ObjectDecoder;
+namespace Klimick\PsalmDecode\Helper;
 
+use Fp\Functional\Option\Option;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\PsalmDecode\Issue\Object\NotPartialPropertyIssue;
 use Klimick\PsalmTest\Integration\Psalm;
-use Psalm\Type;
 use Psalm\Codebase;
-use Psalm\IssueBuffer;
 use Psalm\CodeLocation;
+use Psalm\Internal\Type\TypeExpander;
+use Psalm\IssueBuffer;
+use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\StatementsSource;
 use Psalm\Storage\ClassLikeStorage;
-use Psalm\Internal\Type\TypeExpander;
-use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
-use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
-use Klimick\PsalmDecode\ShapeDecoder\ShapePropertiesExtractor;
-use Klimick\PsalmDecode\NamedArguments\NamedArgumentsMapper;
-use Fp\Functional\Option\Option;
+use Psalm\Type;
 use function Fp\Cast\asList;
 use function Fp\Collection\first;
 use function Fp\Collection\second;

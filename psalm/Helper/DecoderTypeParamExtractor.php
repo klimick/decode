@@ -2,21 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\NamedArguments;
+namespace Klimick\PsalmDecode\Helper;
 
-use Fp\Collections\ArrayList;
-use Psalm\Codebase;
-use Psalm\Internal\Analyzer\ProjectAnalyzer;
-use Psalm\Internal\Type\TemplateResult;
-use Psalm\Internal\Type\TemplateStandinTypeReplacer;
-use Psalm\Storage\ClassLikeStorage;
-use Psalm\Type;
-use Klimick\PsalmTest\Integration\Psalm;
-use Klimick\Decode\Decoder\DecoderInterface;
 use Fp\Functional\Option\Option;
+use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\PsalmTest\Integration\Psalm;
+use Psalm\Type;
 use Psalm\Type\Atomic\TGenericObject;
-use Psalm\Type\Atomic\TNamedObject;
-use function Fp\Collection\at;
 use function Fp\Collection\first;
 
 final class DecoderTypeParamExtractor

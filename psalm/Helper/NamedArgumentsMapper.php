@@ -2,16 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\NamedArguments;
+namespace Klimick\PsalmDecode\Helper;
 
+use Fp\Functional\Option\Option;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
 use Klimick\PsalmTest\Integration\Psalm;
 use PhpParser\Node;
-use Psalm\Type;
 use Psalm\NodeTypeProvider;
-use Fp\Collections\ArrayList;
-use Fp\Functional\Option\Option;
-use Klimick\PsalmDecode\ShapeDecoder\DecoderType;
+use Psalm\Type;
 use function Fp\Evidence\proveString;
 
 final class NamedArgumentsMapper

@@ -2,15 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Visit;
+namespace Klimick\PsalmDecode\Hook\AfterClassLikeVisit;
 
-use Psalm\Storage\ClassLikeStorage;
-use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
-use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
-use Klimick\Decode\Decoder\ProductType;
 use Fp\Functional\Option\Option;
+use Klimick\Decode\Decoder\ProductType;
+use Klimick\PsalmDecode\Helper\StorageManager;
+use Klimick\PsalmDecode\Helper\TypedArg;
+use Klimick\PsalmDecode\Helper\TypedArgGrabber;
+use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
+use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
+use Psalm\Storage\ClassLikeStorage;
 
-final class VisitProductType implements AfterClassLikeVisitInterface
+final class ProductTypeAfterClassLikeVisit implements AfterClassLikeVisitInterface
 {
     public static function afterClassLikeVisit(AfterClassLikeVisitEvent $event): void
     {

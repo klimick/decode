@@ -2,17 +2,19 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\ShapeDecoder;
+namespace Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider;
 
+use Fp\Functional\Option\Option;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\PsalmDecode\Helper\DecoderType;
+use Klimick\PsalmDecode\Helper\DecoderTypeParamExtractor;
+use Klimick\PsalmDecode\Helper\ShapePropertiesExtractor;
 use Klimick\PsalmDecode\Issue\Object\IntersectionCollisionIssue;
 use Klimick\PsalmTest\Integration\Psalm;
-use Psalm\Type;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
-use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
-use Fp\Functional\Option\Option;
+use Psalm\Type;
 
 final class IntersectionReturnTypeProvider implements FunctionReturnTypeProviderInterface
 {
