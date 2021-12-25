@@ -5,14 +5,40 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Closure;
-use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Internal;
 use Klimick\Decode\Context;
+use Klimick\Decode\Internal\ArrDecoder;
+use Klimick\Decode\Internal\ArrKeyDecoder;
+use Klimick\Decode\Internal\ArrListDecoder;
+use Klimick\Decode\Internal\BoolDecoder;
+use Klimick\Decode\Internal\ConstantDecoder;
+use Klimick\Decode\Internal\DatetimeDecoder;
+use Klimick\Decode\Internal\FloatDecoder;
+use Klimick\Decode\Internal\FromJsonDecoder;
+use Klimick\Decode\Internal\IntDecoder;
+use Klimick\Decode\Internal\LiteralDecoder;
+use Klimick\Decode\Internal\MixedDecoder;
+use Klimick\Decode\Internal\NonEmptyArrDecoder;
+use Klimick\Decode\Internal\NonEmptyArrListDecoder;
+use Klimick\Decode\Internal\NonEmptyStringDecoder;
+use Klimick\Decode\Internal\NullDecoder;
+use Klimick\Decode\Internal\NumericDecoder;
+use Klimick\Decode\Internal\NumericStringDecoder;
+use Klimick\Decode\Internal\ObjectDecoder;
+use Klimick\Decode\Internal\PositiveIntDecoder;
+use Klimick\Decode\Internal\RecursionDecoder;
+use Klimick\Decode\Internal\ScalarDecoder;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\Decode\Internal\StringDecoder;
+use Klimick\Decode\Internal\TupleDecoder;
+use Klimick\Decode\Internal\UnionDecoder;
 use Klimick\Decode\Report\DefaultReporter;
 use Klimick\PsalmDecode\ShapeDecoder\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\ShapeDecoder\TupleReturnTypeProvider;
+use Klimick\Decode\Decoder\SumType;
+use Klimick\Decode\Decoder\ProductType;
+use Klimick\Decode\Decoder\Runtype;
 
 /**
  * @template T
@@ -97,12 +123,10 @@ function valid(mixed $value): Either
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<mixed>
  */
-function mixed(): DecoderInterface
+function mixed(): MixedDecoder
 {
-    return new Internal\MixedDecoder();
+    return new MixedDecoder();
 }
 
 /**
@@ -110,131 +134,107 @@ function mixed(): DecoderInterface
  * @psalm-pure
  *
  * @param T $value
- * @return DecoderInterface<T>
+ * @return ConstantDecoder<T>
  */
-function constant(mixed $value): DecoderInterface
+function constant(mixed $value): ConstantDecoder
 {
-    return new Internal\ConstantDecoder($value);
+    return new ConstantDecoder($value);
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<null>
  */
-function null(): DecoderInterface
+function null(): NullDecoder
 {
-    return new Internal\NullDecoder();
+    return new NullDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<int>
  */
-function int(): DecoderInterface
+function int(): IntDecoder
 {
-    return new Internal\IntDecoder();
+    return new IntDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<positive-int>
  */
-function positiveInt(): DecoderInterface
+function positiveInt(): PositiveIntDecoder
 {
-    return new Internal\PositiveIntDecoder();
+    return new PositiveIntDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<float>
  */
-function float(): DecoderInterface
+function float(): FloatDecoder
 {
-    return new Internal\FloatDecoder();
+    return new FloatDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<numeric>
  */
-function numeric(): DecoderInterface
+function numeric(): NumericDecoder
 {
-    return new Internal\NumericDecoder();
+    return new NumericDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<numeric-string>
  */
-function numericString(): DecoderInterface
+function numericString(): NumericStringDecoder
 {
-    return new Internal\NumericStringDecoder();
+    return new NumericStringDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<bool>
  */
-function bool(): DecoderInterface
+function bool(): BoolDecoder
 {
-    return new Internal\BoolDecoder();
+    return new BoolDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<string>
  */
-function string(): DecoderInterface
+function string(): StringDecoder
 {
-    return new Internal\StringDecoder();
+    return new StringDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<non-empty-string>
  */
-function nonEmptyString(): DecoderInterface
+function nonEmptyString(): NonEmptyStringDecoder
 {
-    return new Internal\NonEmptyStringDecoder();
+    return new NonEmptyStringDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<scalar>
  */
-function scalar(): DecoderInterface
+function scalar(): ScalarDecoder
 {
-    return new Internal\ScalarDecoder();
+    return new ScalarDecoder();
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<DateTimeImmutable>
  */
-function datetime(string $timezone = 'UTC', null|string $fromFormat = null): DecoderInterface
+function datetime(string $timezone = 'UTC', null|string $fromFormat = null): DatetimeDecoder
 {
-    return new Internal\DatetimeDecoder($timezone, $fromFormat);
+    return new DatetimeDecoder($timezone, $fromFormat);
 }
 
 /**
  * @psalm-pure
- *
- * @return DecoderInterface<array-key>
  */
-function arrKey(): DecoderInterface
+function arrKey(): ArrKeyDecoder
 {
-    return new Internal\ArrKeyDecoder();
+    return new ArrKeyDecoder();
 }
 
 /**
@@ -244,11 +244,11 @@ function arrKey(): DecoderInterface
  *
  * @param T $head
  * @param T ...$tail
- * @return DecoderInterface<T>
+ * @return LiteralDecoder<T>
  */
-function literal(mixed $head, mixed ...$tail): DecoderInterface
+function literal(mixed $head, mixed ...$tail): LiteralDecoder
 {
-    return new Internal\LiteralDecoder([$head, ...$tail]);
+    return new LiteralDecoder([$head, ...$tail]);
 }
 
 /**
@@ -256,11 +256,11 @@ function literal(mixed $head, mixed ...$tail): DecoderInterface
  * @psalm-pure
  *
  * @psalm-param DecoderInterface<T> $decoder
- * @return DecoderInterface<list<T>>
+ * @return ArrListDecoder<T>
  */
-function arrList(DecoderInterface $decoder): DecoderInterface
+function arrList(DecoderInterface $decoder): ArrListDecoder
 {
-    return new Internal\ArrListDecoder($decoder);
+    return new ArrListDecoder($decoder);
 }
 
 /**
@@ -268,11 +268,11 @@ function arrList(DecoderInterface $decoder): DecoderInterface
  * @psalm-pure
  *
  * @psalm-param DecoderInterface<T> $decoder
- * @return DecoderInterface<non-empty-list<T>>
+ * @return NonEmptyArrListDecoder<T>
  */
-function nonEmptyArrList(DecoderInterface $decoder): DecoderInterface
+function nonEmptyArrList(DecoderInterface $decoder): NonEmptyArrListDecoder
 {
-    return new Internal\NonEmptyArrListDecoder($decoder);
+    return new NonEmptyArrListDecoder($decoder);
 }
 
 /**
@@ -283,11 +283,11 @@ function nonEmptyArrList(DecoderInterface $decoder): DecoderInterface
  * @psalm-param DecoderInterface<K> $keyDecoder
  * @psalm-param DecoderInterface<V> $valDecoder
  *
- * @return DecoderInterface<array<K, V>>
+ * @return ArrDecoder<K, V>
  */
-function arr(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): DecoderInterface
+function arr(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): ArrDecoder
 {
-    return new Internal\ArrDecoder($keyDecoder, $valDecoder);
+    return new ArrDecoder($keyDecoder, $valDecoder);
 }
 
 /**
@@ -298,11 +298,11 @@ function arr(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): Decode
  * @psalm-param DecoderInterface<K> $keyDecoder
  * @psalm-param DecoderInterface<V> $valDecoder
  *
- * @return DecoderInterface<non-empty-array<K, V>>
+ * @return NonEmptyArrDecoder<K, V>
  */
-function nonEmptyArr(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): DecoderInterface
+function nonEmptyArr(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): NonEmptyArrDecoder
 {
-    return new Internal\NonEmptyArrDecoder($keyDecoder, $valDecoder);
+    return new NonEmptyArrDecoder($keyDecoder, $valDecoder);
 }
 
 /**
@@ -310,45 +310,37 @@ function nonEmptyArr(DecoderInterface $keyDecoder, DecoderInterface $valDecoder)
  * @psalm-pure
  *
  * @param DecoderInterface<T> $decoder
- * @return DecoderInterface<T>
+ * @return FromJsonDecoder<T>
  */
-function fromJson(DecoderInterface $decoder): DecoderInterface
+function fromJson(DecoderInterface $decoder): FromJsonDecoder
 {
-    return new Internal\FromJsonDecoder($decoder);
+    return new FromJsonDecoder($decoder);
 }
 
 /**
  * @psalm-pure
- *
- * @psalm-param DecoderInterface ...$decoders
- * @return DecoderInterface<array<string, mixed>>
- *
  * @see ShapeReturnTypeProvider
  */
-function shape(DecoderInterface ...$decoders): DecoderInterface
+function shape(DecoderInterface ...$decoders): ShapeDecoder
 {
     /**
      * Validated via psalm plugin hook at this moment
      * @psalm-var array<string, DecoderInterface> $decoders
      */
-    return new Internal\Shape\ShapeDecoder($decoders);
+    return new ShapeDecoder($decoders);
 }
 
 /**
  * @psalm-pure
- *
- * @psalm-param DecoderInterface ...$decoders
- * @return DecoderInterface<array<string, mixed>>
- *
- * @see PartialShapeReturnTypeProvider
+ * @see ShapeReturnTypeProvider
  */
-function partialShape(DecoderInterface ...$decoders): DecoderInterface
+function partialShape(DecoderInterface ...$decoders): ShapeDecoder
 {
     /**
      * Validated via psalm plugin hook at this moment
      * @psalm-var array<string, DecoderInterface> $decoders
      */
-    return new Internal\Shape\ShapeDecoder($decoders, partial: true);
+    return new ShapeDecoder($decoders, partial: true);
 }
 
 /**
@@ -380,11 +372,11 @@ function partialObject(string $objectClass): ObjectDecoderFactory
  * @psalm-pure
  *
  * @param callable(): DecoderInterface<T> $type
- * @return DecoderInterface<T>
+ * @return RecursionDecoder<T>
  */
-function rec(callable $type): DecoderInterface
+function rec(callable $type): RecursionDecoder
 {
-    return new Internal\RecursionDecoder(Closure::fromCallable($type));
+    return new RecursionDecoder(Closure::fromCallable($type));
 }
 
 /**
@@ -395,82 +387,75 @@ function rec(callable $type): DecoderInterface
  * @psalm-param DecoderInterface<T> $first
  * @psalm-param DecoderInterface<T> $second
  * @psalm-param DecoderInterface<T> ...$rest
- * @psalm-return DecoderInterface<T> & Internal\UnionDecoder<T>
+ * @psalm-return UnionDecoder<T>
  */
-function union(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): DecoderInterface
+function union(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): UnionDecoder
 {
-    return new Internal\UnionDecoder([$first, $second, ...$rest]);
+    return new UnionDecoder([$first, $second, ...$rest]);
 }
 
 /**
- * @template T of array
  * @psalm-pure
  * @no-named-arguments
- *
- * @psalm-param Internal\Shape\ShapeDecoder<T> $first
- * @psalm-param Internal\Shape\ShapeDecoder<T> $second
- * @psalm-param Internal\Shape\ShapeDecoder<T> ...$rest
  */
-function intersection(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): DecoderInterface
+function intersection(ShapeDecoder $first, ShapeDecoder $second, ShapeDecoder ...$rest): ShapeDecoder
 {
     $decoders = array_merge(
         ...array_map(fn($decoder) => $decoder->decoders, [$first, $second, ...$rest])
     );
 
-    return new Internal\Shape\ShapeDecoder($decoders);
+    return new ShapeDecoder($decoders);
 }
 
 /**
  * @psalm-pure
  * @no-named-arguments
- *
- * @psalm-param DecoderInterface $first
- * @psalm-param DecoderInterface ...$rest
- * @return DecoderInterface<list<mixed>>
- *
  * @see TupleReturnTypeProvider
  */
-function tuple(DecoderInterface $first, DecoderInterface ...$rest): DecoderInterface
+function tuple(DecoderInterface $first, DecoderInterface ...$rest): TupleDecoder
 {
-    return new Internal\TupleDecoder([$first, ...$rest]);
+    return new TupleDecoder([$first, ...$rest]);
 }
 
-function cases(Internal\ObjectDecoder|Internal\UnionDecoder ...$cases): SumCases
+/**
+ * @template T of object
+ *
+ * @param DecoderInterface<T> ...$cases
+ * @return SumCases<T>
+ *
+ * @todo: fix signature
+ * @psalm-suppress InvalidReturnType, InvalidReturnStatement
+ */
+function cases(DecoderInterface ...$cases): SumCases
 {
-    /** @psalm-var non-empty-array<non-empty-string, Internal\ObjectDecoder<ProductType> | Internal\UnionDecoder<SumType>> $cases */
+    /**
+     * @var non-empty-array<non-empty-string, ObjectDecoder<ProductType> | UnionDecoder<SumType>> $cases
+     */
     return new SumCases($cases);
 }
 
 /**
- * @template T
+ * @template T of SumType
  *
  * @param class-string<T> $class
- * @return Internal\ObjectDecoder<T> | Internal\UnionDecoder<T>
- * @psalm-return (DecoderInterface<T> & Internal\ObjectDecoder<T>) | (DecoderInterface<T> & Internal\UnionDecoder<T>)
+ * @return UnionDecoder<T>
  */
-function sumType(string $class): DecoderInterface
+function sumType(string $class): UnionDecoder
 {
-    /**
-     * @todo: fix
-     * @psalm-suppress MixedMethodCall, MixedReturnStatement
-     * @var (DecoderInterface<T> & Internal\ObjectDecoder<T>) | (DecoderInterface<T> & Internal\UnionDecoder<T>)
-     */
     return $class::type();
 }
 
 /**
- * @template T
+ * @template T of Runtype
  *
  * @param class-string<T> $class
- * @return Internal\ObjectDecoder<T>
- * @psalm-return DecoderInterface<T> & Internal\ObjectDecoder<T>
+ * @return ObjectDecoder<T>|UnionDecoder<T>
+ *
+ * @todo: fix signature
+ * @psalm-suppress InvalidReturnStatement, InvalidReturnType
  */
-function productType(string $class): DecoderInterface
+function productType(string $class): ObjectDecoder|UnionDecoder
 {
-    /**
-     * @todo: fix
-     * @psalm-suppress MixedMethodCall, MixedReturnStatement
-     * @var DecoderInterface<T> & Internal\ObjectDecoder<T>
-     */
+    /** @var class-string<ProductType> | class-string<SumType> $class */
     return $class::type();
 }

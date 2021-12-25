@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ObjectDecoder;
 
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\PsalmDecode\Issue\Object\NotPartialPropertyIssue;
 use Klimick\PsalmTest\Integration\Psalm;
 use Psalm\Type;
@@ -31,6 +32,13 @@ final class ObjectVerifier
             $codebase = $source->getCodebase();
 
             $actual_shape = yield NamedArgumentsMapper::map($event->getCallArgs(), $source->getNodeTypeProvider())
+                ->map(
+                    fn($properties) => new Type\Union([
+                        new Type\Atomic\TGenericObject(ShapeDecoder::class, [
+                            new Type\Union([$properties])
+                        ]),
+                    ])
+                )
                 ->flatMap(fn($shape_decoder) => ShapePropertiesExtractor::fromDecoder($shape_decoder));
 
             $call_info = yield self::extractCallInfo($event);
@@ -109,7 +117,13 @@ final class ObjectVerifier
             }
         }
 
-        return DecoderType::createShape($shape);
+        return new Type\Union([
+            new Type\Atomic\TGenericObject(ShapeDecoder::class, [
+                new Type\Union([
+                    DecoderType::createShape($shape)
+                ]),
+            ])
+        ]);
     }
 
     private static function expandType(

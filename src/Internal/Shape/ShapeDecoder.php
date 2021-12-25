@@ -7,6 +7,7 @@ namespace Klimick\Decode\Internal\Shape;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Semigroup\Semigroup;
 use Klimick\Decode\Context;
+use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
@@ -17,8 +18,8 @@ use function Klimick\Decode\Decoder\valid;
 use function Klimick\Decode\Decoder\invalid;
 
 /**
- * @template TVal
- * @extends AbstractDecoder<array<string, TVal>>
+ * @template-covariant TShape of array
+ * @extends AbstractDecoder<TShape>
  * @psalm-immutable
  *
  * @psalm-import-type ValidShapeProperties from ShapePropertySemigroup
@@ -27,7 +28,7 @@ use function Klimick\Decode\Decoder\invalid;
 final class ShapeDecoder extends AbstractDecoder
 {
     /**
-     * @param array<string, DecoderInterface<TVal>> $decoders
+     * @param array<string, DecoderInterface> $decoders
      */
     public function __construct(
         public array $decoders,
@@ -73,6 +74,7 @@ final class ShapeDecoder extends AbstractDecoder
             $decodedShape = $S->combine($decodedShape, $decodedKV);
         }
 
+        /** @var Either<Invalid, Valid<TShape>> */
         return $decodedShape;
     }
 

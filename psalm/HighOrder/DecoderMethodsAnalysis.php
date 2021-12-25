@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\HighOrder;
 
 use Fp\Functional\Option\Option;
+use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\HighOrder\Brand\FromBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
@@ -32,13 +33,13 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
         self::METHOD_DEFAULT => DefaultBrand::class,
     ];
 
-    private const METHOD_OPTIONAL = DecoderInterface::class . '::' . 'optional';
-    private const METHOD_FROM = DecoderInterface::class . '::' . 'from';
-    private const METHOD_DEFAULT = DecoderInterface::class . '::' . 'default';
+    private const METHOD_OPTIONAL = AbstractDecoder::class . '::' . 'optional';
+    private const METHOD_FROM = AbstractDecoder::class . '::' . 'from';
+    private const METHOD_DEFAULT = AbstractDecoder::class . '::' . 'default';
 
     public static function getClassLikeNames(): array
     {
-        return [DecoderInterface::class];
+        return [AbstractDecoder::class];
     }
 
     public static function afterMethodCallAnalysis(AfterMethodCallAnalysisEvent $event): void
@@ -53,7 +54,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
             $code_location = new CodeLocation($event->getStatementsSource(), $method_call->name);
 
             $return_type = yield Psalm::getType($event, $method_call->var)
-                ->flatMap(fn($decoder_type) => self::simplifyToAtomic($decoder_type))
+                ->flatMap(fn($decoder_type) => Psalm::asSingleAtomicOf(Type\Atomic\TNamedObject::class, $decoder_type))
                 ->map(fn($decoder_atomic) => self::withBrand($source, $code_location, $decoder_atomic, $method_name))
                 ->map(fn($branded_decoder_atomic) => new Type\Union([$branded_decoder_atomic]));
 
@@ -62,23 +63,14 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
     }
 
     /**
-     * @return Option<Type\Atomic\TGenericObject>
-     */
-    private static function simplifyToAtomic(Type\Union $decoder_type): Option
-    {
-        return Psalm::asSingleAtomicOf(Type\Atomic\TGenericObject::class, $decoder_type)
-            ->filter(fn($atomic) => $atomic->value === DecoderInterface::class);
-    }
-
-    /**
      * @psalm-param DecoderMethodsAnalysis::METHOD_* $method_name
      */
     private static function withBrand(
         StatementsSource $source,
         CodeLocation $code_location,
-        Type\Atomic\TGenericObject $atomic,
+        Type\Atomic\TNamedObject $atomic,
         string $method_name,
-    ): Type\Atomic\TGenericObject
+    ): Type\Atomic\TNamedObject
     {
         $current_brands = map(asList($atomic->getIntersectionTypes() ?? []), fn(Type\Atomic $a) => $a->getId());
         $brand = self::METHODS_TO_BRANDS[$method_name];
@@ -99,19 +91,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
         $with_brand = clone $atomic;
         $with_brand->addIntersectionType($brand_type);
 
-        return self::possiblyUndefinedIfHasOptionalBrand($with_brand);
-    }
-
-    private static function possiblyUndefinedIfHasOptionalBrand(Type\Atomic\TGenericObject $atomic): Type\Atomic\TGenericObject
-    {
-        if (array_key_exists(OptionalBrand::class, $atomic->extra_types ?? [])) {
-            $cloned = clone $atomic;
-            $cloned->type_params[0]->possibly_undefined = true;
-
-            return $cloned;
-        }
-
-        return $atomic;
+        return $with_brand;
     }
 
     private static function hasBrandContradiction(string $brand, array $current_brands): bool

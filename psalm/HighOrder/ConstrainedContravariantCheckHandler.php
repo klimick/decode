@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\HighOrder;
 
 use Fp\Collections\NonEmptyArrayList;
+use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Internal\StringDecoder;
 use Klimick\PsalmDecode\Issue\HighOrder\IncompatibleConstraintIssue;
+use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
 use Klimick\PsalmTest\Integration\CallArg;
 use Klimick\PsalmTest\Integration\Psalm;
+use PhpParser\Node\Expr\MethodCall;
 use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Psalm\IssueBuffer;
 use Psalm\StatementsSource;
@@ -26,18 +30,20 @@ use Psalm\Type\Atomic\TLiteralClassString;
 use Psalm\Type\Atomic\TLiteralFloat;
 use Psalm\Type\Atomic\TLiteralInt;
 use Psalm\Type\Atomic\TLiteralString;
+use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Atomic\TNonEmptyArray;
 use Psalm\Type\Atomic\TNonEmptyList;
 use Psalm\Type\Atomic\TNonEmptyString;
 use Psalm\Type\Atomic\TString;
 use Psalm\Type\Union;
+use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
 final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProviderInterface
 {
     public static function getClassLikeNames(): array
     {
-        return [DecoderInterface::class];
+        return [AbstractDecoder::class];
     }
 
     public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Union
@@ -49,8 +55,9 @@ final class ConstrainedContravariantCheckHandler implements MethodReturnTypeProv
                 source: $event->getSource(),
                 constrained_call_args: yield Psalm::getNonEmptyCallArgs($event)
                     ->flatMap(fn($call_args) => self::mapCallArgs($call_args)),
-                decoder_type_param: yield Psalm::getTemplates($event)
-                    ->firstElement()
+                decoder_type_param: yield proveOf($event->getStmt(), MethodCall::class)
+                    ->flatMap(fn($method_call) => Psalm::getType($event, $method_call->var))
+                    ->flatMap(fn($atomic) => DecoderTypeParamExtractor::extract($atomic))
                     ->map(fn($type) => self::withoutUndefined($type)),
             );
         });

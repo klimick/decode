@@ -69,6 +69,10 @@ final class VisitSumType implements AfterClassLikeVisitInterface
                 with_return_type: self::matchReturnType($storage),
             );
 
+            $storage->template_types = [
+                'TFix' => [$storage->name => Type::getMixed()],
+            ];
+
             StorageManager::makeImmutable($storage);
         });
     }

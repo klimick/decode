@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test\Static;
 
+use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmTest\PsalmTest;
 use Klimick\PsalmTest\StaticTestCase;
@@ -43,7 +44,7 @@ final class HighOrderIssueTest extends PsalmTest
                 type: 'BrandAlreadyDefinedIssue',
                 message: 'Method #[decoder]::optional should not called multiple times.',
                 args: [
-                    'decoder' => DecoderInterface::class,
+                    'decoder' => AbstractDecoder::class,
                 ],
             );
 
@@ -55,7 +56,7 @@ final class HighOrderIssueTest extends PsalmTest
                 type: 'BrandAlreadyDefinedIssue',
                 message: 'Method #[decoder]::from should not called multiple times.',
                 args: [
-                    'decoder' => DecoderInterface::class,
+                    'decoder' => AbstractDecoder::class,
                 ],
             );
 

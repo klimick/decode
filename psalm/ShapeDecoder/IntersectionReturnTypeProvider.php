@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\PsalmDecode\Issue\Object\IntersectionCollisionIssue;
 use Klimick\PsalmTest\Integration\Psalm;
 use Psalm\Type;
@@ -47,7 +48,13 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
                 IssueBuffer::accepts($issue, $source->getSuppressedIssues());
             }
 
-            return DecoderType::createShape($properties);
+            return new Type\Union([
+                new Type\Atomic\TGenericObject(ShapeDecoder::class, [
+                    new Type\Union([
+                        DecoderType::createShape($properties)
+                    ]),
+                ]),
+            ]);
         });
 
         return $type->get();

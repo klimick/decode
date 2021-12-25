@@ -6,6 +6,7 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Decoder\Valid;
+use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
@@ -64,6 +65,10 @@ final class ArrListDecoder extends AbstractDecoder
             }
         }
 
+        /**
+         * @var Either<Invalid, Valid<list<A>>>
+         * @psalm-suppress UndefinedDocblockClass todo:(ArrDecoder TVal generic does not exist. WHAT???)
+         */
         return arr(int(), $this->decoder)
             ->decode($value, $context)
             ->flatMap(fn(Valid $valid) => self::isList($valid->value)

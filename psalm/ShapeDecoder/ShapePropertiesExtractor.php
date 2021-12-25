@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\ShapeDecoder;
 
+use Klimick\PsalmDecode\NamedArguments\ClassTypeUpcast;
 use Klimick\PsalmTest\Integration\Psalm;
 use Psalm\Type;
 use Fp\Functional\Option\Option;
@@ -19,8 +20,9 @@ final class ShapePropertiesExtractor
      */
     public static function fromDecoder(Type\Union $shape_decoder_type): Option
     {
-        return Psalm::asSingleAtomicOf(Type\Atomic\TGenericObject::class, $shape_decoder_type)
-            ->filter(fn($generic) => DecoderInterface::class === $generic->value)
+        return Psalm::asSingleAtomicOf(Type\Atomic\TNamedObject::class, $shape_decoder_type)
+            ->flatMap(fn($atomic) => ClassTypeUpcast::forAtomic($atomic, to: DecoderInterface::class))
+            ->filterOf(Type\Atomic\TGenericObject::class)
             ->flatMap(fn($generic) => first($generic->type_params))
             ->flatMap(fn($type_param) => self::fromDecoderTypeParam($type_param));
     }

@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\NamedArguments;
 
-use Klimick\PsalmDecode\Psalm;
+use Klimick\Decode\HighOrder\Brand\OptionalBrand;
+use Klimick\PsalmTest\Integration\Psalm;
 use PhpParser\Node;
 use Psalm\Type;
 use Psalm\NodeTypeProvider;
@@ -17,35 +18,53 @@ final class NamedArgumentsMapper
 {
     /**
      * @param list<Node\Arg> $call_args
-     * @return Option<Type\Union>
+     * @return Option<Type\Atomic\TArray|Type\Atomic\TKeyedArray>
      */
     public static function map(array $call_args, NodeTypeProvider $provider, bool $partial = false): Option
     {
-        return ArrayList::collect($call_args)
-            ->everyMap(fn($arg) => self::getPropertyInfo($arg, $provider, $partial))
-            ->flatMap(
-                fn($properties) => $properties
-                    ->toHashMap(fn($info) => [$info['property'], $info['type']])
-                    ->toAssocArray()
-            )
-            ->map(fn($properties) => DecoderType::createShape($properties));
+        return Option::do(function() use ($call_args, $provider, $partial) {
+            $properties = [];
+
+            foreach ($call_args as $offset => $arg) {
+                $info = yield self::getPropertyInfo($offset, $arg, $provider, $partial);
+                $properties[$info['property']] = $info['type'];
+            }
+
+            return DecoderType::createShape($properties);
+        });
+    }
+
+    private static function getArgId(int $arg_offset, Node\Arg $named_arg): string|int
+    {
+        return Option::fromNullable($named_arg->name)
+            ->flatMap(fn($id) => proveString($id->name))
+            ->getOrElse($arg_offset);
     }
 
     /**
-     * @return Option<array{property: string, type: Type\Union}>
+     * @return Option<array{property: int|string, type: Type\Union}>
      */
-    private static function getPropertyInfo(Node\Arg $named_arg, NodeTypeProvider $provider, bool $partial = false): Option
+    private static function getPropertyInfo(int $arg_offset, Node\Arg $arg, NodeTypeProvider $provider, bool $partial = false): Option
     {
-        return Option::do(function() use ($named_arg, $provider, $partial) {
-            $named_arg_type = yield Option::fromNullable($provider->getType($named_arg->value));
-            $arg_identifier = yield Option::fromNullable($named_arg->name);
+        return Option::do(function() use ($arg_offset, $arg, $provider, $partial) {
+            $arg_type = yield Option::fromNullable($provider->getType($arg->value));
 
             return [
-                'property' => yield proveString($arg_identifier->name),
-                'type' => yield DecoderTypeParamExtractor::extract($named_arg_type)
-                    ->map(fn($type) => $partial ? self::asPossiblyUndefined($type) : $type),
+                'property' => self::getArgId($arg_offset, $arg),
+                'type' => yield DecoderTypeParamExtractor::extract($arg_type)
+                    ->map(fn($type) => ($partial || self::isOptional($arg_type))
+                        ? self::asPossiblyUndefined($type)
+                        : $type),
             ];
         });
+    }
+
+    private static function isOptional(Type\Union $union): bool
+    {
+        return Psalm::asSingleAtomicOf(Type\Atomic\TNamedObject::class, $union)
+            ->map(fn($named_object) => $named_object->getIntersectionTypes() ?? [])
+            ->map(fn($intersections) => array_key_exists(OptionalBrand::class, $intersections))
+            ->getOrElse(false);
     }
 
     private static function asPossiblyUndefined(Type\Union $union): Type\Union

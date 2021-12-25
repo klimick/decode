@@ -8,6 +8,8 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\Decode\Decoder\Invalid;
+use Klimick\Decode\Decoder\Valid;
 use function Klimick\Decode\Decoder\arrList;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\valid;
@@ -41,6 +43,7 @@ final class NonEmptyArrListDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
+        /** @var Either<Invalid, Valid<non-empty-list<T>>> */
         return arrList($this->decoder)
             ->decode($value, $context)
             ->flatMap(fn($valid) => 0 !== count($valid->value)

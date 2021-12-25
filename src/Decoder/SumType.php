@@ -13,9 +13,10 @@ use ReflectionProperty;
 use RuntimeException;
 
 /**
+ * @extends Runtype<UnionDecoder<SumType&static>>
  * @psalm-immutable
  */
-abstract class SumType implements JsonSerializable
+abstract class SumType extends Runtype implements JsonSerializable
 {
     private string $caseId;
     private ProductType|SumType $instance;
@@ -43,9 +44,9 @@ abstract class SumType implements JsonSerializable
     }
 
     /**
-     * @psalm-return DecoderInterface<static> & UnionDecoder<static>
+     * @psalm-return UnionDecoder<static>
      */
-    final public static function type(): DecoderInterface
+    final public static function type(): UnionDecoder
     {
         $constructor = static function(array $properties): static {
             $classReflection = new ReflectionClass(static::class);

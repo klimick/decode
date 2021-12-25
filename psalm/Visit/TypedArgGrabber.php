@@ -7,6 +7,8 @@ namespace Klimick\PsalmDecode\Visit;
 use Fp\Collections\ArrayList;
 use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Unit;
+use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\PsalmDecode\NamedArguments\ClassTypeUpcast;
 use PhpParser\Node;
 use Fp\Functional\Option\Option;
 use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
@@ -88,7 +90,10 @@ final class TypedArgGrabber
                 ->map(fn($analyzer) => new StatementsAnalyzer(
                     source: $analyzer,
                     node_data: new NodeDataProvider(),
-                ));
+                ))
+                ->tap(function(StatementsAnalyzer $analyzer) {
+                    $analyzer->addSuppressedIssues(['InvalidArgument']);
+                });
         });
     }
 
@@ -163,20 +168,32 @@ final class TypedArgGrabber
     {
         $analyze_method_call = Option::do(function() use ($expr, $analyzer) {
             $method_call = yield proveOf($expr, Node\Expr\MethodCall::class);
-            $context = self::createContext($expr);
 
             if ($method_call->var instanceof Node\Expr\MethodCall || $method_call->var instanceof Node\Expr\FuncCall) {
-                self::analyzeDecoderTypes($method_call->var, $analyzer);
+                yield self::analyzeDecoderTypes($method_call->var, $analyzer);
             }
 
-            MethodCallAnalyzer::analyze($analyzer, $method_call, $context);
+            MethodCallAnalyzer::analyze(
+                statements_analyzer: $analyzer,
+                stmt: $method_call,
+                context: self::createContext($expr),
+                real_method_call: false,
+            );
         });
 
         $analyze_func_call = Option::do(function() use ($expr, $analyzer) {
             $func_call = yield proveOf($expr, Node\Expr\FuncCall::class);
-            $context = self::createContext($func_call);
 
-            FunctionCallAnalyzer::analyze($analyzer, $func_call, $context);
+            FunctionCallAnalyzer::analyze(
+                statements_analyzer: $analyzer,
+                stmt: $func_call,
+                context: self::createContext($func_call),
+            );
+
+            $upcasted = yield Option::fromNullable($analyzer->node_data->getType($func_call))
+                ->flatMap(fn($type) => ClassTypeUpcast::forUnion($type, DecoderInterface::class));
+
+            $analyzer->node_data->setType($func_call, $upcasted);
         });
 
         return $analyze_method_call->orElse(fn() => $analyze_func_call)->map(fn() => unit());

@@ -13,16 +13,16 @@ use ReflectionProperty;
 use RuntimeException;
 
 /**
+ * @extends Runtype<ObjectDecoder<ProductType&static>>
  * @psalm-immutable
  * @psalm-seal-properties
  */
-abstract class ProductType implements JsonSerializable
+abstract class ProductType extends Runtype implements JsonSerializable
 {
     private array $properties;
 
     final public function __construct(mixed ...$properties)
     {
-        /** @var ObjectDecoder<static> $decoder */
         $decoder = static::type();
 
         $propertiesWithKeys = static::completeKeys($properties, $decoder);
@@ -75,9 +75,9 @@ abstract class ProductType implements JsonSerializable
     }
 
     /**
-     * @psalm-return DecoderInterface<static> & ObjectDecoder<static>
+     * @psalm-return ObjectDecoder<static>
      */
-    public static function type(): DecoderInterface
+    public static function type(): ObjectDecoder
     {
         $shapeDecoder = static::definition();
 

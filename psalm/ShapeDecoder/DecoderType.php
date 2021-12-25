@@ -11,25 +11,17 @@ use Klimick\Decode\Decoder\DecoderInterface;
 final class DecoderType
 {
     /**
-     * @param array<string, Type\Union> $properties
+     * @param array<int|string, Type\Union> $properties
      */
-    public static function createShape(array $properties): Type\Union
+    public static function createShape(array $properties): Type\Atomic\TArray|Type\Atomic\TKeyedArray
     {
-        $properties_atomic = new Type\Union([
-            empty($properties)
-                ? new Type\Atomic\TArray([Type::getNever(), Type::getNever()])
-                : new Type\Atomic\TKeyedArray($properties)
-        ]);
+        if (empty($properties)) {
+            return new Type\Atomic\TArray([
+                Type::getNever(),
+                Type::getNever(),
+            ]);
+        }
 
-        return new Type\Union([
-            new Type\Atomic\TGenericObject(DecoderInterface::class, [$properties_atomic]),
-        ]);
-    }
-
-    public static function withTypeParameter(Type\Union $type_parameter): Type\Union
-    {
-        return new Type\Union([
-            new Type\Atomic\TGenericObject(DecoderInterface::class, [$type_parameter]),
-        ]);
+        return new Type\Atomic\TKeyedArray($properties);
     }
 }
