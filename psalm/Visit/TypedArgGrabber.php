@@ -91,7 +91,7 @@ final class TypedArgGrabber
                     node_data: new NodeDataProvider(),
                 ))
                 ->tap(function(StatementsAnalyzer $analyzer) {
-                    $analyzer->addSuppressedIssues(['InvalidArgument']);
+                    $analyzer->addSuppressedIssues(['all']);
                 });
         });
     }
