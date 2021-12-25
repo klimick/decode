@@ -12,7 +12,6 @@ use Klimick\PsalmDecode\NamedArguments\ClassTypeUpcast;
 use PhpParser\Node;
 use Fp\Functional\Option\Option;
 use Klimick\PsalmDecode\NamedArguments\DecoderTypeParamExtractor;
-use Klimick\PsalmDecode\Psalm;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use Psalm\Context;
@@ -154,8 +153,8 @@ final class TypedArgGrabber
             yield self::analyzeDecoderTypes($arg->value, $analyzer);
 
             return new TypedArg(
-                name: yield Psalm::getArgName($arg),
-                type: yield Psalm::getType($analyzer->getNodeTypeProvider(), $arg->value)
+                name: yield proveOf($arg->name, Node\Identifier::class)->map(fn($id) => $id->name),
+                type: yield Option::fromNullable($analyzer->node_data->getType($arg->value))
                     ->flatMap(fn($union) => DecoderTypeParamExtractor::extract($union)),
             );
         });
