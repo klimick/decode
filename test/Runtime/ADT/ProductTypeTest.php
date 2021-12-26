@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Runtime\ADT;
 
 use Klimick\Decode\Test\Static\Fixtures\Messenger\Owner\Bot;
-use OutOfRangeException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use function Klimick\Decode\Decoder\cast;
@@ -58,17 +57,6 @@ final class ProductTypeTest extends TestCase
         $serialized = json_encode($bot);
 
         self::assertEquals('{"token":"...","apiVersion":"v3"}', $serialized);
-    }
-
-    public function testUndefinedPropertyFetch(): void
-    {
-        $this->expectException(OutOfRangeException::class);
-        $this->expectExceptionMessage("Property 'nonexistent' is undefined. Check psalm issues.");
-
-        $bot = new Bot('token-val', apiVersion: 'v3');
-
-        /** @psalm-suppress UndefinedMagicPropertyFetch */
-        $_ = $bot->nonexistent;
     }
 
     public function testTypeError(): void

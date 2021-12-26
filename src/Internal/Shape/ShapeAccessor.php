@@ -13,43 +13,28 @@ use Klimick\Decode\Decoder\UndefinedError;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
-use function Klimick\Decode\Decoder\valid;
 
 /**
  * @psalm-immutable
- * @psalm-import-type ValidShapeProperties from ShapePropertySemigroup
  */
 final class ShapeAccessor
 {
     /**
-     * @return Either<Invalid, ValidShapeProperties>
+     * @return Either<Invalid, Valid>
      * @psalm-pure
      */
     public static function decodeProperty(
         Context $context,
         DecoderInterface $decoder,
-        string $key,
+        int|string $key,
         array $shape,
-        bool $partial = false,
     ): Either
     {
         return self::getConstant($decoder)
             ->orElse(fn() => self::getByAliasedKey($decoder, $shape))
             ->orElse(fn() => self::getByOriginalKey($decoder, $key, $shape))
-            ->map(fn($value) => [$key => $value])
-            ->orElse(fn() => self::asEmptyWhenOptional($decoder, $partial))
-            ->toRight(fn() => self::undefinedProperty($context, $decoder, $key))
+            ->toRight(fn() => self::undefined($context, $decoder, $key))
             ->flatMap(fn($value) => self::decode($decoder, $value, $key, $context));
-    }
-
-    /**
-     * @return Option<array>
-     */
-    private static function asEmptyWhenOptional(DecoderInterface $decoder, bool $partial): Option
-    {
-        return $partial || ($decoder instanceof HighOrderDecoder && $decoder->isOptional())
-            ? Option::some([])
-            : Option::none();
     }
 
     /**
@@ -84,7 +69,7 @@ final class ShapeAccessor
      * @return Option<mixed>
      * @psalm-pure
      */
-    private static function getByOriginalKey(DecoderInterface $decoder, string $key, array $shape): Option
+    private static function getByOriginalKey(DecoderInterface $decoder, int|string $key, array $shape): Option
     {
         return array_key_exists($key, $shape)
             ? Option::some($shape[$key])
@@ -128,28 +113,27 @@ final class ShapeAccessor
     /**
      * @psalm-pure
      */
-    private static function undefinedProperty(Context $context, DecoderInterface $decoder, string $property): Invalid
+    private static function undefined(Context $context, DecoderInterface $decoder, int|string $key): Invalid
     {
         return new Invalid([
             new UndefinedError($context(
                 name: $decoder->name(),
                 actual: null,
-                key: $property,
+                key: (string)$key,
             )),
         ]);
     }
 
     /**
-     * @return Either<Invalid, ValidShapeProperties>
+     * @return Either<Invalid, Valid>
      * @psalm-pure
      */
-    private static function decode(DecoderInterface $decoder, array $value, string $key, Context $context): Either
+    private static function decode(DecoderInterface $decoder, mixed $value, int|string $key, Context $context): Either
     {
-        if (empty($value)) {
-            return valid([]);
-        }
-
-        return $decoder->decode($value[$key], $context($decoder->name(), $value[$key], $key))
-            ->map(fn(Valid $valid) => new Valid([$key => $valid->value]));
+        return $decoder->decode($value, $context(
+            name: $decoder->name(),
+            actual: $value,
+            key: (string)$key,
+        ));
     }
 }

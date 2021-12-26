@@ -15,4 +15,9 @@ final class Invalid
     public function __construct(
         public array $errors,
     ) { }
+
+    public function isUndefined(): bool
+    {
+        return 1 === count($this->errors) && $this->errors[0] instanceof UndefinedError;
+    }
 }

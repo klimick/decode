@@ -46,7 +46,7 @@ final class ShapeAccessorTest extends TestCase
         $decoder = mixed();
         $field = 'any_field_name';
 
-        $valid = fn(array $val): Either => Either::right(new Valid($val));
+        $valid = fn(mixed $val): Either => Either::right(new Valid($val));
 
         $undefinedProperty = Either::left(
             new Invalid([
@@ -71,7 +71,7 @@ final class ShapeAccessorTest extends TestCase
             'decoder' => $decoder,
             'field' => $field,
             'shape' => [$field => 'val'],
-            'expected' => $valid([$field => 'val']),
+            'expected' => $valid('val'),
         ];
 
         yield 'aliased field does not exist' => [
@@ -85,35 +85,28 @@ final class ShapeAccessorTest extends TestCase
             'decoder' => $decoder->from('$.some_field.path'),
             'field' => $field,
             'shape' => ['some_field' => ['path' => 'val']],
-            'expected' => $valid([$field => 'val']),
+            'expected' => $valid('val'),
         ];
 
         yield 'from self' => [
             'decoder' => $decoder->from('$'),
             'field' => $field,
             'shape' => ['val1' => 10, 'val2' => 20],
-            'expected' => $valid([$field => ['val1' => 10, 'val2' => 20]]),
+            'expected' => $valid(['val1' => 10, 'val2' => 20]),
         ];
 
         yield 'with default' => [
             'decoder' => $decoder->default(10),
             'field' => $field,
             'shape' => [],
-            'expected' => $valid([$field => 10]),
-        ];
-
-        yield 'optional field' => [
-            'decoder' => $decoder->optional(),
-            'field' => $field,
-            'shape' => [],
-            'expected' => $valid([]),
+            'expected' => $valid(10),
         ];
 
         yield 'constant field' => [
             'decoder' => constant(10),
             'field' => $field,
             'shape' => [],
-            'expected' => $valid([$field => 10]),
+            'expected' => $valid(10),
         ];
     }
 }

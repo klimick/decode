@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\Shape;
 
 use Fp\Functional\Either\Either;
-use Fp\Functional\Semigroup\Semigroup;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\DecodeSemigroup;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
 use function Fp\Collection\every;
+use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\valid;
 use function Klimick\Decode\Decoder\invalid;
 
@@ -21,9 +20,6 @@ use function Klimick\Decode\Decoder\invalid;
  * @template-covariant TShape of array
  * @extends AbstractDecoder<TShape>
  * @psalm-immutable
- *
- * @psalm-import-type ValidShapeProperties from ShapePropertySemigroup
- * @psalm-type ErrorsOrValidShape = Either<Invalid, ValidShapeProperties>
  */
 final class ShapeDecoder extends AbstractDecoder
 {
@@ -66,26 +62,23 @@ final class ShapeDecoder extends AbstractDecoder
             return invalid($context);
         }
 
-        $decodedShape = valid([]);
-        $S = self::shapeSemigroup();
+        $decoded = [];
+        $errors = [];
 
         foreach ($this->decoders as $key => $decoder) {
-            $decodedKV = ShapeAccessor::decodeProperty($context, $decoder, $key, $value, $this->partial);
-            $decodedShape = $S->combine($decodedShape, $decodedKV);
+            $decodedKV = ShapeAccessor::decodeProperty($context, $decoder, $key, $value)->get();
+
+            if ($decodedKV instanceof Valid) {
+                /** @psalm-suppress MixedAssignment */
+                $decoded[$key] = $decodedKV->value;
+            } elseif ($decodedKV->isUndefined() && $decoder instanceof HighOrderDecoder && $decoder->isOptional()) {
+                continue;
+            } else {
+                $errors = [...$errors, ...$decodedKV->errors];
+            }
         }
 
         /** @var Either<Invalid, Valid<TShape>> */
-        return $decodedShape;
-    }
-
-    /**
-     * @return Semigroup<Either<Invalid, ValidShapeProperties>>
-     * @psalm-pure
-     */
-    public static function shapeSemigroup(): Semigroup
-    {
-        return new DecodeSemigroup(
-            new ShapePropertySemigroup(),
-        );
+        return !empty($errors) ? invalids($errors) : valid($decoded);
     }
 }
