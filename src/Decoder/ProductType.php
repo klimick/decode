@@ -7,7 +7,6 @@ namespace Klimick\Decode\Decoder;
 use JsonSerializable;
 use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use OutOfRangeException;
 use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
@@ -62,11 +61,7 @@ abstract class ProductType extends Runtype implements JsonSerializable
 
     public function __get(string $name)
     {
-        if (!array_key_exists($name, $this->properties)) {
-            throw new OutOfRangeException("Property '{$name}' is undefined. Check psalm issues.");
-        }
-
-        return $this->properties[$name];
+        return $this->properties[$name] ?? null;
     }
 
     public function jsonSerialize(): array

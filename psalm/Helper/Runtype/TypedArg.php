@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Helper;
+namespace Klimick\PsalmDecode\Helper\Runtype;
 
 use Psalm\Storage\FunctionLikeParameter;
 use Psalm\Type\Union;

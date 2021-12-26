@@ -6,9 +6,9 @@ namespace Klimick\PsalmDecode\Hook\AfterClassLikeVisit;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\ProductType;
-use Klimick\PsalmDecode\Helper\StorageManager;
-use Klimick\PsalmDecode\Helper\TypedArg;
-use Klimick\PsalmDecode\Helper\TypedArgGrabber;
+use Klimick\PsalmDecode\Helper\Runtype\StorageManager;
+use Klimick\PsalmDecode\Helper\Runtype\TypedArg;
+use Klimick\PsalmDecode\Helper\Runtype\TypedArgGrabber;
 use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
 use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use Psalm\Storage\ClassLikeStorage;
@@ -19,8 +19,8 @@ final class ProductTypeAfterClassLikeVisit implements AfterClassLikeVisitInterfa
     {
         Option::do(function() use ($event) {
             $typed_args = yield TypedArgGrabber::grab(
-                fromEvent: $event,
-                forSubClassOf: ProductType::class,
+                event: $event,
+                parent_class: ProductType::class,
                 forMetaFunction: 'Klimick\Decode\Decoder\shape',
             );
 

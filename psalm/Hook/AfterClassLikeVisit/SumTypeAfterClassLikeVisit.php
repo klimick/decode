@@ -6,9 +6,9 @@ namespace Klimick\PsalmDecode\Hook\AfterClassLikeVisit;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\SumType;
-use Klimick\PsalmDecode\Helper\StorageManager;
-use Klimick\PsalmDecode\Helper\TypedArg;
-use Klimick\PsalmDecode\Helper\TypedArgGrabber;
+use Klimick\PsalmDecode\Helper\Runtype\StorageManager;
+use Klimick\PsalmDecode\Helper\Runtype\TypedArg;
+use Klimick\PsalmDecode\Helper\Runtype\TypedArgGrabber;
 use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
 use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use Psalm\Storage\ClassLikeStorage;
@@ -37,8 +37,8 @@ final class SumTypeAfterClassLikeVisit implements AfterClassLikeVisitInterface
     {
         Option::do(function() use ($event) {
             $typed_args = yield TypedArgGrabber::grab(
-                fromEvent: $event,
-                forSubClassOf: SumType::class,
+                event: $event,
+                parent_class: SumType::class,
                 forMetaFunction: 'Klimick\Decode\Decoder\cases',
             );
 
