@@ -71,7 +71,7 @@ final class ArrDecoder extends AbstractDecoder
                 ->get();
 
             $decodedV = $this->valDecoder
-                ->decode($v, $context($this->valDecoder->name(), $k, (string) $k))
+                ->decode($v, $context($this->valDecoder->name(), $v, (string) $k))
                 ->get();
 
             if ($decodedV instanceof Invalid) {
