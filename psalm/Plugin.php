@@ -16,18 +16,20 @@ use Klimick\PsalmDecode\Hook\AfterClassLikeVisit\SumTypeAfterClassLikeVisit;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\TaggedUnionDecoderFactoryReturnTypeProvider;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
+use RuntimeException;
 use SimpleXMLElement;
 
 final class Plugin implements PluginEntryPointInterface
 {
     public function __invoke(RegistrationInterface $registration, ?SimpleXMLElement $config = null): void
     {
-        $register =
-            /** @param class-string $hook */
-            function(string $hook) use ($registration): void {
-                class_exists($hook);
-                $registration->registerHooksFromClass($hook);
-            };
+        $register = function(string $hook) use ($registration): void {
+            if (!class_exists($hook)) {
+                throw new RuntimeException('Something went wrong');
+            }
+
+            $registration->registerHooksFromClass($hook);
+        };
 
         $register(ObjectDecoderFactoryReturnTypeProvider::class);
 
