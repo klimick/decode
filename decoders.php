@@ -17,6 +17,7 @@ use Klimick\Decode\Internal\DatetimeDecoder;
 use Klimick\Decode\Internal\FloatDecoder;
 use Klimick\Decode\Internal\FromJsonDecoder;
 use Klimick\Decode\Internal\IntDecoder;
+use Klimick\Decode\Internal\IntersectionDecoder;
 use Klimick\Decode\Internal\LiteralDecoder;
 use Klimick\Decode\Internal\MixedDecoder;
 use Klimick\Decode\Internal\NonEmptyArrDecoder;
@@ -392,16 +393,17 @@ function union(DecoderInterface $first, DecoderInterface $second, DecoderInterfa
 }
 
 /**
+ * @template T of array
  * @psalm-pure
  * @no-named-arguments
+ *
+ * @param DecoderInterface<T> $first
+ * @param DecoderInterface<T> $second
+ * @param DecoderInterface<T> ...$rest
  */
-function intersection(ShapeDecoder $first, ShapeDecoder $second, ShapeDecoder ...$rest): ShapeDecoder
+function intersection(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): DecoderInterface
 {
-    $decoders = array_merge(
-        ...array_map(fn($decoder) => $decoder->decoders, [$first, $second, ...$rest])
-    );
-
-    return new ShapeDecoder($decoders);
+    return new IntersectionDecoder([$first, $second, ...$rest]);
 }
 
 /**
