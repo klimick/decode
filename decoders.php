@@ -406,6 +406,15 @@ function union(DecoderInterface $first, DecoderInterface $second, DecoderInterfa
 }
 
 /**
+ * @param non-empty-string $with
+ * @psalm-pure
+ */
+function tagged(string $with): TaggedUnionDecoderFactory
+{
+    return new TaggedUnionDecoderFactory($with);
+}
+
+/**
  * @template T of array
  *
  * @param DecoderInterface<T> $first

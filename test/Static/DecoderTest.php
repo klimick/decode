@@ -24,10 +24,33 @@ use function Klimick\Decode\Decoder\partialObject;
 use function Klimick\Decode\Decoder\rec;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
+use function Klimick\Decode\Decoder\tagged;
 use function Klimick\Decode\Decoder\tuple;
 
 final class DecoderTest extends PsalmTest
 {
+    public function testTaggedUnion(): void
+    {
+        StaticTestCase::describe('All args must be named')
+            ->haveCode(fn() => tagged(with: 'type')(
+                shape(foo: string(), bar: int()),
+                type2: shape(id: int(), num: int()),
+            ))
+            ->seePsalmIssue(
+                type: 'NotNamedArgForTaggedUnionIssue',
+                message: 'All args for tagged union must be named',
+            );
+
+        StaticTestCase::describe('At leas two decoders')
+            ->haveCode(fn() => tagged(with: 'type')(
+                type1: shape(foo: string(), bar: int()),
+            ))
+            ->seePsalmIssue(
+                type: 'TooFewArgsForTaggedUnionIssue',
+                message: 'Too few args passed for tagged',
+            );
+    }
+
     /**
      * @psalm-suppress UnusedVariable
      *     todo: $self = &$decoder; - false positive

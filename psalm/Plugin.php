@@ -13,6 +13,7 @@ use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\AfterClassLikeVisit\ProductTypeAfterClassLikeVisit;
 use Klimick\PsalmDecode\Hook\AfterClassLikeVisit\SumTypeAfterClassLikeVisit;
+use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\TaggedUnionDecoderFactoryReturnTypeProvider;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
 use SimpleXMLElement;
@@ -33,6 +34,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(ShapeReturnTypeProvider::class);
         $register(IntersectionReturnTypeProvider::class);
         $register(TupleReturnTypeProvider::class);
+        $register(TaggedUnionDecoderFactoryReturnTypeProvider::class);
 
         $register(DecoderMethodsAnalysis::class);
         $register(ConstrainedMethodReturnTypeProvider::class);
