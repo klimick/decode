@@ -11,7 +11,6 @@ use function Klimick\Decode\Constraint\maxLength;
 use function Klimick\Decode\Constraint\minLength;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
-use function Klimick\Decode\Decoder\sumType;
 
 final class Telegram extends ProductType
 {
@@ -24,7 +23,7 @@ final class Telegram extends ProductType
                     minLength(is: 2),
                     maxLength(is: 10),
                 ),
-            owner: sumType(Owner::class),
+            owner: Owner::type(),
         );
     }
 }

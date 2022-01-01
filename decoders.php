@@ -36,9 +36,6 @@ use Klimick\Decode\Internal\UnionDecoder;
 use Klimick\Decode\Report\DefaultReporter;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
-use Klimick\Decode\Decoder\SumType;
-use Klimick\Decode\Decoder\ProductType;
-use Klimick\Decode\Decoder\Runtype;
 
 /**
  * @template T
@@ -432,30 +429,4 @@ function cases(DecoderInterface ...$cases): SumCases
      * @var non-empty-array<non-empty-string, ObjectDecoder<ProductType> | UnionDecoder<SumType>> $cases
      */
     return new SumCases($cases);
-}
-
-/**
- * @template T of SumType
- *
- * @param class-string<T> $class
- * @return UnionDecoder<T>
- */
-function sumType(string $class): UnionDecoder
-{
-    return $class::type();
-}
-
-/**
- * @template T of Runtype
- *
- * @param class-string<T> $class
- * @return ObjectDecoder<T>|UnionDecoder<T>
- *
- * @todo: fix signature
- * @psalm-suppress InvalidReturnStatement, InvalidReturnType
- */
-function productType(string $class): ObjectDecoder|UnionDecoder
-{
-    /** @var class-string<ProductType> | class-string<SumType> $class */
-    return $class::type();
 }
