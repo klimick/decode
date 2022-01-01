@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\HighOrder\Brand\FromBrand;
 use Klimick\Decode\HighOrder\Brand\DefaultBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
@@ -32,13 +32,13 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
         self::METHOD_DEFAULT => DefaultBrand::class,
     ];
 
-    private const METHOD_OPTIONAL = AbstractDecoder::class . '::' . 'optional';
-    private const METHOD_FROM = AbstractDecoder::class . '::' . 'from';
-    private const METHOD_DEFAULT = AbstractDecoder::class . '::' . 'default';
+    private const METHOD_OPTIONAL = DecoderInterface::class . '::' . 'optional';
+    private const METHOD_FROM = DecoderInterface::class . '::' . 'from';
+    private const METHOD_DEFAULT = DecoderInterface::class . '::' . 'default';
 
     public static function getClassLikeNames(): array
     {
-        return [AbstractDecoder::class];
+        return [DecoderInterface::class];
     }
 
     public static function afterMethodCallAnalysis(AfterMethodCallAnalysisEvent $event): void

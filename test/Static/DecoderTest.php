@@ -7,42 +7,24 @@ namespace Klimick\Decode\Test\Static;
 use DateTimeImmutable;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\ObjectDecoder;
-use Klimick\Decode\Internal\RecursionDecoder;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use Klimick\Decode\Internal\TupleDecoder;
-use Klimick\Decode\Internal\UnionDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Department;
 use Klimick\Decode\Test\Static\Fixtures\PartialPerson;
 use Klimick\Decode\Test\Static\Fixtures\Person;
 use Klimick\PsalmTest\PsalmTest;
 use Klimick\PsalmTest\StaticTestCase;
 use Klimick\PsalmTest\StaticType\StaticTypes as t;
-use function Klimick\Decode\Decoder\arr;
-use function Klimick\Decode\Decoder\arrKey;
 use function Klimick\Decode\Decoder\arrList;
 use function Klimick\Decode\Decoder\bool;
 use function Klimick\Decode\Decoder\datetime;
-use function Klimick\Decode\Decoder\constant;
-use function Klimick\Decode\Decoder\float;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\intersection;
-use function Klimick\Decode\Decoder\literal;
-use function Klimick\Decode\Decoder\mixed;
-use function Klimick\Decode\Decoder\nonEmptyArr;
-use function Klimick\Decode\Decoder\nonEmptyArrList;
-use function Klimick\Decode\Decoder\nonEmptyString;
-use function Klimick\Decode\Decoder\null;
-use function Klimick\Decode\Decoder\numeric;
-use function Klimick\Decode\Decoder\numericString;
 use function Klimick\Decode\Decoder\object;
 use function Klimick\Decode\Decoder\partialObject;
-use function Klimick\Decode\Decoder\positiveInt;
 use function Klimick\Decode\Decoder\rec;
-use function Klimick\Decode\Decoder\scalar;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Decoder\tuple;
-use function Klimick\Decode\Decoder\union;
 
 final class DecoderTest extends PsalmTest
 {
@@ -65,7 +47,7 @@ final class DecoderTest extends PsalmTest
         StaticTestCase::describe('Recursive decoder')
             ->haveCode(fn() => $decoder)
             ->seeReturnType(t::generic(
-                ofType: RecursionDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::object(Department::class),
                 ],
@@ -173,7 +155,7 @@ final class DecoderTest extends PsalmTest
                 bool()->optional()
             ))
             ->seeReturnType(t::generic(
-                ofType: TupleDecoder::class,
+                ofType: DecoderInterface::class,
                 withParams: [
                     t::shape([
                         t::string(),

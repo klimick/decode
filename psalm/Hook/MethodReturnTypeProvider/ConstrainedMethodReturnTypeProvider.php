@@ -7,7 +7,7 @@ namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
 use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmDecode\Helper\DecoderTypeParamExtractor;
 use Klimick\PsalmDecode\Issue\HighOrder\IncompatibleConstraintIssue;
 use Klimick\PsalmTest\Integration\CallArg;
@@ -40,7 +40,7 @@ final class ConstrainedMethodReturnTypeProvider implements MethodReturnTypeProvi
 {
     public static function getClassLikeNames(): array
     {
-        return [AbstractDecoder::class];
+        return [DecoderInterface::class];
     }
 
     public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Union

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\AbstractDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmDecode\Issue\HighOrder\InvalidPropertyAliasIssue;
 use Klimick\PsalmTest\Integration\Psalm;
 use PhpParser\Node\Arg;
@@ -24,7 +24,7 @@ final class FromArgumentAnalysis implements AfterMethodCallAnalysisInterface
     public static function afterMethodCallAnalysis(AfterMethodCallAnalysisEvent $event): void
     {
         Option::do(function() use ($event) {
-            $method_call = yield proveTrue(AbstractDecoder::class . '::' . 'from' === $event->getAppearingMethodId())
+            $method_call = yield proveTrue(DecoderInterface::class . '::' . 'from' === $event->getAppearingMethodId())
                 ->flatMap(fn() => proveOf($event->getExpr(), MethodCall::class));
 
             $is_valid_literal = firstOf($method_call->args, Arg::class)
