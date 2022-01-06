@@ -24,7 +24,7 @@ final class RecursionDecoder extends AbstractDecoder
     private ?DecoderInterface $cache = null;
 
     /**
-     * @param Closure(): DecoderInterface<T> $type
+     * @psalm-param pure-Closure(): DecoderInterface<T> $type
      */
     public function __construct(private Closure $type) {}
 

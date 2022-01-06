@@ -67,7 +67,6 @@ final class ArrListDecoder extends AbstractDecoder
 
         /**
          * @var Either<Invalid, Valid<list<A>>>
-         * @psalm-suppress UndefinedDocblockClass todo:(ArrDecoder TVal generic does not exist. WHAT???)
          */
         return arr(int(), $this->decoder)
             ->decode($value, $context)

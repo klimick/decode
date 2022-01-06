@@ -40,6 +40,7 @@ abstract class SumType extends Runtype implements JsonSerializable
 
     final public function match(callable ...$matchers): mixed
     {
+        /** @psalm-suppress ImpureFunctionCall */
         return ($matchers[$this->caseId])($this->instance);
     }
 

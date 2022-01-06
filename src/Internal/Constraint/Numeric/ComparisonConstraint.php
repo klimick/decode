@@ -59,7 +59,7 @@ final class ComparisonConstraint implements ConstraintInterface
      * @psalm-pure
      *
      * @psalm-param ComparisonConstraint::OP_* $type
-     * @return Closure(numeric, numeric): bool
+     * @psalm-return pure-Closure(numeric, numeric): bool
      */
     private static function getOp(string $type): Closure
     {
