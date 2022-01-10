@@ -126,7 +126,7 @@ final class DecoderGenerator
 
             return $decoderName === 'non-empty-list'
                 ? [d\nonEmptyArrList($listItemD), Gen::nonEmptyArrList($listItemG)]
-                : [d\arrList($listItemD), Gen::arrList($listItemG)];
+                : [d\listOf($listItemD), Gen::arrList($listItemG)];
         }
 
         if ('array' === $decoderName || 'non-empty-array' === $decoderName) {

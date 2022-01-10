@@ -25,7 +25,7 @@ use Klimick\Decode\Decoder as t;
 $libraryDefinition = t\shape(
     id: t\int(),
     name: t\string(),
-    meta: t\arrList(t\string()),
+    meta: t\listOf(t\string()),
 );
 
 // Untrusted data
@@ -619,7 +619,7 @@ final class Library extends ProductType
         return shape(
             id: t\int(),
             name: t\string(),
-            meta: t\arrList(t\string()),
+            meta: t\listOf(t\string()),
         );
     }
 }

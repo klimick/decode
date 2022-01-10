@@ -272,7 +272,7 @@ function literal(mixed $head, mixed ...$tail): DecoderInterface
  * @return DecoderInterface<list<T>>
  * @psalm-pure
  */
-function arrList(DecoderInterface $decoder): DecoderInterface
+function listOf(DecoderInterface $decoder): DecoderInterface
 {
     return new ArrListDecoder($decoder);
 }

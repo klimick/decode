@@ -14,7 +14,7 @@ use Klimick\Decode\Test\Static\Fixtures\Person;
 use Klimick\PsalmTest\PsalmTest;
 use Klimick\PsalmTest\StaticTestCase;
 use Klimick\PsalmTest\StaticType\StaticTypes as t;
-use function Klimick\Decode\Decoder\arrList;
+use function Klimick\Decode\Decoder\listOf;
 use function Klimick\Decode\Decoder\bool;
 use function Klimick\Decode\Decoder\datetime;
 use function Klimick\Decode\Decoder\int;
@@ -63,7 +63,7 @@ final class DecoderTest extends PsalmTest
 
             return object(Department::class)(
                 name: string(),
-                subDepartments: arrList($self),
+                subDepartments: listOf($self),
             );
         });
 

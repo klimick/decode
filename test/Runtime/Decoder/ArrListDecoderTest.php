@@ -9,7 +9,7 @@ use Klimick\Decode\Test\Helper\DecoderGenerator;
 use Klimick\Decode\Test\Helper\Gen;
 use Klimick\Decode\Test\Helper\Predicate;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\Decoder\arrList;
+use function Klimick\Decode\Decoder\listOf;
 use function Klimick\Decode\Decoder\mixed;
 use function Klimick\Decode\Test\Helper\forAll;
 
@@ -27,7 +27,7 @@ final class ArrListDecoderTest extends TestCase
         forAll($listGen)
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(arrList($listItemDecoder))
+                Check::thatValidFor(listOf($listItemDecoder))
             );
     }
 
@@ -36,7 +36,7 @@ final class ArrListDecoderTest extends TestCase
         forAll(Gen::mixed())
             ->when(fn(mixed $v) => !Predicate::isList($v))
             ->then(
-                Check::thatInvalidFor(arrList(mixed()))
+                Check::thatInvalidFor(listOf(mixed()))
             );
     }
 }
