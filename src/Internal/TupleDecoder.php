@@ -14,7 +14,7 @@ use function Fp\Collection\map;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\mixed;
-use function Klimick\Decode\Decoder\nonEmptyArrList;
+use function Klimick\Decode\Decoder\nonEmptyListOf;
 use function Klimick\Decode\Decoder\valid;
 
 /**
@@ -46,7 +46,7 @@ final class TupleDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
-        return nonEmptyArrList(mixed())
+        return nonEmptyListOf(mixed())
             ->decode($value, $context)
             ->map(fn($valid) => $valid->value)
             ->flatMap(function($tuple) use ($context) {

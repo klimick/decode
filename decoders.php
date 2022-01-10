@@ -284,7 +284,7 @@ function listOf(DecoderInterface $decoder): DecoderInterface
  * @return DecoderInterface<non-empty-list<T>>
  * @psalm-pure
  */
-function nonEmptyArrList(DecoderInterface $decoder): DecoderInterface
+function nonEmptyListOf(DecoderInterface $decoder): DecoderInterface
 {
     return new NonEmptyArrListDecoder($decoder);
 }

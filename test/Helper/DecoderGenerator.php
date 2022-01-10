@@ -125,7 +125,7 @@ final class DecoderGenerator
             [$listItemD, $listItemG] = self::generate($level + 1);
 
             return $decoderName === 'non-empty-list'
-                ? [d\nonEmptyArrList($listItemD), Gen::nonEmptyArrList($listItemG)]
+                ? [d\nonEmptyListOf($listItemD), Gen::nonEmptyArrList($listItemG)]
                 : [d\listOf($listItemD), Gen::arrList($listItemG)];
         }
 

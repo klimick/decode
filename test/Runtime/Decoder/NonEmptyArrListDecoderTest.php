@@ -10,7 +10,7 @@ use Klimick\Decode\Test\Helper\Gen;
 use Klimick\Decode\Test\Helper\Predicate;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Decoder\mixed;
-use function Klimick\Decode\Decoder\nonEmptyArrList;
+use function Klimick\Decode\Decoder\nonEmptyListOf;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class NonEmptyArrListDecoderTest extends TestCase
@@ -22,7 +22,7 @@ final class NonEmptyArrListDecoderTest extends TestCase
         forAll(Gen::nonEmptyArrList($itemGen))
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(nonEmptyArrList($itemDecoder))
+                Check::thatValidFor(nonEmptyListOf($itemDecoder))
             );
     }
 
@@ -32,7 +32,7 @@ final class NonEmptyArrListDecoderTest extends TestCase
             ->withMaxSize(50)
             ->when(fn(mixed $v) => !Predicate::isNonEmptyList($v))
             ->then(
-                Check::thatInvalidFor(nonEmptyArrList(mixed()))
+                Check::thatInvalidFor(nonEmptyListOf(mixed()))
             );
     }
 }
