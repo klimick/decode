@@ -17,6 +17,7 @@ use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\DatetimeDecoder;
 use Klimick\Decode\Internal\FloatDecoder;
 use Klimick\Decode\Internal\FromJsonDecoder;
+use Klimick\Decode\Internal\InstanceofDecoder;
 use Klimick\Decode\Internal\IntDecoder;
 use Klimick\Decode\Internal\IntersectionDecoder;
 use Klimick\Decode\Internal\LiteralDecoder;
@@ -369,6 +370,18 @@ function object(string $objectClass): ObjectDecoderFactory
 /**
  * @template T
  *
+ * @param class-string<T> $of
+ * @return DecoderInterface<T>
+ * @psalm-pure
+ */
+function instance(string $of): DecoderInterface
+{
+    return new InstanceofDecoder($of);
+}
+
+/**
+ * @template T
+ *
  * @param class-string<T> $objectClass
  * @return ObjectDecoderFactory<T, true>
  * @psalm-pure
@@ -381,7 +394,7 @@ function partialObject(string $objectClass): ObjectDecoderFactory
 /**
  * @template T of object
  *
- * @param callable(): DecoderInterface<T> $type
+ * @psalm-param pure-callable(): DecoderInterface<T> $type
  * @return DecoderInterface<T>
  * @psalm-pure
  */
