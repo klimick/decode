@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Decoder\arrKey;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\mixed;
-use function Klimick\Decode\Decoder\nonEmptyArr;
+use function Klimick\Decode\Decoder\nonEmptyArrayOf;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Test\Helper\forAll;
 
@@ -30,7 +30,7 @@ final class NonEmptyArrDecoderTest extends TestCase
         forAll($arrGen)
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(nonEmptyArr(int(), $arrItemDecoder))
+                Check::thatValidFor(nonEmptyArrayOf(int(), $arrItemDecoder))
             );
     }
 
@@ -41,7 +41,7 @@ final class NonEmptyArrDecoderTest extends TestCase
         forAll(Gen::nonEmptyArr(Gen::arrKey('string'), $arrItemGen))
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(nonEmptyArr(string(), $arrItemDecoder))
+                Check::thatValidFor(nonEmptyArrayOf(string(), $arrItemDecoder))
             );
     }
 
@@ -50,7 +50,7 @@ final class NonEmptyArrDecoderTest extends TestCase
         forAll(Gen::mixed())
             ->when(fn(mixed $v) => !Predicate::isNonEmptyArray($v))
             ->then(
-                Check::thatInvalidFor(nonEmptyArr(arrKey(), mixed()))
+                Check::thatInvalidFor(nonEmptyArrayOf(arrKey(), mixed()))
             );
     }
 }

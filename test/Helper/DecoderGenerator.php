@@ -146,7 +146,7 @@ final class DecoderGenerator
             [$arrayItemD, $arrayItemG] = self::generate($level + 1);
 
             return 'non-empty-array' === $decoderName
-                ? [d\nonEmptyArr($arrayKeyD, $arrayItemD), Gen::nonEmptyArr($arrayKeyG, $arrayItemG)]
+                ? [d\nonEmptyArrayOf($arrayKeyD, $arrayItemD), Gen::nonEmptyArr($arrayKeyG, $arrayItemG)]
                 : [d\arrayOf($arrayKeyD, $arrayItemD), Gen::arr($arrayKeyG, $arrayItemG)];
         }
 
