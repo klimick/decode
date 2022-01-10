@@ -10,7 +10,7 @@ use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
-use function Klimick\Decode\Decoder\arr;
+use function Klimick\Decode\Decoder\arrayOf;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\valid;
@@ -34,7 +34,7 @@ final class ArrListDecoder extends AbstractDecoder
 
     public function is(mixed $value): bool
     {
-        if (!arr(int(), $this->decoder)->is($value)) {
+        if (!arrayOf(int(), $this->decoder)->is($value)) {
             return false;
         }
 
@@ -68,7 +68,7 @@ final class ArrListDecoder extends AbstractDecoder
         /**
          * @var Either<Invalid, Valid<list<A>>>
          */
-        return arr(int(), $this->decoder)
+        return arrayOf(int(), $this->decoder)
             ->decode($value, $context)
             ->flatMap(fn(Valid $valid) => self::isList($valid->value)
                 ? valid($valid->value)

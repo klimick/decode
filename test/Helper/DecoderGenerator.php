@@ -147,7 +147,7 @@ final class DecoderGenerator
 
             return 'non-empty-array' === $decoderName
                 ? [d\nonEmptyArr($arrayKeyD, $arrayItemD), Gen::nonEmptyArr($arrayKeyG, $arrayItemG)]
-                : [d\arr($arrayKeyD, $arrayItemD), Gen::arr($arrayKeyG, $arrayItemG)];
+                : [d\arrayOf($arrayKeyD, $arrayItemD), Gen::arr($arrayKeyG, $arrayItemG)];
         }
 
         if ('tuple' === $decoderName) {

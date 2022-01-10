@@ -8,7 +8,7 @@ use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\DecoderGenerator;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\Decoder\arr;
+use function Klimick\Decode\Decoder\arrayOf;
 use function Klimick\Decode\Decoder\arrKey;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\mixed;
@@ -31,7 +31,7 @@ final class ArrDecoderTest extends TestCase
         forAll($arrGen)
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(arr(int(), $arrItemDecoder))
+                Check::thatValidFor(arrayOf(int(), $arrItemDecoder))
             );
     }
 
@@ -47,7 +47,7 @@ final class ArrDecoderTest extends TestCase
         forAll($arrGen)
             ->withMaxSize(50)
             ->then(
-                Check::thatValidFor(arr(string(), $arrItemDecoder))
+                Check::thatValidFor(arrayOf(string(), $arrItemDecoder))
             );
     }
 
@@ -56,7 +56,7 @@ final class ArrDecoderTest extends TestCase
         forAll(Gen::mixed())
             ->when(fn(mixed $v) => !is_array($v))
             ->then(
-                Check::thatInvalidFor(arr(arrKey(), mixed()))
+                Check::thatInvalidFor(arrayOf(arrKey(), mixed()))
             );
     }
 
@@ -67,7 +67,7 @@ final class ArrDecoderTest extends TestCase
         forAll(Gen::nonEmptyArr(Gen::arrKey('string'), $arrItemGen))
             ->withMaxSize(50)
             ->then(
-                Check::thatInvalidFor(arr(int(), $arrItemDecoder))
+                Check::thatInvalidFor(arrayOf(int(), $arrItemDecoder))
             );
     }
 
@@ -86,7 +86,7 @@ final class ArrDecoderTest extends TestCase
         forAll($arrGen)
             ->withMaxSize(50)
             ->then(
-                Check::thatInvalidFor(arr(string(), int()))
+                Check::thatInvalidFor(arrayOf(string(), int()))
             );
     }
 }

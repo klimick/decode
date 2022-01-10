@@ -10,7 +10,7 @@ use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
-use function Klimick\Decode\Decoder\arr;
+use function Klimick\Decode\Decoder\arrayOf;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\valid;
 
@@ -38,7 +38,7 @@ final class NonEmptyArrDecoder extends AbstractDecoder
 
     public function is(mixed $value): bool
     {
-        if (!arr($this->keyDecoder, $this->valDecoder)->is($value)) {
+        if (!arrayOf($this->keyDecoder, $this->valDecoder)->is($value)) {
             return false;
         }
 
@@ -52,7 +52,7 @@ final class NonEmptyArrDecoder extends AbstractDecoder
         //  Either<Invalid, Valid<non-empty-array<TKey:ArrDecoder as array-key, TVal:ArrDecoder as mixed>>>
         //  Either<Invalid, Valid<non-empty-array<TKey:NonEmptyArrDecoder as array-key, TVal:NonEmptyArrDecoder as mixed>>>
         /** @var Either<Invalid, Valid<non-empty-array<TKey, TVal>>> */
-        return arr($this->keyDecoder, $this->valDecoder)
+        return arrayOf($this->keyDecoder, $this->valDecoder)
             ->decode($value, $context)
             ->flatMap(fn($valid) => 0 !== count($valid->value)
                 ? valid($valid->value)
