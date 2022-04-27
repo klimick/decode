@@ -11,8 +11,6 @@ use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionReturnTypePr
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\DecoderMethodsAnalysis;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
-use Klimick\PsalmDecode\Hook\AfterClassLikeVisit\ProductTypeAfterClassLikeVisit;
-use Klimick\PsalmDecode\Hook\AfterClassLikeVisit\SumTypeAfterClassLikeVisit;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\TaggedUnionDecoderFactoryReturnTypeProvider;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
@@ -41,8 +39,5 @@ final class Plugin implements PluginEntryPointInterface
         $register(DecoderMethodsAnalysis::class);
         $register(ConstrainedMethodReturnTypeProvider::class);
         $register(FromArgumentAnalysis::class);
-
-        $register(SumTypeAfterClassLikeVisit::class);
-        $register(ProductTypeAfterClassLikeVisit::class);
     }
 }

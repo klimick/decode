@@ -11,8 +11,6 @@ This library allow you to take untrusted data and check that it can be represent
 - [Generic types](#generic-types)
 - [Higher order helpers](#higher-order-helpers)
 - [Constraints](#constraints)
-- [Class with runtime type safety (Product type)](#product-type)
-- [Closed union type with runtime type safety (Sum type)](#sum-type)
 
 ## Usage example
 
@@ -134,36 +132,36 @@ $floatOrNull = union(float(), null());
 $intOrFloatOrStringOrNull = union($intOrString, $floatOrNull);
 ```
 
-##### arr(TK, TV)
+##### arrayOf(TK, TV)
 Represents `array` with keys of type `TK` and values of type `TV`.
 
 ```php
 // array<int, string>
-$arr = arr(int(), string());
+$arr = arrayOf(int(), string());
 ```
 
-##### nonEmptyArr(TK, TV)
+##### nonEmptyArrayOf(TK, TV)
 Represents `non-empty-array` with keys of type `TK` and values of type `TV`.
 
 ```php
 // non-empty-array<int, string>
-$nonEmptyArr = nonEmptyArr(int(), string());
+$nonEmptyArr = nonEmptyArrayOf(int(), string());
 ```
 
-##### arrList(TV)
+##### listOf(TV)
 Represents `list` with values of type `TV`.
 
 ```php
 // list<string>
-$list = arrList(string());
+$list = listOf(string());
 ```
 
-##### nonEmptyArrList(TV)
+##### nonEmptyListOf(TV)
 Represents `non-empty-list` with values of type `TV`.
 
 ```php
 // non-empty-list<string>
-$list = nonEmptyArrList(string());
+$list = nonEmptyListOf(string());
 ```
 
 ##### shape(prop1: T, prop2: T, propN: T)
@@ -237,7 +235,6 @@ final class SomeClass
     }
 }
 ```
-To avoid some boilerplate code you may consider to use [product type](#product-type) or [sum type](#sum-type).
 
 ##### partialObject(SomeClass::class)(prop1: T1, prop2: T2, propN: T3)
 Like `object` decoder, but each parameter of the constructor must be nullable.
@@ -267,7 +264,7 @@ final class SomeClass
         return object(self::class)(
             prop1: int(),
             prop2: string(),
-            recursive: arrList($self),
+            recursive: listOf($self),
         );
     }
 }
@@ -293,7 +290,7 @@ Allows you to mark property as possibly undefined.
 ```php
 $personD = shape(
     name: string(),
-    additional: arrList(string())->optional(),
+    additional: listOf(string())->optional(),
 );
 
 // inferred type: array{name: string, additional?: list<string>}
@@ -529,7 +526,7 @@ Checks that the given constraint holds for all elements of an array value.
 ```php
 $allNumbersGreaterThan10 = forall(greater(than: 10));
 
-$numbersGreaterThan10 = arrList(int())
+$numbersGreaterThan10 = listOf(int())
     ->constrained($allNumbersGreaterThan10);
 ```
 
@@ -539,7 +536,7 @@ Checks that the given constraint holds for some elements of an array value.
 ```php
 $hasNumbersGreaterThan10 = exists(greater(than: 10));
 
-$withNumberGreaterThan10 = arrList(int())
+$withNumberGreaterThan10 = listOf(int())
     ->constrained($hasNumbersGreaterThan10);
 ```
 
@@ -547,7 +544,7 @@ $withNumberGreaterThan10 = arrList(int())
 Checks that an array value contains a value equal to the given one.
 
 ```php
-$listWith10 = arrList(int())
+$listWith10 = listOf(int())
     ->constrained(inCollection(10));
 ```
 
@@ -555,7 +552,7 @@ $listWith10 = arrList(int())
 Checks that an array value size is not greater than the given one.
 
 ```php
-$max10numbers = arrList(int())
+$max10numbers = listOf(int())
     ->constrained(maxSize(is: 10));
 ````
 
@@ -563,7 +560,7 @@ $max10numbers = arrList(int())
 Checks that an array value size is not less than the given one.
 
 ```php
-$atLeast10numbers = arrList(int())
+$atLeast10numbers = listOf(int())
     ->constrained(minSize(is: 10));
 ````
 
@@ -576,7 +573,7 @@ $from100to200 = allOf(
     lessOrEqual(to: 200),
 );
 
-$numbersFrom100to200 = arrList(int())
+$numbersFrom100to200 = listOf(int())
     ->constrained($from100to200);
 ```
 
@@ -594,145 +591,6 @@ $from300to400 = allOf(
     lessOrEqual(to: 400),
 );
 
-$numbersFrom100to200orFrom300to400 = arrList(int())
+$numbersFrom100to200orFrom300to400 = listOf(int())
     ->constrained(anyOf($from100to200, $from300to400));
-```
-
-
-### Product type
-
-Class with runtime type safety.
-Properties will be inferred from definition methods.
-
-```php
-use Klimick\Decode\Decoder\ProductType;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use Klimick\Decode\Decoder as t;
-
-/**
- * @psalm-immutable
- */
-final class Library extends ProductType
-{
-    protected static function definition(): ShapeDecoder
-    {
-        return shape(
-            id: t\int(),
-            name: t\string(),
-            meta: t\listOf(t\string()),
-        );
-    }
-}
-
-// Instance of Library created from untrusted data
-$fromUntrusted = t\tryCast(
-    value: '...any untrusted data...',
-    to: Library::type(),
-);
-
-// Psalm knows that 'id' property is existed and typed as int
-print_r($instance->id);
-```
-
-This kind of class is not intended for creating from trusted data.
-But you can do it with the new expression.
-
-```php
-// Statically type checked
-// Args order depends on definition of Library
-$createdWithNewExpr = new Library(42, 'Decode', [
-    "runtime type system",
-    "psalm integration",
-    "with whsv26/functional",
-]);
-
-// Named args also supported
-$createdWithNamedArgs = new Library(
-    id: 42,
-    name: 'Decode',
-    meta: [
-        "runtime type system",
-        "psalm integration",
-        "with whsv26/functional",
-    ],
-);
-```
-
-### Sum type
-
-Represents closed union type for multiple [product types](#product-type) or sum type itself.
-
-```php
-use Klimick\Decode\Decoder\SumType;
-use Klimick\Decode\Decoder\SumCases;
-use Klimick\Decode\Decoder\ProductType;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use Klimick\Decode\Decoder as t;
-
-/**
- * @psalm-immutable
- */
-final class Messenger extends SumType
-{
-    protected static function definition(): SumCases
-    {
-        return t\cases(
-            telegram: Telegram::type(),
-            whatsapp: Whatsapp::type(),
-        );
-    }
-}
-
-/**
- * @psalm-immutable
- * Case of closed Messenger union
- */
-final class Telegram extends ProductType
-{
-    protected static function definition(): ShapeDecoder
-    {
-        return t\shape(
-            telegramId: t\string(),
-            // ...rest
-        );
-    }
-}
-
-/**
- * @psalm-immutable
- * Case of closed Messenger union
- */
-final class Whatsapp extends ProductType
-{
-    protected static function definition(): ShapeDecoder
-    {
-        return t\shape(
-            phone: t\string(),
-            // ...rest
-        );
-    }
-}
-
-// Instance of Messenger created from untrusted data
-$fromUntrusted = t\tryCast(
-    value: '...any untrusted data...',
-    to: Messenger::type(),
-);
-
-// The match method is only one possible way to work with SumType instances
-// Name of named arg depends on the definition method of the Messenger
-print_r($fromUntrusted->match(
-    telegram: fn(Telegram $m) => print_r($m->telegramId),
-    whatsapp: fn(Whatsapp $m) => print_r($m->phone),
-));
-```
-
-Like the [SumType](#product-type) this kind of class is not intended for creating from trusted data.
-But you can do it with the new expression.
-
-```php
-// A case must be wrapped within Messenger instance
-$createdWithNewExpr = new Messenger(
-    case: new Telegram('@Klimick'),
-);
 ```
