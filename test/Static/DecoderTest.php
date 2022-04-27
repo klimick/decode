@@ -6,7 +6,6 @@ namespace Klimick\Decode\Test\Static;
 
 use DateTimeImmutable;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Department;
 use Klimick\Decode\Test\Static\Fixtures\PartialPerson;
 use Klimick\Decode\Test\Static\Fixtures\Person;
@@ -213,7 +212,7 @@ final class DecoderTest extends PsalmTest
     public function testIntersectionDecoder(): void
     {
         $expected_decoder_type = t::generic(
-            ofType: ShapeDecoder::class,
+            ofType: DecoderInterface::class,
             withParams: [
                 t::shape([
                     'prop1' => t::string(),

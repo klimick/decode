@@ -13,7 +13,6 @@ use Klimick\PsalmDecode\Issue\HighOrder\IncompatibleConstraintIssue;
 use Klimick\PsalmTest\Integration\CallArg;
 use Klimick\PsalmTest\Integration\Psalm;
 use PhpParser\Node\Expr\MethodCall;
-use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
@@ -134,9 +133,10 @@ final class ConstrainedMethodReturnTypeProvider implements MethodReturnTypeProvi
         Union $decoder_type_param,
     ): void
     {
+        $codebase = $source->getCodebase();
+
         foreach ($constrained_call_args as $call_arg) {
-            $is_contained_by = UnionTypeComparator::isContainedBy(
-                codebase: $source->getCodebase(),
+            $is_contained_by = $codebase->isTypeContainedByType(
                 input_type: $decoder_type_param,
                 container_type: $call_arg->type,
             );

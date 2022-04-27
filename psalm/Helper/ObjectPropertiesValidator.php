@@ -9,7 +9,6 @@ use Klimick\PsalmDecode\Issue\Object\NonexistentPropertyObjectPropertyIssue;
 use Klimick\PsalmDecode\Issue\Object\RequiredObjectPropertyMissingIssue;
 use Psalm\Codebase;
 use Psalm\CodeLocation;
-use Psalm\Internal\Type\Comparator\UnionTypeComparator;
 use Psalm\IssueBuffer;
 use Psalm\StatementsSource;
 use Psalm\Type;
@@ -35,7 +34,7 @@ final class ObjectPropertiesValidator
                 continue;
             }
 
-            if (UnionTypeComparator::isContainedBy($codebase, $actual_shape[$property], $type)) {
+            if ($codebase->isTypeContainedByType($actual_shape[$property], $type)) {
                 continue;
             }
 

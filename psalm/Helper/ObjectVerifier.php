@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Helper;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmDecode\Issue\Object\NotPartialPropertyIssue;
+use Klimick\PsalmDecode\PsalmInternal;
 use Klimick\PsalmTest\Integration\Psalm;
 use Psalm\Codebase;
 use Psalm\CodeLocation;
-use Psalm\Internal\Type\TypeExpander;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\StatementsSource;
@@ -31,7 +31,7 @@ final class ObjectVerifier
             $actual_shape = yield NamedArgumentsMapper::map($event->getCallArgs(), $source->getNodeTypeProvider())
                 ->map(
                     fn($properties) => new Type\Union([
-                        new Type\Atomic\TGenericObject(ShapeDecoder::class, [
+                        new Type\Atomic\TGenericObject(DecoderInterface::class, [
                             new Type\Union([$properties])
                         ]),
                     ])
@@ -52,19 +52,17 @@ final class ObjectVerifier
     }
 
     /**
-     * @psalm-type CallInfo = array{
+     * @return Option<array{
      *     expected_shape: array<string, Type\Union>,
      *     arg_locations: array<string, CodeLocation>,
      *     call_location: CodeLocation
-     * }
-     *
-     * @return Option<CallInfo>
+     * }>
      */
     private static function extractCallInfo(MethodReturnTypeProviderEvent $event): Option
     {
         return Option::do(function() use ($event) {
             $source = $event->getSource();
-            $codebase = $source->getCodebase();
+            $call_location = $event->getCodeLocation();
 
             $params = asList($event->getTemplateTypeParameters() ?? []);
 
@@ -72,11 +70,10 @@ final class ObjectVerifier
             $partial_type_param = yield second($params);
 
             $is_partial = yield self::extractPartialityInfo($partial_type_param);
-            $class_storage = yield self::extractClassStorage($object_class_type_param, $codebase);
+            $class_storage = yield self::extractClassStorage($object_class_type_param);
             $arg_locations = yield self::extractArgLocations($event, $source);
 
-            $call_location = $event->getCodeLocation();
-            $decoder_type = self::inferDecoderType($codebase, $source, $class_storage, $call_location, $arg_locations, $is_partial);
+            $decoder_type = self::inferDecoderType($source, $class_storage, $call_location, $arg_locations, $is_partial);
             $expected_shape = yield ShapePropertiesExtractor::fromDecoder($decoder_type);
 
             return [
@@ -91,7 +88,6 @@ final class ObjectVerifier
      * @param array<string, CodeLocation> $arg_locations
      */
     private static function inferDecoderType(
-        Codebase $codebase,
         StatementsSource $source,
         ClassLikeStorage $class_storage,
         CodeLocation $call_location,
@@ -102,7 +98,7 @@ final class ObjectVerifier
         $shape = [];
 
         foreach ($class_storage->properties as $property => $storage) {
-            $shape[$property] = self::expandType($codebase, $class_storage, $storage->type ?? Type::getMixed());
+            $shape[$property] = self::expandType($class_storage->name, $storage->type ?? Type::getMixed());
 
             if ($partial && !$shape[$property]->isNullable()) {
                 $issue = new NotPartialPropertyIssue(
@@ -115,7 +111,7 @@ final class ObjectVerifier
         }
 
         return new Type\Union([
-            new Type\Atomic\TGenericObject(ShapeDecoder::class, [
+            new Type\Atomic\TGenericObject(DecoderInterface::class, [
                 new Type\Union([
                     DecoderType::createShape($shape)
                 ]),
@@ -123,19 +119,9 @@ final class ObjectVerifier
         ]);
     }
 
-    private static function expandType(
-        Codebase $codebase,
-        ClassLikeStorage $class,
-        Type\Union $propertyType,
-    ): Type\Union
+    private static function expandType(string $self_class, Type\Union $property_type): Type\Union
     {
-        return TypeExpander::expandUnion(
-            codebase: $codebase,
-            return_type: $propertyType,
-            self_class: $class->name,
-            static_class_type: null,
-            parent_class: null,
-        );
+        return PsalmInternal::expandType(type: $property_type, self_class: $self_class);
     }
 
     /**
@@ -173,11 +159,10 @@ final class ObjectVerifier
     /**
      * @return Option<ClassLikeStorage>
      */
-    private static function extractClassStorage(Type\Union $object_class, Codebase $codebase): Option
+    private static function extractClassStorage(Type\Union $object_class): Option
     {
-        return Psalm::asSingleAtomicOf(Type\Atomic\TNamedObject::class, $object_class)->flatMap(
-            fn($named_object) => Option::try(fn() => $codebase->classlike_storage_provider->get($named_object->value))
-        );
+        return Psalm::asSingleAtomicOf(Type\Atomic\TNamedObject::class, $object_class)
+            ->flatMap(fn($named_object) => PsalmInternal::getStorageFor($named_object->value));
     }
 
     /**

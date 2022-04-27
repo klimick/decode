@@ -12,23 +12,23 @@
             <directory name="vendor"/>
         </ignoreFiles>
     </projectFiles>
-    <issueHandlers>
-        <InternalClass>
-            <errorLevel type="suppress">
-                <directory name="psalm"/>
-            </errorLevel>
-        </InternalClass>
-        <InternalMethod>
-            <errorLevel type="suppress">
-                <directory name="psalm"/>
-            </errorLevel>
-        </InternalMethod>
-        <InternalProperty>
-            <errorLevel type="suppress">
-                <directory name="psalm"/>
-            </errorLevel>
-        </InternalProperty>
-    </issueHandlers>
+<!--    <issueHandlers>-->
+<!--        <InternalClass>-->
+<!--            <errorLevel type="suppress">-->
+<!--                <directory name="psalm"/>-->
+<!--            </errorLevel>-->
+<!--        </InternalClass>-->
+<!--        <InternalMethod>-->
+<!--            <errorLevel type="suppress">-->
+<!--                <directory name="psalm"/>-->
+<!--            </errorLevel>-->
+<!--        </InternalMethod>-->
+<!--        <InternalProperty>-->
+<!--            <errorLevel type="suppress">-->
+<!--                <directory name="psalm"/>-->
+<!--            </errorLevel>-->
+<!--        </InternalProperty>-->
+<!--    </issueHandlers>-->
     <plugins>
         <pluginClass class="Klimick\PsalmDecode\Plugin"/>
         <pluginClass class="Klimick\PsalmShowType\ShowTypePlugin"/>

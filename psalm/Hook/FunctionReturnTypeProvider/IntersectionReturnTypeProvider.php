@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmDecode\Helper\DecoderType;
 use Klimick\PsalmDecode\Helper\DecoderTypeParamExtractor;
 use Klimick\PsalmDecode\Helper\ShapePropertiesExtractor;
@@ -51,7 +51,7 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
             }
 
             return new Type\Union([
-                new Type\Atomic\TGenericObject(ShapeDecoder::class, [
+                new Type\Atomic\TGenericObject(DecoderInterface::class, [
                     new Type\Union([
                         DecoderType::createShape($properties)
                     ]),
