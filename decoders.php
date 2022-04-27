@@ -28,7 +28,6 @@ use Klimick\Decode\Internal\NonEmptyStringDecoder;
 use Klimick\Decode\Internal\NullDecoder;
 use Klimick\Decode\Internal\NumericDecoder;
 use Klimick\Decode\Internal\NumericStringDecoder;
-use Klimick\Decode\Internal\ObjectDecoder;
 use Klimick\Decode\Internal\PositiveIntDecoder;
 use Klimick\Decode\Internal\RecursionDecoder;
 use Klimick\Decode\Internal\ScalarDecoder;
@@ -450,21 +449,4 @@ function intersection(DecoderInterface $first, DecoderInterface $second, Decoder
 function tuple(DecoderInterface $first, DecoderInterface ...$rest): DecoderInterface
 {
     return new TupleDecoder([$first, ...$rest]);
-}
-
-/**
- * @template T of object
- *
- * @param DecoderInterface<T> ...$cases
- * @return SumCases<T>
- *
- * @todo: fix signature
- * @psalm-suppress InvalidReturnType, InvalidReturnStatement
- */
-function cases(DecoderInterface ...$cases): SumCases
-{
-    /**
-     * @var non-empty-array<non-empty-string, ObjectDecoder<ProductType> | UnionDecoder<SumType>> $cases
-     */
-    return new SumCases($cases);
 }

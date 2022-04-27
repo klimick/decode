@@ -24,10 +24,10 @@ final class ObjectDecoderFactory
     ) { }
 
     /**
-     * @return ObjectDecoder<TObjectClass>
+     * @return DecoderInterface<TObjectClass>
      * @see ObjectDecoderFactoryReturnTypeProvider
      */
-    public function __invoke(DecoderInterface ...$decoders): ObjectDecoder
+    public function __invoke(DecoderInterface ...$decoders): DecoderInterface
     {
         /**
          * Validated via psalm plugin hook at this moment
