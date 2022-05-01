@@ -12,25 +12,11 @@
             <directory name="vendor"/>
         </ignoreFiles>
     </projectFiles>
-<!--    <issueHandlers>-->
-<!--        <InternalClass>-->
-<!--            <errorLevel type="suppress">-->
-<!--                <directory name="psalm"/>-->
-<!--            </errorLevel>-->
-<!--        </InternalClass>-->
-<!--        <InternalMethod>-->
-<!--            <errorLevel type="suppress">-->
-<!--                <directory name="psalm"/>-->
-<!--            </errorLevel>-->
-<!--        </InternalMethod>-->
-<!--        <InternalProperty>-->
-<!--            <errorLevel type="suppress">-->
-<!--                <directory name="psalm"/>-->
-<!--            </errorLevel>-->
-<!--        </InternalProperty>-->
-<!--    </issueHandlers>-->
     <plugins>
-        <pluginClass class="Klimick\PsalmDecode\Plugin"/>
+        <pluginClass class="Klimick\PsalmDecode\Plugin">
+            <derived-props-mixin-path>dev</derived-props-mixin-path>
+            <derived-props-mixin-namespace>Psalm\Mixins</derived-props-mixin-namespace>
+        </pluginClass>
         <pluginClass class="Klimick\PsalmShowType\ShowTypePlugin"/>
         <pluginClass class="Klimick\PsalmTest\Integration\Plugin"/>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>

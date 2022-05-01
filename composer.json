@@ -25,7 +25,8 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Klimick\\Decode\\Test\\": ["./test"]
+            "Klimick\\Decode\\Test\\": ["./test"],
+            "Psalm\\Mixins\\": ["./dev"]
         },
         "files": [
             "test/Helper/Eris.php"

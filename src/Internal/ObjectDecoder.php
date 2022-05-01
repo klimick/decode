@@ -42,6 +42,16 @@ final class ObjectDecoder extends AbstractDecoder
 
     public function is(mixed $value): bool
     {
+        if (!($value instanceof $this->objectClass)) {
+            return false;
+        }
+
+        foreach ($this->decoders as $key => $decoder) {
+            if (!$decoder->is($value->{$key})) {
+                return false;
+            }
+        }
+
         return $value instanceof $this->objectClass;
     }
 

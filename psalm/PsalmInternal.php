@@ -39,4 +39,14 @@ final class PsalmInternal
             parent_class: null,
         );
     }
+
+    /**
+     * @psalm-suppress InternalClass
+     * @psalm-suppress InternalMethod
+     */
+    public static function baseDir(): string
+    {
+        $config = ProjectAnalyzer::$instance->getConfig();
+        return $config->base_dir;
+    }
 }
