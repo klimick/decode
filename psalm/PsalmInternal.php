@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode;
 
 use Fp\Functional\Option\Option;
+use Psalm\Codebase;
 use Psalm\Internal\Analyzer\ProjectAnalyzer;
 use Psalm\Internal\Type\TypeExpander;
 use Psalm\Storage\ClassLikeStorage;
@@ -12,6 +13,14 @@ use Psalm\Type\Union;
 
 final class PsalmInternal
 {
+    /**
+     * @psalm-suppress InternalMethod
+     */
+    public static function codebase(): Codebase
+    {
+        return ProjectAnalyzer::$instance->getCodebase();
+    }
+
     /**
      * @return Option<ClassLikeStorage>
      * @psalm-suppress InternalMethod
