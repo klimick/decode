@@ -8,6 +8,7 @@ use Klimick\Decode\Decoder\Derive;
 use Klimick\Decode\Decoder as t;
 use Psalm\Mixins\Klimick\Decode\Test\Static\Fixtures\UserProps;
 use function Klimick\Decode\Constraint\maxLength;
+use function Klimick\Decode\Constraint\minLength;
 
 /**
  * @implements Derive\Props<User>
@@ -20,9 +21,21 @@ final class User implements Derive\Props
     public static function props(): t\DecoderInterface
     {
         return t\shape(
-            name: t\string()->constrained(maxLength(is: 10)),
+            name: self::complexType(),
             age: t\int(),
             projects: t\listOf(Project::type()),
+        );
+    }
+
+    /**
+     * @return t\DecoderInterface<string>
+     * @psalm-pure
+     */
+    public static function complexType(): t\DecoderInterface
+    {
+        return t\string()->constrained(
+            minLength(is: 3),
+            maxLength(is: 255),
         );
     }
 }

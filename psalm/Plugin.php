@@ -6,6 +6,7 @@ namespace Klimick\PsalmDecode;
 
 use Fp\Functional\Option\Option;
 use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\DerivePropsHook;
+use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\TestHypothesis;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\FromArgumentAnalysis;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturnTypeProvider;
@@ -53,6 +54,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(ConstrainedMethodReturnTypeProvider::class);
         $register(FromArgumentAnalysis::class);
         $register(DerivePropsHook::class);
+        $register(TestHypothesis::class);
     }
 
     /**

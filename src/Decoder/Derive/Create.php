@@ -45,6 +45,8 @@ trait Create
     {
         /** @var ShapeDecoder $shape */
         $shape = self::props();
+
+        /** @var DecoderInterface<static> */
         return new ObjectDecoder(static::class, $shape->decoders);
     }
 }

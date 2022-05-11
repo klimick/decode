@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
-<psalm findUnusedPsalmSuppress="true"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<psalm xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns="https://getpsalm.org/schema/config"
+       errorLevel="1"
+       findUnusedPsalmSuppress="true"
        cacheDirectory="/tmp/decode-psalm"
        ensureArrayStringOffsetsExist="true"
        ensureArrayIntOffsetsExist="true"
