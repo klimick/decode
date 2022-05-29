@@ -25,7 +25,9 @@ final class AnyOfConstraint implements ConstraintInterface
 
     public function name(): string
     {
-        return 'ANY_OF';
+        $constraints = implode(', ', array_map(fn($c) => $c->name(), $this->constraints));
+
+        return "ANY_OF({$constraints})";
     }
 
     public function payload(): array

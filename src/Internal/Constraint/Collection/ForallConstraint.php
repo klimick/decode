@@ -25,7 +25,7 @@ final class ForallConstraint implements ConstraintInterface
 
     public function name(): string
     {
-        return 'FORALL';
+        return "FORALL.{$this->constraint->name()}";
     }
 
     public function payload(): array

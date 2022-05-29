@@ -25,7 +25,7 @@ final class ExistsConstraint implements ConstraintInterface
 
     public function name(): string
     {
-        return 'EXISTS';
+        return "EXISTS.{$this->constraint->name()}";
     }
 
     public function payload(): array

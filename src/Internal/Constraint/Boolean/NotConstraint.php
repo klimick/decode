@@ -25,7 +25,7 @@ final class NotConstraint implements ConstraintInterface
 
     public function name(): string
     {
-        return 'NOT';
+        return "NOT.{$this->constraint->name()}";
     }
 
     public function payload(): array

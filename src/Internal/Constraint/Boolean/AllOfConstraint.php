@@ -25,7 +25,9 @@ final class AllOfConstraint implements ConstraintInterface
 
     public function name(): string
     {
-        return 'ALL_OF';
+        $constraints = implode(', ', array_map(fn($c) => $c->name(), $this->constraints));
+
+        return "ALL_OF({$constraints})";
     }
 
     public function payload(): array
