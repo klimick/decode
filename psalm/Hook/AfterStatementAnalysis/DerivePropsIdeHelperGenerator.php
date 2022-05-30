@@ -2,11 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
+namespace Klimick\PsalmDecode\Hook\AfterStatementAnalysis;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\Derive\Props;
-use Klimick\PsalmDecode\Helper\DerivedPropsClassHandler;
 use Klimick\PsalmDecode\Helper\ShapePropertiesExtractor;
 use Klimick\PsalmDecode\Plugin;
 use Klimick\PsalmDecode\PsalmInternal;
@@ -20,7 +19,7 @@ use function Fp\Evidence\proveTrue;
 /**
  * @psalm-import-type MixinConfig from Plugin
  */
-final class DerivePropsHook implements AfterStatementAnalysisInterface
+final class DerivePropsIdeHelperGenerator implements AfterStatementAnalysisInterface
 {
     public static function afterStatementAnalysis(AfterStatementAnalysisEvent $event): ?bool
     {
@@ -41,7 +40,7 @@ final class DerivePropsHook implements AfterStatementAnalysisInterface
                 ->flatMap(fn($return) => Option::fromNullable($types->getType($return)))
                 ->flatMap(fn($type) => ShapePropertiesExtractor::fromDecoder($type));
 
-            DerivedPropsClassHandler::handle($storage, $config, $property_types);
+            GeneratePropsIdeHelper::for($storage, $config, $property_types);
         });
 
         return null;

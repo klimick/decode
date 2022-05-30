@@ -9,6 +9,7 @@ use Fp\Collections\ArrayList;
 use Fp\Functional\Option\Option;
 use Psalm\Codebase;
 use Psalm\FileSource;
+use Psalm\Internal\Analyzer\FileAnalyzer;
 use Psalm\Internal\Analyzer\NamespaceAnalyzer;
 use Psalm\Internal\Analyzer\ProjectAnalyzer;
 use Psalm\Internal\Analyzer\StatementsAnalyzer;
@@ -42,9 +43,10 @@ final class CreateStatementsAnalyzer
 
             return yield Option
                 ::try(fn() => ProjectAnalyzer::$instance->getFileAnalyzerForClassLike($storage->name))
-                ->map(fn($analyzer) => new NamespaceAnalyzer($namespace, $analyzer))
-                ->tap(fn($analyzer) => $analyzer->collectAnalyzableInformation())
-                ->map(fn($analyzer) => new StatementsAnalyzer($analyzer, $node_data_provider));
+                ->map(fn(FileAnalyzer $analyzer) => new NamespaceAnalyzer($namespace, $analyzer))
+                ->tap(fn(NamespaceAnalyzer $analyzer) => $analyzer->collectAnalyzableInformation())
+                ->tap(fn(NamespaceAnalyzer $analyzer) => $analyzer->addSuppressedIssues(['all']))
+                ->map(fn(NamespaceAnalyzer $analyzer) => new StatementsAnalyzer($analyzer, $node_data_provider));
         });
     }
 

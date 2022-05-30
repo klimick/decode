@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode;
 
+use PhpParser;
 use Fp\Functional\Option\Option;
 use Psalm\Codebase;
+use Psalm\Context;
 use Psalm\Internal\Analyzer\ProjectAnalyzer;
+use Psalm\Internal\Analyzer\Statements\ExpressionAnalyzer;
+use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use Psalm\Internal\Type\TypeExpander;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Type\Union;
@@ -50,12 +54,28 @@ final class PsalmInternal
     }
 
     /**
-     * @psalm-suppress InternalClass
      * @psalm-suppress InternalMethod
      */
     public static function baseDir(): string
     {
         $config = ProjectAnalyzer::$instance->getConfig();
         return $config->base_dir;
+    }
+
+    /**
+     * @return Option<Union>
+     *
+     * @psalm-suppress InternalClass
+     * @psalm-suppress InternalProperty
+     * @psalm-suppress InternalMethod
+     */
+    public static function analyzeExpression(
+        StatementsAnalyzer $analyzer,
+        PhpParser\Node\Expr $stmt,
+        Context $context,
+    ): Option
+    {
+        return Option::try(fn() => ExpressionAnalyzer::analyze($analyzer, $stmt,  $context))
+            ->flatMap(fn() => Option::fromNullable($analyzer->node_data->getType($stmt)));
     }
 }

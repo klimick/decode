@@ -121,7 +121,7 @@ final class ObjectVerifier
 
     private static function expandType(string $self_class, Type\Union $property_type): Type\Union
     {
-        return PsalmInternal::expandType(type: $property_type, self_class: $self_class);
+        return PsalmInternal::expandType(self_class: $self_class, type: $property_type);
     }
 
     /**

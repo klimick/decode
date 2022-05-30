@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode;
 
 use Fp\Functional\Option\Option;
-use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\DerivePropsHook;
 use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\TestHypothesis;
-use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
-use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\FromArgumentAnalysis;
-use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturnTypeProvider;
-use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\DecoderMethodsAnalysis;
+use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\FromArgumentAnalysis;
+use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\DerivePropsIdeHelperGenerator;
+use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\TaggedUnionDecoderFactoryReturnTypeProvider;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
@@ -53,7 +53,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(DecoderMethodsAnalysis::class);
         $register(ConstrainedMethodReturnTypeProvider::class);
         $register(FromArgumentAnalysis::class);
-        $register(DerivePropsHook::class);
+        $register(DerivePropsIdeHelperGenerator::class);
         $register(TestHypothesis::class);
     }
 
@@ -81,11 +81,6 @@ final class Plugin implements PluginEntryPointInterface
 
             if (empty($namespace)) {
                 throw new RuntimeException('Namespace cannot be empty');
-            }
-
-            /** @psalm-suppress UnresolvableInclude */
-            foreach (glob("{$fullPath}/*.php") as $classPath) {
-                require $classPath;
             }
 
             return [
