@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Helper;
+namespace Klimick\PsalmDecode\Hook\AfterStatementAnalysis;
 
+use Klimick\PsalmDecode\Helper\UnionToString;
 use Klimick\PsalmDecode\Plugin;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Type\Union;
@@ -14,7 +15,7 @@ use const PHP_EOL;
 /**
  * @psalm-import-type MixinConfig from Plugin
  */
-final class DerivedPropsClassHandler
+final class GeneratePropsIdeHelper
 {
     private const TEMPLATE = <<<CLASS
     <?php
@@ -57,7 +58,7 @@ final class DerivedPropsClassHandler
      * @param array<string, Union> $types
      * @psalm-param MixinConfig $config
      */
-    public static function handle(ClassLikeStorage $storage, array $config, array $types): void
+    public static function for(ClassLikeStorage $storage, array $config, array $types): void
     {
         $filename = self::getMixinClassFilename($storage);
         $path = self::createFolder($storage, $config['directory']);
