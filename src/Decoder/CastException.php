@@ -11,13 +11,14 @@ final class CastException extends Exception
 {
     private ErrorReport $report;
 
-    public function __construct(ErrorReport $report, string $typename)
+    public function __construct(ErrorReport $report)
     {
-        parent::__construct(
-            message: "Unable to cast given data to type {$typename}"
-        );
-
         $this->report = $report;
+        $reportAsString = (string) $report;
+
+        parent::__construct(
+            message: "Cast failed:\n{$reportAsString}"
+        );
     }
 
     public function getErrorReport(): ErrorReport
