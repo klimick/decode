@@ -16,81 +16,70 @@ use Psalm\Type;
 final class ObjectPropertiesValidator
 {
     /**
-     * @param array<string, Type\Union> $expected_shape
      * @param array<string, Type\Union> $actual_shape
+     * @param array<string, Type\Union> $expected_shape
      * @param array<string, CodeLocation> $arg_code_locations
      */
-    public static function checkPropertyTypes(
-        Codebase $codebase,
-        StatementsSource $source,
-        CodeLocation $method_code_location,
-        array $arg_code_locations,
-        array $expected_shape,
-        array $actual_shape,
-    ): void
+    public function __construct(
+        private Codebase $codebase,
+        private StatementsSource $source,
+        private array $actual_shape,
+        private array $expected_shape,
+        private CodeLocation $method_code_location,
+        private array $arg_code_locations,
+    ) {}
+
+    public function validate(): void
     {
-        foreach ($expected_shape as $property => $type) {
-            if (!array_key_exists($property, $actual_shape)) {
+        $this->checkPropertyTypes();
+        $this->checkNonexistentProperties();
+        $this->checkMissingProperties();
+    }
+
+    private function checkPropertyTypes(): void
+    {
+        foreach ($this->expected_shape as $property => $type) {
+            if (!array_key_exists($property, $this->actual_shape)) {
                 continue;
             }
 
-            if ($codebase->isTypeContainedByType($actual_shape[$property], $type)) {
+            if ($this->codebase->isTypeContainedByType($this->actual_shape[$property], $type)) {
                 continue;
             }
 
             $issue = new InvalidDecoderForPropertyIssue(
                 property: $property,
-                actual_type: $actual_shape[$property],
+                actual_type: $this->actual_shape[$property],
                 expected_type: $type,
-                code_location: $arg_code_locations[$property] ?? $method_code_location,
+                code_location: $this->arg_code_locations[$property] ?? $this->method_code_location,
             );
 
-            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+            IssueBuffer::accepts($issue, $this->source->getSuppressedIssues());
         }
     }
 
-    /**
-     * @param array<string, Type\Union> $actual_shape
-     * @param array<string, Type\Union> $expected_shape
-     * @param array<string, CodeLocation> $arg_code_locations
-     */
-    public static function checkNonexistentProperties(
-        array $actual_shape,
-        array $expected_shape,
-        array $arg_code_locations,
-        StatementsSource $source,
-        CodeLocation $method_code_location,
-    ): void
+    private function checkNonexistentProperties(): void
     {
-        foreach (array_keys($actual_shape) as $property) {
-            if (array_key_exists($property, $expected_shape)) {
+        foreach (array_keys($this->actual_shape) as $property) {
+            if (array_key_exists($property, $this->expected_shape)) {
                 continue;
             }
 
             $issue = new NonexistentPropertyObjectPropertyIssue(
                 property: $property,
-                code_location: $arg_code_locations[$property] ?? $method_code_location,
+                code_location: $this->arg_code_locations[$property] ?? $this->method_code_location,
             );
 
-            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+            IssueBuffer::accepts($issue, $this->source->getSuppressedIssues());
         }
     }
 
-    /**
-     * @param array<string, Type\Union> $expected_shape
-     * @param array<string, Type\Union> $actual_shape
-     */
-    public static function checkMissingProperties(
-        StatementsSource $source,
-        CodeLocation $method_code_location,
-        array $expected_shape,
-        array $actual_shape,
-    ): void
+    private function checkMissingProperties(): void
     {
         $missing_properties = [];
 
-        foreach (array_keys($expected_shape) as $property) {
-            if (!array_key_exists($property, $actual_shape)) {
+        foreach (array_keys($this->expected_shape) as $property) {
+            if (!array_key_exists($property, $this->actual_shape)) {
                 $missing_properties[] = $property;
             }
         }
@@ -98,10 +87,10 @@ final class ObjectPropertiesValidator
         if (!empty($missing_properties)) {
             $issue = new RequiredObjectPropertyMissingIssue(
                 missing_properties: $missing_properties,
-                code_location: $method_code_location
+                code_location: $this->method_code_location,
             );
 
-            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+            IssueBuffer::accepts($issue, $this->source->getSuppressedIssues());
         }
     }
 }

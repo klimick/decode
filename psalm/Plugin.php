@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode;
 
 use Fp\Functional\Option\Option;
-use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\TestHypothesis;
+use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\DerivePropsVisitor;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\DecoderMethodsAnalysis;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\FromArgumentAnalysis;
 use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\DerivePropsIdeHelperGenerator;
@@ -15,6 +15,7 @@ use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\TaggedUnionDecoderFactoryReturnTypeProvider;
+use Psalm\Config;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
 use RuntimeException;
@@ -54,7 +55,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(ConstrainedMethodReturnTypeProvider::class);
         $register(FromArgumentAnalysis::class);
         $register(DerivePropsIdeHelperGenerator::class);
-        $register(TestHypothesis::class);
+        $register(DerivePropsVisitor::class);
     }
 
     /**
@@ -71,7 +72,7 @@ final class Plugin implements PluginEntryPointInterface
     private static function resolveMixinConfig(?SimpleXMLElement $config = null): ?array
     {
         if (isset($config->{'derived-props-mixin-path'}) && isset($config->{'derived-props-mixin-namespace'})) {
-            $fullPath = PsalmInternal::baseDir() . trim((string) $config->{'derived-props-mixin-path'});
+            $fullPath = Config::getInstance()->base_dir . trim((string) $config->{'derived-props-mixin-path'});
 
             if (empty($fullPath) || !is_dir($fullPath)) {
                 throw new RuntimeException("{$fullPath} is not a directory");

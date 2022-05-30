@@ -11,7 +11,7 @@ use Klimick\Decode\HighOrder\Brand\DefaultBrand;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
 use Klimick\PsalmDecode\Issue\HighOrder\BrandAlreadyDefinedIssue;
 use Klimick\PsalmDecode\Issue\HighOrder\OptionalCallContradictionIssue;
-use Klimick\PsalmTest\Integration\Psalm;
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
@@ -27,14 +27,10 @@ use function Fp\Evidence\proveTrue;
 final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
 {
     private const METHODS_TO_BRANDS = [
-        self::METHOD_OPTIONAL => OptionalBrand::class,
-        self::METHOD_FROM => FromBrand::class,
-        self::METHOD_DEFAULT => DefaultBrand::class,
+        (DecoderInterface::class . '::' . 'optional') => OptionalBrand::class,
+        (DecoderInterface::class . '::' . 'from') => FromBrand::class,
+        (DecoderInterface::class . '::' . 'default') => DefaultBrand::class,
     ];
-
-    private const METHOD_OPTIONAL = DecoderInterface::class . '::' . 'optional';
-    private const METHOD_FROM = DecoderInterface::class . '::' . 'from';
-    private const METHOD_DEFAULT = DecoderInterface::class . '::' . 'default';
 
     public static function getClassLikeNames(): array
     {
@@ -52,8 +48,8 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
             $method_call = yield proveOf($event->getExpr(), MethodCall::class);
             $code_location = new CodeLocation($event->getStatementsSource(), $method_call->name);
 
-            $return_type = yield Psalm::getType($event, $method_call->var)
-                ->flatMap(fn($decoder_type) => Psalm::asSingleAtomicOf(Type\Atomic\TNamedObject::class, $decoder_type))
+            $return_type = yield PsalmApi::$types->getType($event, $method_call->var)
+                ->flatMap(fn($decoder_type) => PsalmApi::$types->asSingleAtomicOf(Type\Atomic\TNamedObject::class, $decoder_type))
                 ->map(fn($decoder_atomic) => self::withBrand($source, $code_location, $decoder_atomic, $method_name))
                 ->map(fn($branded_decoder_atomic) => new Type\Union([$branded_decoder_atomic]));
 
@@ -62,7 +58,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
     }
 
     /**
-     * @psalm-param DecoderMethodsAnalysis::METHOD_* $method_name
+     * @psalm-param (key-of<DecoderMethodsAnalysis::METHODS_TO_BRANDS>) $method_name
      */
     private static function withBrand(
         StatementsSource $source,

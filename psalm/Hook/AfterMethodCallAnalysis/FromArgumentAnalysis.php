@@ -7,7 +7,7 @@ namespace Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmDecode\Issue\HighOrder\InvalidPropertyAliasIssue;
-use Klimick\PsalmTest\Integration\Psalm;
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use PhpParser\Node\Arg;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\CodeLocation;
@@ -28,8 +28,8 @@ final class FromArgumentAnalysis implements AfterMethodCallAnalysisInterface
                 ->flatMap(fn() => proveOf($event->getExpr(), MethodCall::class));
 
             $is_valid_literal = firstOf($method_call->args, Arg::class)
-                ->flatMap(fn($arg) => Psalm::getType($event, $arg->value))
-                ->flatMap(fn($type) => Psalm::asSingleAtomicOf(TLiteralString::class, $type))
+                ->flatMap(fn($arg) => PsalmApi::$types->getType($event, $arg->value))
+                ->flatMap(fn($type) => PsalmApi::$types->asSingleAtomicOf(TLiteralString::class, $type))
                 ->map(fn($literal) => $literal->value)
                 ->fold(
                     ifSome: fn($arg) => '$' === $arg || (str_starts_with($arg, '$.') && mb_strlen($arg) > 2),

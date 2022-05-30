@@ -8,10 +8,10 @@ use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\PsalmDecode\Helper\DecoderTypeParamExtractor;
+use Klimick\PsalmDecode\Helper\DecoderType;
 use Klimick\PsalmDecode\Issue\HighOrder\IncompatibleConstraintIssue;
-use Klimick\PsalmTest\Integration\CallArg;
-use Klimick\PsalmTest\Integration\Psalm;
+use Fp\PsalmToolkit\Toolkit\CallArg;
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
@@ -49,11 +49,11 @@ final class ConstrainedMethodReturnTypeProvider implements MethodReturnTypeProvi
 
             self::contravariantCheck(
                 source: $event->getSource(),
-                constrained_call_args: yield Psalm::getNonEmptyCallArgs($event)
+                constrained_call_args: yield PsalmApi::$args->getNonEmptyCallArgs($event)
                     ->flatMap(fn($call_args) => self::mapCallArgs($call_args)),
                 decoder_type_param: yield proveOf($event->getStmt(), MethodCall::class)
-                    ->flatMap(fn($method_call) => Psalm::getType($event, $method_call->var))
-                    ->flatMap(fn($atomic) => DecoderTypeParamExtractor::extract($atomic))
+                    ->flatMap(fn($method_call) => PsalmApi::$types->getType($event, $method_call->var))
+                    ->flatMap(fn($atomic) => DecoderType::extractTypeParam($atomic))
                     ->map(fn($type) => self::withoutUndefined($type)),
             );
         });
@@ -67,13 +67,11 @@ final class ConstrainedMethodReturnTypeProvider implements MethodReturnTypeProvi
      */
     private static function mapCallArgs(NonEmptyArrayList $call_args): Option
     {
-        $arg_type_to_constraint_type_param =
-            fn(Union $type): Option => Psalm::asSingleAtomicOf(TGenericObject::class, $type)
-                ->flatMap(fn($object) => Psalm::getTypeParam($object, ConstraintInterface::class, position: 0))
-                ->map(fn($type_param) => self::toNonLiteralType($type_param));
-
         return $call_args->everyMap(
-            fn($call_arg) => $call_arg->flatMap($arg_type_to_constraint_type_param)
+            fn(CallArg $call_arg) => PsalmApi::$types->asSingleAtomicOf(TGenericObject::class, $call_arg->type)
+                ->flatMap(fn($object) => PsalmApi::$types->getFirstGeneric($object, ConstraintInterface::class))
+                ->map(fn($type_param) => self::toNonLiteralType($type_param))
+                ->map(fn($type) => new CallArg($call_arg->node, $call_arg->location, $type))
         );
     }
 

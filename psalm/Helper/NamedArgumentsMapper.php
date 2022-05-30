@@ -6,7 +6,7 @@ namespace Klimick\PsalmDecode\Helper;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;
-use Klimick\PsalmTest\Integration\Psalm;
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use PhpParser\Node;
 use Psalm\NodeTypeProvider;
 use Psalm\Type;
@@ -16,7 +16,7 @@ final class NamedArgumentsMapper
 {
     /**
      * @param list<Node\Arg> $call_args
-     * @return Option<Type\Atomic\TArray|Type\Atomic\TKeyedArray>
+     * @return Option<Type\Union>
      */
     public static function map(array $call_args, NodeTypeProvider $provider, bool $partial = false): Option
     {
@@ -49,7 +49,7 @@ final class NamedArgumentsMapper
 
             return [
                 'property' => self::getArgId($arg_offset, $arg),
-                'type' => yield DecoderTypeParamExtractor::extract($arg_type)
+                'type' => yield DecoderType::extractTypeParam($arg_type)
                     ->map(fn($type) => ($partial || self::isOptional($arg_type))
                         ? self::asPossiblyUndefined($type)
                         : $type),
@@ -59,7 +59,7 @@ final class NamedArgumentsMapper
 
     private static function isOptional(Type\Union $union): bool
     {
-        return Psalm::asSingleAtomicOf(Type\Atomic\TNamedObject::class, $union)
+        return PsalmApi::$types->asSingleAtomicOf(Type\Atomic\TNamedObject::class, $union)
             ->map(fn($named_object) => $named_object->getIntersectionTypes() ?? [])
             ->map(fn($intersections) => array_key_exists(OptionalBrand::class, $intersections))
             ->getOrElse(false);

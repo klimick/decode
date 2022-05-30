@@ -15,11 +15,12 @@ use Psalm\Internal\Analyzer\ProjectAnalyzer;
 use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use Psalm\Internal\Provider\NodeDataProvider;
 use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
+use Psalm\StatementsSource;
 
 final class CreateStatementsAnalyzer
 {
     /**
-     * @return Option<StatementsAnalyzer>
+     * @return Option<StatementsSource>
      * @psalm-suppress InternalClass
      * @psalm-suppress InternalMethod
      */

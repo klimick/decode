@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Static;
 
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\PsalmTest\PsalmTest;
-use Klimick\PsalmTest\StaticTestCase;
+use Fp\PsalmToolkit\StaticTest\PsalmTest;
+use Fp\PsalmToolkit\StaticTest\StaticTestCase;
 use function Klimick\Decode\Constraint\greater;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\shape;

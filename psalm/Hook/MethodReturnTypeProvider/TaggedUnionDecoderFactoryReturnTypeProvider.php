@@ -6,7 +6,7 @@ namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\TaggedUnionDecoderFactory;
-use Klimick\PsalmTest\Integration\Psalm;
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
 use Psalm\Type\Union;
@@ -23,7 +23,7 @@ final class TaggedUnionDecoderFactoryReturnTypeProvider implements MethodReturnT
     public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Union
     {
         Option::do(function() use ($event) {
-            $args = yield Psalm::getCallArgs($event);
+            $args = yield PsalmApi::$args->getCallArgs($event);
 
             yield proveTrue($args->count() >= 2)
                 ->orElse(Issue\TaggedUnion\TooFewArgsForTaggedUnionIssue::raise($event));

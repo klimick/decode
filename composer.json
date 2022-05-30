@@ -25,8 +25,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Klimick\\Decode\\Test\\": ["./test"],
-            "Psalm\\Mixins\\": ["./dev"]
+            "Klimick\\Decode\\Test\\": ["./test"]
         },
         "files": [
             "test/Helper/Eris.php"
@@ -34,7 +33,7 @@
     },
     "require": {
         "php": "^8.0",
-        "whsv26/functional": "^4.10"
+        "fp4php/functional": "^4.16"
     },
     "require-dev": {
         "vimeo/psalm": "^4.15",
@@ -44,6 +43,6 @@
         "phpunit/phpunit": "^9.5",
         "php-coveralls/php-coveralls": "^2.4",
         "rregeer/phpunit-coverage-check": "^0.3.1",
-        "klimick/psalm-test": "^1.2"
+        "fp4php/psalm-toolkit": "^2.0"
     }
 }

@@ -12,7 +12,7 @@ use PhpParser\Node\Expr\FuncCall;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use Psalm\Context;
-use Psalm\Internal\Provider\NodeDataProvider;
+use Psalm\NodeTypeProvider;
 use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Union;
@@ -21,14 +21,14 @@ use function Fp\Evidence\proveString;
 
 final class CreateContext
 {
-    public static function for(string $self, FuncCall $props_expr, NodeDataProvider $node_data): Context
+    public static function for(string $self, FuncCall $props_expr, NodeTypeProvider $node_data): Context
     {
         $visitor = new class($node_data) extends NodeVisitorAbstract {
             /** @var list<string> */
             private array $phantom_classes = [];
 
             public function __construct(
-                private NodeDataProvider $node_data,
+                private NodeTypeProvider $node_data,
             ) {}
 
             /**

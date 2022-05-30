@@ -68,7 +68,7 @@ final class GeneratePropsIdeHelper
 
     private static function createFolder(ClassLikeStorage $storage, string $inDir): string
     {
-        $directories = explode('\\', str_replace(strrchr($storage->name, '\\'), '', $storage->name));
+        $directories = explode('\\', str_replace(self::classShortName($storage), '', $storage->name));
 
         foreach ($directories as $directory) {
             $inDir = "{$inDir}/{$directory}";
@@ -83,7 +83,14 @@ final class GeneratePropsIdeHelper
 
     private static function getMixinClassFilename(ClassLikeStorage $storage): string
     {
-        return substr(strrchr($storage->name, '\\'), 1) . 'Props.php';
+        return self::classShortName($storage) . 'Props.php';
+    }
+
+    private static function classShortName(ClassLikeStorage $storage): string
+    {
+        return str_contains($storage->name, '\\')
+            ? substr(strrchr($storage->name, '\\'), 1)
+            : $storage->name;
     }
 
     /**
@@ -91,13 +98,13 @@ final class GeneratePropsIdeHelper
      */
     private static function generateTemplate(ClassLikeStorage $storage, array $return, string $namespace): string
     {
-        $class_namespace = str_replace(strrchr($storage->name, '\\'), '', $storage->name);
+        $class_namespace = str_replace('\\' . self::classShortName($storage), '', $storage->name);
 
         $replacements = [
             '{{MIXIN_NAMESPACE}}' => !empty($class_namespace)
                 ? "{$namespace}\\$class_namespace"
                 : $namespace,
-            '{{MIXIN_NAME}}' => substr(strrchr($storage->name, '\\'), 1) . 'Props',
+            '{{MIXIN_NAME}}' => self::classShortName($storage) . 'Props',
             '{{PROPS_LIST}}' => implode(PHP_EOL, map(
                 $return,
                 fn($type, $name) => sprintf(self::PROP, UnionToString::for($type), $name),

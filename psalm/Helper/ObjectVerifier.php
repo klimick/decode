@@ -5,11 +5,8 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Helper;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmDecode\Issue\Object\NotPartialPropertyIssue;
-use Klimick\PsalmDecode\PsalmInternal;
-use Klimick\PsalmTest\Integration\Psalm;
-use Psalm\Codebase;
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
@@ -29,18 +26,11 @@ final class ObjectVerifier
             $codebase = $source->getCodebase();
 
             $actual_shape = yield NamedArgumentsMapper::map($event->getCallArgs(), $source->getNodeTypeProvider())
-                ->map(
-                    fn($properties) => new Type\Union([
-                        new Type\Atomic\TGenericObject(DecoderInterface::class, [
-                            new Type\Union([$properties])
-                        ]),
-                    ])
-                )
-                ->flatMap(fn($shape_decoder) => ShapePropertiesExtractor::fromDecoder($shape_decoder));
+                ->flatMap(fn($shape_decoder) => DecoderType::extractShapeProperties($shape_decoder));
 
             $call_info = yield self::extractCallInfo($event);
 
-            self::compareSideBySide(
+            $validator = new ObjectPropertiesValidator(
                 codebase: $codebase,
                 source: $source,
                 actual_shape: $actual_shape,
@@ -48,6 +38,7 @@ final class ObjectVerifier
                 method_code_location: $call_info['call_location'],
                 arg_code_locations: $call_info['arg_locations'],
             );
+            $validator->validate();
         });
     }
 
@@ -74,7 +65,7 @@ final class ObjectVerifier
             $arg_locations = yield self::extractArgLocations($event, $source);
 
             $decoder_type = self::inferDecoderType($source, $class_storage, $call_location, $arg_locations, $is_partial);
-            $expected_shape = yield ShapePropertiesExtractor::fromDecoder($decoder_type);
+            $expected_shape = yield DecoderType::extractShapeProperties($decoder_type);
 
             return [
                 'call_location' => $call_location,
@@ -98,7 +89,9 @@ final class ObjectVerifier
         $shape = [];
 
         foreach ($class_storage->properties as $property => $storage) {
-            $shape[$property] = self::expandType($class_storage->name, $storage->type ?? Type::getMixed());
+            $shape[$property] = null !== $storage->type
+                ? PsalmApi::$types->expandUnion($class_storage->name, $storage->type)
+                : Type::getMixed();
 
             if ($partial && !$shape[$property]->isNullable()) {
                 $issue = new NotPartialPropertyIssue(
@@ -110,18 +103,7 @@ final class ObjectVerifier
             }
         }
 
-        return new Type\Union([
-            new Type\Atomic\TGenericObject(DecoderInterface::class, [
-                new Type\Union([
-                    DecoderType::createShape($shape)
-                ]),
-            ])
-        ]);
-    }
-
-    private static function expandType(string $self_class, Type\Union $property_type): Type\Union
-    {
-        return PsalmInternal::expandType(self_class: $self_class, type: $property_type);
+        return DecoderType::createShape($shape);
     }
 
     /**
@@ -149,7 +131,7 @@ final class ObjectVerifier
      */
     private static function extractPartialityInfo(Type\Union $partial_type_param): Option
     {
-        return Psalm::asSingleAtomicOf(Type\Atomic\TBool::class, $partial_type_param)
+        return PsalmApi::$types->asSingleAtomicOf(Type\Atomic\TBool::class, $partial_type_param)
             ->map(fn($bool) => match (true) {
                 ($bool instanceof Type\Atomic\TTrue) => true,
                 ($bool instanceof Type\Atomic\TFalse) => false,
@@ -161,26 +143,7 @@ final class ObjectVerifier
      */
     private static function extractClassStorage(Type\Union $object_class): Option
     {
-        return Psalm::asSingleAtomicOf(Type\Atomic\TNamedObject::class, $object_class)
-            ->flatMap(fn($named_object) => PsalmInternal::getStorageFor($named_object->value));
-    }
-
-    /**
-     * @param array<string, Type\Union> $actual_shape
-     * @param array<string, Type\Union> $expected_shape
-     * @param array<string, CodeLocation> $arg_code_locations
-     */
-    private static function compareSideBySide(
-        Codebase $codebase,
-        StatementsSource $source,
-        array $actual_shape,
-        array $expected_shape,
-        CodeLocation $method_code_location,
-        array $arg_code_locations,
-    ): void
-    {
-        ObjectPropertiesValidator::checkPropertyTypes($codebase, $source, $method_code_location, $arg_code_locations, $expected_shape, $actual_shape);
-        ObjectPropertiesValidator::checkNonexistentProperties($actual_shape, $expected_shape, $arg_code_locations, $source, $method_code_location);
-        ObjectPropertiesValidator::checkMissingProperties($source, $method_code_location, $expected_shape, $actual_shape);
+        return PsalmApi::$types->asSingleAtomicOf(Type\Atomic\TNamedObject::class, $object_class)
+            ->flatMap(fn($named_object) => PsalmApi::$classlikes->getStorage($named_object));
     }
 }

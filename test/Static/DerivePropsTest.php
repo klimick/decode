@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Static;
 
 use Klimick\Decode\Test\Static\Fixtures\User;
-use Klimick\PsalmTest\PsalmTest;
-use Klimick\PsalmTest\StaticTestCase;
-use Klimick\PsalmTest\StaticType\StaticTypes;
+use Fp\PsalmToolkit\StaticTest\PsalmTest;
+use Fp\PsalmToolkit\StaticTest\StaticTestCase;
+use Fp\PsalmToolkit\StaticType\StaticTypes as t;
 
 final class DerivePropsTest extends PsalmTest
 {
@@ -17,6 +17,6 @@ final class DerivePropsTest extends PsalmTest
             ->haveCode(function(User $u) {
                 return $u->name;
             })
-            ->seeReturnType(StaticTypes::string());
+            ->seeReturnType(t::string());
     }
 }
