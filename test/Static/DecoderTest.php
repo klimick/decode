@@ -49,10 +49,6 @@ final class DecoderTest extends PsalmTest
             );
     }
 
-    /**
-     * @psalm-suppress UnusedVariable
-     *     todo: $self = &$decoder; - false positive
-     */
     public function testRecDecoder(): void
     {
         $decoder = rec(function() use (&$decoder) {

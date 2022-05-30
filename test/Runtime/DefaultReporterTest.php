@@ -9,7 +9,6 @@ use Klimick\Decode\Report\DecodeResultHandler;
 use Klimick\Decode\Report\ErrorReport;
 use Klimick\Decode\Report\TypeErrorReport;
 use Klimick\Decode\Report\UndefinedErrorReport;
-use Klimick\Decode\Report\UnionCaseReport;
 use Klimick\Decode\Test\Static\Fixtures\Person;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Constraint\maxLength;
@@ -88,22 +87,6 @@ final class DefaultReporterTest extends TestCase
                 new ConstraintErrorReport('$.address.postcode', 'MIN_LENGTH', "'12345'", ['minLengthMustBe' => 6])
             ],
             $errorReport->constraintErrors,
-        );
-
-        assertEquals(
-            [
-                new UnionCaseReport('int', new ErrorReport(
-                    typeErrors: [
-                        new TypeErrorReport('$.privilege_id', 'int', "'100'"),
-                    ],
-                )),
-                new UnionCaseReport('null', new ErrorReport(
-                    typeErrors: [
-                        new TypeErrorReport('$.privilege_id', 'null', "'100'"),
-                    ],
-                )),
-            ],
-            $errorReport->unionTypeErrors,
         );
     }
 }

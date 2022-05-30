@@ -6,8 +6,7 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\UnionCaseErrors;
-use Klimick\Decode\Decoder\UnionTypeErrors;
+use Klimick\Decode\Decoder\TypeError;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
@@ -39,7 +38,7 @@ final class UnionDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
-        $errors = [];
+        $invalidTypes = [];
 
         foreach ($this->decoders as $decoder) {
             $typename = $decoder->name();
@@ -52,11 +51,11 @@ final class UnionDecoder extends AbstractDecoder
                 return valid($decoded->value);
             }
 
-            $errors[] = new UnionCaseErrors($typename, $decoded->errors);
+            $invalidTypes[] = $typename;
         }
 
         return invalids([
-            new UnionTypeErrors($errors),
+            new TypeError($context(implode(' | ', $invalidTypes), $value)),
         ]);
     }
 }
