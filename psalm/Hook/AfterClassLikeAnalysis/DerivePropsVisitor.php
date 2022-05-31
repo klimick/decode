@@ -97,10 +97,11 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
         $method = new MethodStorage();
         $method->cased_name = $name_lc;
         $method->is_static = true;
-        $method->setParams(asList($params));
         $method->return_type = new Union([
             new TNamedObject($to->name),
         ]);
+        /** @psalm-suppress InternalMethod */
+        $method->setParams(asList($params));
 
         $to->declaring_method_ids[$name_lc] = new MethodIdentifier($to->name, $name_lc);
         $to->appearing_method_ids[$name_lc] = new MethodIdentifier($to->name, $name_lc);
