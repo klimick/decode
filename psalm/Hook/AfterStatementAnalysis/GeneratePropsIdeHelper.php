@@ -19,7 +19,7 @@ use const PHP_EOL;
  */
 final class GeneratePropsIdeHelper
 {
-    private const TEMPLATE = <<<CLASS
+    private const TEMPLATE = <<<TEMPLATE
     <?php
     
     declare(strict_types=1);
@@ -29,32 +29,17 @@ final class GeneratePropsIdeHelper
     final class {{MIXIN_NAME}}
     {
     {{PROPS_LIST}}
-    
-    {{CREATE_DOCBLOCK}}
-        public static function create(
-    {{PARAM_LIST}}
-        ) {
-            die('???');
-        }
     }
-    
-    CLASS;
+    TEMPLATE;
 
-    private const PROP = <<<PROP
+    private const PROP = <<<TEMPLATE
         /** @var %s */
         public $%s;
-    PROP;
+    TEMPLATE;
 
-    private const DOCBLOCK_PARAM = '     * @param %s $%s';
-
-    private const NATIVE_PARAM = '        $%s,';
-
-    private const CREATE_DOCBLOCK = <<<DOCK
-        /**
-    %s
-         * @return \%s
-         */
-    DOCK;
+    private const NATIVE_PARAM = <<<TEMPLATE
+            $%s,';
+    TEMPLATE;
 
     /**
      * @param array<string, Union> $types
@@ -101,13 +86,6 @@ final class GeneratePropsIdeHelper
                 $return,
                 fn($type, $name) => sprintf(self::PROP, PsalmApi::$types->toDocblockString($type), $name),
             )),
-            '{{CREATE_DOCBLOCK}}' => sprintf(self::CREATE_DOCBLOCK,
-                implode(PHP_EOL, map(
-                    $return,
-                    fn($type, $name) => sprintf(self::DOCBLOCK_PARAM, PsalmApi::$types->toDocblockString($type), $name),
-                )),
-                $storage->name
-            ),
             '{{PARAM_LIST}}' => implode(PHP_EOL, map(
                 keys($return),
                 fn($param) => sprintf(self::NATIVE_PARAM, $param),
