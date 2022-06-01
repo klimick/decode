@@ -7,6 +7,7 @@ namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Derive;
+use Klimick\Decode\Decoder\Derive\Decoder;
 use Klimick\PsalmDecode\Helper\DecoderType;
 use Klimick\PsalmDecode\Plugin;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
@@ -14,14 +15,11 @@ use Psalm\Internal\MethodIdentifier;
 use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
 use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use Psalm\Storage\ClassLikeStorage;
-use Psalm\Storage\FunctionLikeParameter;
 use Psalm\Storage\MethodStorage;
 use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Union;
-use function Fp\Cast\asList;
 use function Fp\Collection\filter;
-use function Fp\Collection\map;
 use function Fp\Evidence\proveTrue;
 
 final class DerivePropsVisitor implements AfterClassLikeVisitInterface
@@ -35,7 +33,6 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
                 ->flatMap(fn() => self::getPropsType($event));
 
             self::addTypeMethod(to: $storage);
-            self::addCreateMethod($props, to: $storage);
             self::addProperties($props, to: $storage);
             self::removePropsMixin(from: $storage);
         });
@@ -56,7 +53,11 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
             return yield PsalmApi::$types->analyzeType(
                 analyzer: $analyzer,
                 expr: $props_expr,
-                context: CreateContext::for($storage->name, $props_expr, $analyzer->getNodeTypeProvider()),
+                context: CreateContext::for(
+                    self: $storage->name,
+                    props_expr: $props_expr,
+                    node_data: $analyzer->getNodeTypeProvider(),
+                ),
             );
         });
 
@@ -79,36 +80,12 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
         $to->sealed_properties = true;
     }
 
-    /**
-     * @param array<string, Union> $properties
-     */
-    private static function addCreateMethod(array $properties, ClassLikeStorage $to): void
-    {
-        $params = map($properties, fn($type, $name) => new FunctionLikeParameter(
-            name: $name,
-            by_ref: false,
-            type: $type,
-            is_optional: false,
-        ));
-
-        $name_lc = 'create';
-
-        $method = new MethodStorage();
-        $method->cased_name = $name_lc;
-        $method->is_static = true;
-        $method->return_type = new Union([
-            new TNamedObject($to->name),
-        ]);
-        /** @psalm-suppress InternalMethod */
-        $method->setParams(asList($params));
-
-        $to->declaring_method_ids[$name_lc] = new MethodIdentifier($to->name, $name_lc);
-        $to->appearing_method_ids[$name_lc] = new MethodIdentifier($to->name, $name_lc);
-        $to->methods[$name_lc] = $method;
-    }
-
     private static function addTypeMethod(ClassLikeStorage $to): void
     {
+        if (!array_key_exists(strtolower(Decoder::class), $to->used_traits)) {
+            return;
+        }
+
         $name_lc = 'type';
 
         $method = new MethodStorage();

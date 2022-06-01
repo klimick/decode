@@ -16,7 +16,7 @@ use function Klimick\Decode\Constraint\maxLength;
  */
 final class Project implements Derive\Props
 {
-    use Derive\Create;
+    use Derive\Decoder;
 
     public static function props(): ShapeDecoder
     {

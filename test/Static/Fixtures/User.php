@@ -17,7 +17,7 @@ use function Klimick\Decode\Constraint\minLength;
  */
 final class User implements Derive\Props
 {
-    use Derive\Create;
+    use Derive\Decoder;
 
     public static function props(): ShapeDecoder
     {
