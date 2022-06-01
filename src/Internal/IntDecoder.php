@@ -21,16 +21,8 @@ final class IntDecoder extends AbstractDecoder
         return 'int';
     }
 
-    /**
-     * @psalm-assert-if-true int $value
-     */
-    public function is(mixed $value): bool
-    {
-        return is_int($value);
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
-        return $this->is($value) ? valid($value) : invalid($context);
+        return is_int($value) ? valid($value) : invalid($context);
     }
 }

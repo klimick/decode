@@ -12,8 +12,6 @@ use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Decoder\tuple;
 use function Klimick\Decode\Test\Helper\forAll;
-use function PHPUnit\Framework\assertFalse;
-use function PHPUnit\Framework\assertTrue;
 
 final class TupleDecoderTest extends TestCase
 {
@@ -48,25 +46,5 @@ final class TupleDecoderTest extends TestCase
         $tuple = ['str_val', 'non_int_value'];
 
         Check::thatInvalidFor($decoder)($tuple);
-    }
-
-    public function testValidWithTypeAssertion(): void
-    {
-        $decoder = tuple(string(), int());
-
-        /** @var mixed $value */
-        $value = ['test', 10];
-
-        assertTrue($decoder->is($value));
-    }
-
-    public function testInvalidWithTypeAssertion(): void
-    {
-        $decoder = tuple(string(), int());
-
-        /** @var mixed $value */
-        $value = null;
-
-        assertFalse($decoder->is($value));
     }
 }

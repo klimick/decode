@@ -5,7 +5,6 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use function Fp\Collection\exists;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\valid;
 
@@ -31,11 +30,6 @@ final class LiteralDecoder extends AbstractDecoder
             },
             $this->literals
         ));
-    }
-
-    public function is(mixed $value): bool
-    {
-        return exists($this->literals, fn(mixed $literal) => $literal === $value);
     }
 
     public function decode(mixed $value, Context $context): Either

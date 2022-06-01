@@ -9,7 +9,6 @@ use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Invalid;
-use function Fp\Collection\every;
 use function Fp\Collection\map;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\invalids;
@@ -34,14 +33,6 @@ final class TupleDecoder extends AbstractDecoder
         $types = map($this->decoders, fn(DecoderInterface $d) => $d->name());
 
         return 'array{' . implode(', ', $types) . '}';
-    }
-
-    public function is(mixed $value): bool
-    {
-        return is_array($value) && every(
-            $this->decoders,
-            fn(DecoderInterface $d, int $key) => array_key_exists($key, $value) && $d->is($value[$key]),
-        );
     }
 
     public function decode(mixed $value, Context $context): Either

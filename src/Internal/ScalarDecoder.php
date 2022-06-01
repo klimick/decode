@@ -21,16 +21,8 @@ final class ScalarDecoder extends AbstractDecoder
         return 'scalar';
     }
 
-    /**
-     * @psalm-assert-if-true scalar $value
-     */
-    public function is(mixed $value): bool
-    {
-        return is_scalar($value);
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
-        return $this->is($value) ? valid($value) : invalid($context);
+        return is_scalar($value) ? valid($value) : invalid($context);
     }
 }

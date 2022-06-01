@@ -9,7 +9,6 @@ use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use function Fp\Collection\every;
 use function Klimick\Decode\Decoder\valid;
 
 /**
@@ -36,12 +35,6 @@ final class ObjectDecoder extends AbstractDecoder
     public function name(): string
     {
         return $this->objectClass;
-    }
-
-    public function is(mixed $value): bool
-    {
-        return $value instanceof $this->objectClass &&
-            every($this->decoders, fn(DecoderInterface $decoder, string $key) => $decoder->is($value->{$key}));
     }
 
     public function decode(mixed $value, Context $context): Either

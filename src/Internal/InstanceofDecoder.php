@@ -31,11 +31,6 @@ final class InstanceofDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
-        return $this->is($value) ? valid($value) : invalid($context);
-    }
-
-    public function is(mixed $value): bool
-    {
-        return $value instanceof $this->class;
+        return $value instanceof $this->class ? valid($value) : invalid($context);
     }
 }

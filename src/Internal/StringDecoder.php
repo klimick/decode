@@ -21,16 +21,8 @@ final class StringDecoder extends AbstractDecoder
         return 'string';
     }
 
-    /**
-     * @psalm-assert-if-true string $value
-     */
-    public function is(mixed $value): bool
-    {
-        return is_string($value);
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
-        return $this->is($value) ? valid($value) : invalid($context);
+        return is_string($value) ? valid($value) : invalid($context);
     }
 }

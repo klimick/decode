@@ -21,17 +21,9 @@ final class ArrKeyDecoder extends AbstractDecoder
         return 'array-key';
     }
 
-    /**
-     * @psalm-assert-if-true array-key $value
-     */
-    public function is(mixed $value): bool
-    {
-        return is_int($value) || is_string($value);
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
-        if (!$this->is($value)) {
+        if (!is_int($value) && !is_string($value)) {
             return invalid($context);
         }
 

@@ -27,11 +27,6 @@ interface DecoderInterface
     public function decode(mixed $value, Context $context): Either;
 
     /**
-     * @psalm-assert-if-true T $value
-     */
-    public function is(mixed $value): bool;
-
-    /**
      * @template ContravariantT
      * @no-named-arguments
      *

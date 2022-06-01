@@ -38,13 +38,6 @@ final class TaggedUnionDecoder extends AbstractDecoder
         ));
     }
 
-    public function is(mixed $value): bool
-    {
-        return $this->getTaggedDecoderFor($value)
-            ->map(fn($decoder) => $decoder->is($value))
-            ->getOrElse(false);
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
         return $this->getTaggedDecoderFor($value)

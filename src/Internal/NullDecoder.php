@@ -21,11 +21,6 @@ final class NullDecoder extends AbstractDecoder
         return 'null';
     }
 
-    public function is(mixed $value): bool
-    {
-        return null === $value;
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
         return null === $value ? valid($value) : invalid($context);

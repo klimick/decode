@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\HighOrder;
 
 use Fp\Functional\Either\Either;
-use Fp\Functional\Either\Left;
 use Klimick\Decode\Constraint\Invalid;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
@@ -45,23 +44,6 @@ final class ConstrainedDecoder extends HighOrderDecoder
     public function name(): string
     {
         return $this->decoder->name();
-    }
-
-    public function is(mixed $value): bool
-    {
-        if (!$this->decoder->is($value)) {
-            return false;
-        }
-
-        foreach ($this->constraints as $constraint) {
-            $context = Context::root($constraint->name(), $value);
-
-            if ($constraint->check($context, $value) instanceof Left) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     public function decode(mixed $value, Context $context): Either

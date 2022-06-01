@@ -9,9 +9,7 @@ use Fp\Functional\Either\Left;
 use Fp\Functional\Either\Right;
 use Klimick\Decode\Decoder\DecoderInterface;
 use function Klimick\Decode\Decoder\decode;
-use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertInstanceOf;
-use function PHPUnit\Framework\assertTrue;
 
 final class Check
 {
@@ -28,7 +26,6 @@ final class Check
             ]);
 
             assertInstanceOf(Right::class, decode($value, $decoder), "Should decode: {$testData}");
-            assertTrue($decoder->is($value), "Should be valid: {$testData}");
         };
     }
 
@@ -45,7 +42,6 @@ final class Check
             ]);
 
             assertInstanceOf(Left::class, decode($value, $decoder), "Should not decode: {$testData}");
-            assertFalse($decoder->is($value), "Should not be valid: {$testData}");
         };
     }
 }

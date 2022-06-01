@@ -13,7 +13,6 @@ use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\object;
 use function Klimick\Decode\Decoder\string;
 use function PHPUnit\Framework\assertInstanceOf;
-use function PHPUnit\Framework\assertTrue;
 
 final class ObjectDecoderTest extends TestCase
 {
@@ -27,19 +26,6 @@ final class ObjectDecoderTest extends TestCase
         $decoded = cast(['name' => 'foo', 'age' => 42], $decoder);
 
         assertInstanceOf(Some::class, $decoded);
-    }
-
-    public function testValidWithAssertion(): void
-    {
-        $decoder = object(Person::class)(
-            name: string(),
-            age: int(),
-        );
-
-        /** @var mixed $value */
-        $value = new Person('foo', 42);
-
-        assertTrue($decoder->is($value));
     }
 
     public function testInvalid(): void

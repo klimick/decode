@@ -39,9 +39,4 @@ final class MapDecoder extends AbstractDecoder
             fn($valid) => new Valid(($this->map)($valid->value)),
         );
     }
-
-    public function is(mixed $value): bool
-    {
-        return true; // no way to prove type
-    }
 }

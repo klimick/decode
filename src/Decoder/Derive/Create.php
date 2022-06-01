@@ -17,16 +17,6 @@ trait Create
      */
     private function __construct(private array $data)
     {
-        if (!self::props()->is($this)) {
-            $class = static::class;
-
-            throw new RuntimeException(
-                <<<ERR
-                Invalid data supplied for {$class}.
-                With static constructor 'create' you should create only valid instances.
-                ERR,
-            );
-        }
     }
 
     public static function __callStatic(string $name, array $arguments)

@@ -11,7 +11,6 @@ use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
-use function Fp\Collection\every;
 use function Fp\Collection\map;
 use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\valid;
@@ -43,14 +42,6 @@ final class ShapeDecoder extends AbstractDecoder
         }));
 
         return "array{{$properties}}";
-    }
-
-    public function is(mixed $value): bool
-    {
-        return is_array($value) && every(
-            $this->decoders,
-            fn(DecoderInterface $d, string $key) => array_key_exists($key, $value) && $d->is($value[$key])
-        );
     }
 
     public function decode(mixed $value, Context $context): Either

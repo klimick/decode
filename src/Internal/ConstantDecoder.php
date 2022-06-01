@@ -26,11 +26,6 @@ final class ConstantDecoder extends AbstractDecoder
         return 'constant';
     }
 
-    public function is(mixed $value): bool
-    {
-        return $value === $this->constant;
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
         return valid($this->constant);

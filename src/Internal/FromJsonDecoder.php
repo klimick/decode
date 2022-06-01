@@ -30,11 +30,6 @@ final class FromJsonDecoder extends AbstractDecoder
         return $this->decoder->name();
     }
 
-    public function is(mixed $value): bool
-    {
-        return $this->decoder->is($value);
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
         if (!is_string($value)) {

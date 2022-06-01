@@ -41,11 +41,6 @@ final class RecursionDecoder extends AbstractDecoder
         return $this->cache;
     }
 
-    public function is(mixed $value): bool
-    {
-        return $this->type()->is($value);
-    }
-
     public function name(): string
     {
         return $this->type()->name();

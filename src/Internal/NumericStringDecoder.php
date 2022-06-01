@@ -21,16 +21,8 @@ final class NumericStringDecoder extends AbstractDecoder
         return 'numeric-string';
     }
 
-    /**
-     * @psalm-assert-if-true numeric-string $value
-     */
-    public function is(mixed $value): bool
-    {
-        return is_string($value) && is_numeric($value);
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
-        return $this->is($value) ? valid($value) : invalid($context);
+        return is_string($value) && is_numeric($value) ? valid($value) : invalid($context);
     }
 }

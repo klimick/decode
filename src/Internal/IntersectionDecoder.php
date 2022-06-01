@@ -9,7 +9,6 @@ use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Valid;
-use function Fp\Collection\every;
 use function Fp\Collection\map;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\invalids;
@@ -62,10 +61,5 @@ final class IntersectionDecoder extends AbstractDecoder
         }
 
         return !empty($errors) ? invalids($errors) : valid($merged);
-    }
-
-    public function is(mixed $value): bool
-    {
-        return every($this->decoders, fn(DecoderInterface $decoder) => $decoder->is($value));
     }
 }
