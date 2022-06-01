@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Decoder\Derive;
 
-use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
 
 /**
  * @template T of object
@@ -12,7 +12,7 @@ use Klimick\Decode\Decoder\DecoderInterface;
 interface Props
 {
     /**
-     * @return DecoderInterface<array<string, mixed>>
+     * @return ShapeDecoder<array<string, mixed>>
      */
-    public static function props(): DecoderInterface;
+    public static function props(): ShapeDecoder;
 }

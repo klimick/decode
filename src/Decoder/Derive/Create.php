@@ -4,7 +4,6 @@ namespace Klimick\Decode\Decoder\Derive;
 
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\ObjectDecoder;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use RuntimeException;
 
 /**
@@ -30,12 +29,12 @@ trait Create
             return new self($arguments);
         }
 
-        throw new \RuntimeException('not implemented');
+        throw new RuntimeException("Method '{$name}' is not defined. Maybe you mean 'create'?");
     }
 
     public function __get(string $name): mixed
     {
-        return $this->data[$name] ?? throw new RuntimeException("No prop with name '{$name}'");
+        return $this->data[$name] ?? throw new RuntimeException("Property with name '{$name}' is not defined!");
     }
 
     /**
@@ -43,10 +42,6 @@ trait Create
      */
     public static function type(): DecoderInterface
     {
-        /** @var ShapeDecoder $shape */
-        $shape = self::props();
-
-        /** @var DecoderInterface<static> */
-        return new ObjectDecoder(static::class, $shape->decoders);
+        return new ObjectDecoder(static::class, self::props()->decoders);
     }
 }
