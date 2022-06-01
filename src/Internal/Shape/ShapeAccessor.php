@@ -13,6 +13,9 @@ use Klimick\Decode\Decoder\UndefinedError;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
+use function Fp\Collection\at;
+use function Fp\Collection\tail;
+use function Fp\Evidence\proveOf;
 
 /**
  * @psalm-immutable
@@ -20,7 +23,10 @@ use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
 final class ShapeAccessor
 {
     /**
-     * @return Either<Invalid, Valid>
+     * @template TDecoded
+     *
+     * @param DecoderInterface<TDecoded> $decoder
+     * @return Either<Invalid, Valid<TDecoded>>
      * @psalm-pure
      */
     public static function decodeProperty(
@@ -28,11 +34,11 @@ final class ShapeAccessor
         DecoderInterface $decoder,
         int|string $key,
         array $shape,
-    ): Either
-    {
+    ): Either {
         return self::getConstant($decoder)
             ->orElse(fn() => self::getByAliasedKey($decoder, $shape))
-            ->orElse(fn() => self::getByOriginalKey($decoder, $key, $shape))
+            ->orElse(fn() => self::getByOriginalKey($key, $shape))
+            ->orElse(fn() => self::getDefault($decoder))
             ->toRight(fn() => self::undefined($context, $decoder, $key))
             ->flatMap(fn($value) => self::decode($decoder, $value, $key, $context));
     }
@@ -43,9 +49,8 @@ final class ShapeAccessor
      */
     private static function getConstant(DecoderInterface $decoder): Option
     {
-        return $decoder instanceof ConstantDecoder
-            ? Option::some($decoder->constant)
-            : Option::none();
+        return proveOf($decoder, ConstantDecoder::class)
+            ->map(fn($decoder): mixed => $decoder->constant);
     }
 
     /**
@@ -54,26 +59,20 @@ final class ShapeAccessor
      */
     private static function getByAliasedKey(DecoderInterface $decoder, array $shape): Option
     {
-        if (!($decoder instanceof HighOrderDecoder) || !$decoder->isFrom()) {
-            return Option::none();
-        }
-
-        $path = explode('.', preg_replace('/^\$\.(.+)/', '$1', $decoder->asFrom()->alias));
-
-        return $path !== ['$']
-            ? self::dotAccess($path, $shape)->orElse(fn() => self::getDefault($decoder))
-            : Option::some($shape);
+        return proveOf($decoder, HighOrderDecoder::class)
+            ->flatMap(fn($decoder) => Option::fromNullable($decoder->asFrom()))
+            ->flatMap(fn($decoder) => '$' !== $decoder->alias
+                ? self::dotAccess(tail(explode('.', $decoder->alias)), $shape)
+                : Option::some($shape));
     }
 
     /**
      * @return Option<mixed>
      * @psalm-pure
      */
-    private static function getByOriginalKey(DecoderInterface $decoder, int|string $key, array $shape): Option
+    private static function getByOriginalKey(int|string $key, array $shape): Option
     {
-        return array_key_exists($key, $shape)
-            ? Option::some($shape[$key])
-            : self::getDefault($decoder);
+        return at($shape, $key);
     }
 
     /**
@@ -82,20 +81,24 @@ final class ShapeAccessor
      */
     private static function getDefault(DecoderInterface $decoder): Option
     {
-        return $decoder instanceof HighOrderDecoder && $decoder->isDefault()
-            ? Option::some($decoder->asDefault()->default)
-            : Option::none();
+        return proveOf($decoder, HighOrderDecoder::class)
+            ->flatMap(fn($decoder) => Option::fromNullable($decoder->asDefault()))
+            ->map(fn($decoder): mixed => $decoder->default);
     }
 
     /**
-     * @param non-empty-list<string> $path
+     * @param list<string> $path
      * @return Option<mixed>
      * @psalm-pure
      */
     private static function dotAccess(array $path, array $shape): Option
     {
+        if (empty($path)) {
+            return Option::none();
+        }
+
         $key = $path[0];
-        $rest = array_slice($path, offset: 1);
+        $rest = tail($path);
 
         if (array_key_exists($key, $shape)) {
             if (empty($rest)) {
@@ -125,7 +128,10 @@ final class ShapeAccessor
     }
 
     /**
-     * @return Either<Invalid, Valid>
+     * @template TDecoded
+     *
+     * @param DecoderInterface<TDecoded> $decoder
+     * @return Either<Invalid, Valid<TDecoded>>
      * @psalm-pure
      */
     private static function decode(DecoderInterface $decoder, mixed $value, int|string $key, Context $context): Either

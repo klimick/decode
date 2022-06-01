@@ -12,6 +12,7 @@ use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
 use function Fp\Collection\every;
+use function Fp\Collection\map;
 use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\valid;
 use function Klimick\Decode\Decoder\invalid;
@@ -33,17 +34,13 @@ final class ShapeDecoder extends AbstractDecoder
 
     public function name(): string
     {
-        $properties = implode(', ', array_map(
-            function(int|string $property, DecoderInterface $decoder) {
-                if ($decoder instanceof HighOrderDecoder && $decoder->isOptional()) {
-                    return "{$property}?: {$decoder->name()}";
-                }
+        $properties = implode(', ', map($this->decoders, function(DecoderInterface $decoder, string $property) {
+            if ($decoder instanceof HighOrderDecoder && $decoder->isOptional()) {
+                return "{$property}?: {$decoder->name()}";
+            }
 
-                return "{$property}: {$decoder->name()}";
-            },
-            array_keys($this->decoders),
-            array_values($this->decoders),
-        ));
+            return "{$property}: {$decoder->name()}";
+        }));
 
         return "array{{$properties}}";
     }
