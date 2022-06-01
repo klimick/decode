@@ -6,6 +6,7 @@ namespace Klimick\Decode\Test\Static;
 
 use DateTimeImmutable;
 use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Department;
 use Klimick\Decode\Test\Static\Fixtures\PartialPerson;
 use Klimick\Decode\Test\Static\Fixtures\Person;
@@ -188,16 +189,13 @@ final class DecoderTest extends PsalmTest
 
     public function testShapeDecoder(): void
     {
-        $expected_decoder_type = t::generic(
-            ofType: DecoderInterface::class,
-            withParams: [
-                t::shape([
-                    'name' => t::string(),
-                    'age' => t::int(),
-                    'bornAt' => t::object(DateTimeImmutable::class)->optional(),
-                ]),
-            ],
-        );
+        $shape = [
+            t::shape([
+                'name' => t::string(),
+                'age' => t::int(),
+                'bornAt' => t::object(DateTimeImmutable::class)->optional(),
+            ]),
+        ];
 
         StaticTestCase::describe('Shape decoder')
             ->haveCode(fn() => shape(
@@ -205,7 +203,12 @@ final class DecoderTest extends PsalmTest
                 age: int(),
                 bornAt: datetime()->optional(),
             ))
-            ->seeReturnType($expected_decoder_type);
+            ->seeReturnType(
+                t::intersection([
+                    t::generic(DecoderInterface::class, $shape),
+                    t::generic(ShapeDecoder::class, $shape),
+                ])
+            );
     }
 
     public function testIntersectionDecoder(): void

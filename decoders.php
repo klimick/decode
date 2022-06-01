@@ -329,6 +329,8 @@ function fromJson(DecoderInterface $decoder): DecoderInterface
 }
 
 /**
+ * @return DecoderInterface<array<string, mixed>> & ShapeDecoder<array<string, mixed>>
+ *
  * @psalm-pure
  * @see ShapeReturnTypeProvider
  */
@@ -342,6 +344,8 @@ function shape(DecoderInterface ...$decoders): DecoderInterface
 }
 
 /**
+ * @return DecoderInterface<array<string, mixed>> & ShapeDecoder<array<string, mixed>>
+ *
  * @psalm-pure
  * @see ShapeReturnTypeProvider
  */
