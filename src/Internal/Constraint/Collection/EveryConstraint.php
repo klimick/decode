@@ -16,7 +16,7 @@ use function Klimick\Decode\Constraint\valid;
  * @implements ConstraintInterface<array<array-key, TVal>>
  * @psalm-immutable
  */
-final class ForallConstraint implements ConstraintInterface
+final class EveryConstraint implements ConstraintInterface
 {
     /**
      * @param ConstraintInterface<TVal> $constraint

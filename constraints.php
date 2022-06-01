@@ -203,9 +203,9 @@ function matchesRegex(string $regex): ConstraintInterface
  * @param ConstraintInterface<T> $constraint
  * @return ConstraintInterface<array<array-key, T>>
  */
-function forall(ConstraintInterface $constraint): ConstraintInterface
+function every(ConstraintInterface $constraint): ConstraintInterface
 {
-    return new C\Collection\ForallConstraint($constraint);
+    return new C\Collection\EveryConstraint($constraint);
 }
 
 /**
