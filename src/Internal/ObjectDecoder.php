@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal;
 
-use Closure;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use function Fp\Collection\every;
 use function Klimick\Decode\Decoder\valid;
 
 /**
@@ -24,13 +24,11 @@ final class ObjectDecoder extends AbstractDecoder
     /**
      * @param class-string<T> $objectClass
      * @param array<string, DecoderInterface<mixed>> $decoders
-     * @param null|Closure(array): T $customConstructor
      */
     public function __construct(
         public string $objectClass,
         public array $decoders,
         public bool $partial = false,
-        public null|Closure $customConstructor = null,
     ) {
         $this->shape = new ShapeDecoder($decoders, $partial);
     }
@@ -42,17 +40,8 @@ final class ObjectDecoder extends AbstractDecoder
 
     public function is(mixed $value): bool
     {
-        if (!($value instanceof $this->objectClass)) {
-            return false;
-        }
-
-        foreach ($this->decoders as $key => $decoder) {
-            if (!$decoder->is($value->{$key})) {
-                return false;
-            }
-        }
-
-        return $value instanceof $this->objectClass;
+        return $value instanceof $this->objectClass &&
+            every($this->decoders, fn(DecoderInterface $decoder, string $key) => $decoder->is($value->{$key}));
     }
 
     public function decode(mixed $value, Context $context): Either
@@ -61,9 +50,7 @@ final class ObjectDecoder extends AbstractDecoder
             ->decode($value, $context)
             ->flatMap(function($validShape) {
                 /** @psalm-suppress MixedMethodCall */
-                $instance = null !== $this->customConstructor
-                    ? ($this->customConstructor)($validShape->value)
-                    : new ($this->objectClass)(...$validShape->value);
+                $instance = new ($this->objectClass)(...$validShape->value);
 
                 return valid($instance);
             });
