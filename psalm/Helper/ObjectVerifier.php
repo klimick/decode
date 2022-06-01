@@ -22,17 +22,13 @@ final class ObjectVerifier
     public static function verify(MethodReturnTypeProviderEvent $event): void
     {
         Option::do(function() use ($event) {
-            $source = $event->getSource();
-            $codebase = $source->getCodebase();
-
-            $actual_shape = yield NamedArgumentsMapper::map($event->getCallArgs(), $source->getNodeTypeProvider())
-                ->flatMap(fn($shape_decoder) => DecoderType::extractShapeProperties($shape_decoder));
+            $actual_shape = yield NamedArgumentsMapper::map($event->getCallArgs(), $event->getSource())
+                ->flatMap(fn($shape_decoder) => DecoderType::getShapeProperties($shape_decoder));
 
             $call_info = yield self::extractCallInfo($event);
 
             $validator = new ObjectPropertiesValidator(
-                codebase: $codebase,
-                source: $source,
+                source: $event->getSource(),
                 actual_shape: $actual_shape,
                 expected_shape: $call_info['expected_shape'],
                 method_code_location: $call_info['call_location'],
@@ -65,7 +61,7 @@ final class ObjectVerifier
             $arg_locations = yield self::extractArgLocations($event, $source);
 
             $decoder_type = self::inferDecoderType($source, $class_storage, $call_location, $arg_locations, $is_partial);
-            $expected_shape = yield DecoderType::extractShapeProperties($decoder_type);
+            $expected_shape = yield DecoderType::getShapeProperties($decoder_type);
 
             return [
                 'call_location' => $call_location,
@@ -103,7 +99,7 @@ final class ObjectVerifier
             }
         }
 
-        return DecoderType::createShape($shape);
+        return DecoderType::createShapeDecoder($shape);
     }
 
     /**

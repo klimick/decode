@@ -29,10 +29,9 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
     public static function afterClassLikeVisit(AfterClassLikeVisitEvent $event): void
     {
         Option::do(function() use ($event) {
-            $codebase = $event->getCodebase();
             $storage = $event->getStorage();
 
-            $props = yield proveTrue($codebase->classImplements($storage->name, Derive\Props::class))
+            $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, Derive\Props::class))
                 ->flatMap(fn() => self::getPropsType($event));
 
             self::addTypeMethod(to: $storage);
@@ -64,7 +63,7 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
         $storage->populated = false;
 
         return $type->flatMap(
-            fn($t) => DecoderType::extractShapeProperties($t)
+            fn($t) => DecoderType::getShapeProperties($t)
         );
     }
 

@@ -18,13 +18,10 @@ final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterfa
 
     public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
     {
-        $source = $event->getStatementsSource();
-        $is_partial_shape = 'klimick\decode\decoder\partialshape' === $event->getFunctionId();
-
         $mapped = NamedArgumentsMapper::map(
             call_args: $event->getCallArgs(),
-            provider: $source->getNodeTypeProvider(),
-            partial: $is_partial_shape,
+            source: $event->getStatementsSource(),
+            partial: 'klimick\decode\decoder\partialshape' === $event->getFunctionId(),
         );
 
         return $mapped->get();

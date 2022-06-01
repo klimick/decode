@@ -18,11 +18,9 @@ final class TupleReturnTypeProvider implements FunctionReturnTypeProviderInterfa
 
     public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
     {
-        $source = $event->getStatementsSource();
-
         $mapped = NamedArgumentsMapper::map(
             $event->getCallArgs(),
-            $source->getNodeTypeProvider()
+            $event->getStatementsSource()
         );
 
         return $mapped->get();

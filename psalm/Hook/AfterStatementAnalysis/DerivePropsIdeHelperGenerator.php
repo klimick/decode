@@ -25,8 +25,6 @@ final class DerivePropsIdeHelperGenerator implements AfterStatementAnalysisInter
     {
         Option::do(function() use ($event) {
             $context = $event->getContext();
-            $source = $event->getStatementsSource();
-            $types = $source->getNodeTypeProvider();
 
             $config = yield proveString($context->calling_method_id)
                 ->filter(fn($method) => str_ends_with($method, '::props'))
@@ -35,10 +33,10 @@ final class DerivePropsIdeHelperGenerator implements AfterStatementAnalysisInter
             $storage = yield proveString($context->self)
                 ->flatMap(fn($class) => PsalmApi::$classlikes->getStorage($class));
 
-            $property_types = yield proveTrue(array_key_exists(strtolower(Props::class), $storage->class_implements))
+            $property_types = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, Props::class))
                 ->flatMap(fn() => proveOf($event->getStmt(), Return_::class))
-                ->flatMap(fn($return) => Option::fromNullable($types->getType($return)))
-                ->flatMap(fn($type) => DecoderType::extractShapeProperties($type));
+                ->flatMap(fn($return) => PsalmApi::$types->getType($event, $return))
+                ->flatMap(fn($type) => DecoderType::getShapeProperties($type));
 
             GeneratePropsIdeHelper::for($storage, $config, $property_types);
         });

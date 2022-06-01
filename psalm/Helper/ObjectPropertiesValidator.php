@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\Helper;
 
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\PsalmDecode\Issue\Object\InvalidDecoderForPropertyIssue;
 use Klimick\PsalmDecode\Issue\Object\NonexistentPropertyObjectPropertyIssue;
 use Klimick\PsalmDecode\Issue\Object\RequiredObjectPropertyMissingIssue;
-use Psalm\Codebase;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
 use Psalm\StatementsSource;
@@ -21,7 +21,6 @@ final class ObjectPropertiesValidator
      * @param array<string, CodeLocation> $arg_code_locations
      */
     public function __construct(
-        private Codebase $codebase,
         private StatementsSource $source,
         private array $actual_shape,
         private array $expected_shape,
@@ -43,7 +42,7 @@ final class ObjectPropertiesValidator
                 continue;
             }
 
-            if ($this->codebase->isTypeContainedByType($this->actual_shape[$property], $type)) {
+            if (PsalmApi::$types->isTypeContainedByType($this->actual_shape[$property], $type)) {
                 continue;
             }
 

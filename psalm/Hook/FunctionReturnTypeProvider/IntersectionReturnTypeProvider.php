@@ -28,7 +28,7 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
 
             foreach ($event->getCallArgs() as $arg) {
                 $shape_type = yield PsalmApi::$types->getType($event, $arg->value)
-                    ->flatMap(fn($type) => DecoderType::extractShapeProperties($type));
+                    ->flatMap(fn($type) => DecoderType::getShapeProperties($type));
 
                 foreach ($shape_type as $property => $type) {
                     if (array_key_exists($property, $properties)) {
@@ -46,7 +46,7 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
                 IssueBuffer::accepts($issue, $source->getSuppressedIssues());
             }
 
-            return DecoderType::createShape($properties);
+            return DecoderType::createShapeDecoder($properties);
         });
 
         return $type->get();

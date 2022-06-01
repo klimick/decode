@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\Hook\AfterStatementAnalysis;
 
-use Klimick\PsalmDecode\Helper\UnionToString;
+use Fp\Functional\Option\Option;
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\PsalmDecode\Plugin;
+use Psalm\Aliases;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Type\Union;
 use function Fp\Collection\keys;
@@ -60,7 +62,7 @@ final class GeneratePropsIdeHelper
      */
     public static function for(ClassLikeStorage $storage, array $config, array $types): void
     {
-        $filename = self::getMixinClassFilename($storage);
+        $filename = PsalmApi::$classlikes->toShortName($storage) . 'Props.php';
         $path = self::createFolder($storage, $config['directory']);
 
         file_put_contents("{$path}/{$filename}", self::generateTemplate($storage, $types, $config['namespace']));
@@ -68,7 +70,10 @@ final class GeneratePropsIdeHelper
 
     private static function createFolder(ClassLikeStorage $storage, string $inDir): string
     {
-        $directories = explode('\\', str_replace(self::classShortName($storage), '', $storage->name));
+        $directories = Option::fromNullable($storage->aliases)
+            ->flatMap(fn(Aliases $aliases) => Option::fromNullable($aliases->namespace))
+            ->map(fn(string $namespace) => explode('\\', $namespace))
+            ->getOrElse([]);
 
         foreach ($directories as $directory) {
             $inDir = "{$inDir}/{$directory}";
@@ -81,38 +86,25 @@ final class GeneratePropsIdeHelper
         return $inDir;
     }
 
-    private static function getMixinClassFilename(ClassLikeStorage $storage): string
-    {
-        return self::classShortName($storage) . 'Props.php';
-    }
-
-    private static function classShortName(ClassLikeStorage $storage): string
-    {
-        return str_contains($storage->name, '\\')
-            ? substr(strrchr($storage->name, '\\'), 1)
-            : $storage->name;
-    }
-
     /**
      * @param array<string, Union> $return
      */
     private static function generateTemplate(ClassLikeStorage $storage, array $return, string $namespace): string
     {
-        $class_namespace = str_replace('\\' . self::classShortName($storage), '', $storage->name);
-
         $replacements = [
-            '{{MIXIN_NAMESPACE}}' => !empty($class_namespace)
-                ? "{$namespace}\\$class_namespace"
-                : $namespace,
-            '{{MIXIN_NAME}}' => self::classShortName($storage) . 'Props',
+            '{{MIXIN_NAMESPACE}}' => Option::fromNullable($storage->aliases)
+                ->flatMap(fn(Aliases $aliases) => Option::fromNullable($aliases->namespace))
+                ->map(fn(string $class_namespace) => "{$namespace}\\$class_namespace")
+                ->getOrElse($namespace),
+            '{{MIXIN_NAME}}' => PsalmApi::$classlikes->toShortName($storage) . 'Props',
             '{{PROPS_LIST}}' => implode(PHP_EOL, map(
                 $return,
-                fn($type, $name) => sprintf(self::PROP, UnionToString::for($type), $name),
+                fn($type, $name) => sprintf(self::PROP, PsalmApi::$types->toDocblockString($type), $name),
             )),
             '{{CREATE_DOCBLOCK}}' => sprintf(self::CREATE_DOCBLOCK,
                 implode(PHP_EOL, map(
                     $return,
-                    fn($type, $name) => sprintf(self::DOCBLOCK_PARAM, UnionToString::for($type), $name),
+                    fn($type, $name) => sprintf(self::DOCBLOCK_PARAM, PsalmApi::$types->toDocblockString($type), $name),
                 )),
                 $storage->name
             ),

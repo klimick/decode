@@ -18,7 +18,7 @@ final class DecoderType
     /**
      * @param array<int|string, Type\Union> $properties
      */
-    public static function createShape(array $properties): Type\Union
+    public static function createShapeDecoder(array $properties): Type\Union
     {
         return new Type\Union([
             new Type\Atomic\TGenericObject(DecoderInterface::class, [
@@ -34,7 +34,7 @@ final class DecoderType
     /**
      * @return Option<Union>
      */
-    public static function extractTypeParam(Union $decoder_type): Option
+    public static function getDecoderGeneric(Union $decoder_type): Option
     {
         return PsalmApi::$types->asSingleAtomicOf(TGenericObject::class, $decoder_type)
             ->filter(fn(TGenericObject $generic) => $generic->value === DecoderInterface::class)
@@ -45,9 +45,9 @@ final class DecoderType
      * @param Type\Union $shape_decoder_type
      * @return Option<array<string, Type\Union>>
      */
-    public static function extractShapeProperties(Type\Union $shape_decoder_type): Option
+    public static function getShapeProperties(Type\Union $shape_decoder_type): Option
     {
-        return self::extractTypeParam($shape_decoder_type)
+        return self::getDecoderGeneric($shape_decoder_type)
             ->flatMap(fn($decoder_type_param) => PsalmApi::$types->asSingleAtomic($decoder_type_param)->flatMap(
                 fn($keyed_array) => Option::fromNullable(match (true) {
                     ($keyed_array instanceof Type\Atomic\TArray) => [],
