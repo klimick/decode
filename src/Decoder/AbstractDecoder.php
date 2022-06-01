@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Decoder;
 
+use Closure;
 use Klimick\Decode\Internal\HighOrder\FromDecoder;
 use Klimick\Decode\Internal\HighOrder\DefaultDecoder;
 use Klimick\Decode\Internal\HighOrder\OptionalDecoder;
 use Klimick\Decode\Internal\HighOrder\ConstrainedDecoder;
 use Klimick\Decode\Constraint\ConstraintInterface;
+use Klimick\Decode\Internal\MapDecoder;
 
 /**
  * @template-covariant T
@@ -38,5 +40,10 @@ abstract class AbstractDecoder implements DecoderInterface
     public function default(mixed $value): DecoderInterface
     {
         return new DefaultDecoder($value, $this);
+    }
+
+    public function map(Closure $to): DecoderInterface
+    {
+        return new MapDecoder($this, $to);
     }
 }

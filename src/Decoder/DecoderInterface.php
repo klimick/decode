@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Decoder;
 
+use Closure;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
@@ -58,4 +59,12 @@ interface DecoderInterface
      * @return DecoderInterface<T>
      */
     public function default(mixed $value): DecoderInterface;
+
+    /**
+     * @template TMapped
+     *
+     * @param Closure(T): TMapped $to
+     * @return DecoderInterface<TMapped>
+     */
+    public function map(Closure $to): DecoderInterface;
 }
