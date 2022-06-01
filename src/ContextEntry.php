@@ -9,10 +9,9 @@ namespace Klimick\Decode;
  */
 final class ContextEntry
 {
-
     public function __construct(
         public string $name,
         public mixed $actual,
         public string $key,
-    ) { }
+    ) {}
 }

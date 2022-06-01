@@ -82,7 +82,7 @@ function tryCast(mixed $value, DecoderInterface $to): mixed
     $decoded = decode($value, $to)->get();
 
     return $decoded instanceof Invalid
-        ? throw new CastException(DefaultReporter::report($decoded))
+        ? throw new CastException(DefaultReporter::report($decoded), $to->name())
         : $decoded->value;
 }
 

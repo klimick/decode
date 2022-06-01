@@ -6,12 +6,12 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\TypeError;
 use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
+use function Fp\Collection\map;
+use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\valid;
-use function Klimick\Decode\Decoder\invalids;
 
 /**
  * @template-covariant T
@@ -27,7 +27,7 @@ final class UnionDecoder extends AbstractDecoder
 
     public function name(): string
     {
-        return implode(' | ', array_map(fn($d) => $d->name(), $this->decoders));
+        return implode(' | ', map($this->decoders, fn($d) => $d->name()));
     }
 
     public function decode(mixed $value, Context $context): Either
@@ -48,8 +48,6 @@ final class UnionDecoder extends AbstractDecoder
             $invalidTypes[] = $typename;
         }
 
-        return invalids([
-            new TypeError($context(implode(' | ', $invalidTypes), $value)),
-        ]);
+        return invalid($context(implode(' | ', $invalidTypes), $value));
     }
 }

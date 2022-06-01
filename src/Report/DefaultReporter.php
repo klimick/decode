@@ -13,6 +13,7 @@ use Klimick\Decode\Decoder\TypeError;
 use Klimick\Decode\Decoder\ConstraintsError;
 use Klimick\Decode\Decoder\UndefinedError;
 use Klimick\Decode\Constraint\ConstraintError;
+use function Fp\Collection\map;
 
 final class DefaultReporter
 {
@@ -38,12 +39,11 @@ final class DefaultReporter
             if ($error instanceof TypeError) {
                 $typeErrors[] = self::reportTypeError($error, $useShortClassNames);
             } elseif ($error instanceof ConstraintsError) {
-                $constraintErrors = [
-                    ...$constraintErrors,
-                    ...array_map(fn($e) => self::reportConstraintError($e), $error->errors),
-                ];
+                foreach ($error->errors as $e) {
+                    $constraintErrors[] = self::reportConstraintError($e);
+                }
             } elseif ($error instanceof UndefinedError) {
-                $undefinedErrors[] = self::reportUndefinedError($error);
+                $undefinedErrors[] = self::pathFromContext($error->context);
             }
         }
 
@@ -52,24 +52,20 @@ final class DefaultReporter
 
     private static function reportConstraintError(ConstraintError $error): ConstraintErrorReport
     {
-        $lastErr = $error->context->entries[count($error->context->entries) - 1];
-        $propertyPath = self::pathFromContext($error->context);
-
         return new ConstraintErrorReport(
-            path: $propertyPath,
-            constraint: $error->context->entries[0]->name,
-            value: self::actualValue($lastErr),
+            path: self::pathFromContext($error->context),
+            constraint: $error->context->firstEntry()->name,
+            value: self::actualValue($error->context->lastEntry()),
             payload: $error->payload,
         );
     }
 
     private static function reportTypeError(TypeError $error, bool $useShortClassNames): TypeErrorReport
     {
-        $lastErr = $error->context->entries[count($error->context->entries) - 1];
-        $propertyPath = self::pathFromContext($error->context);
+        $lastErr = $error->context->lastEntry();
 
         return new TypeErrorReport(
-            path: $propertyPath,
+            path: self::pathFromContext($error->context),
             expected: $useShortClassNames
                 ? self::formatExpectedType($lastErr->name)
                 : $lastErr->name,
@@ -82,28 +78,11 @@ final class DefaultReporter
         return is_string($entry->actual) ? "'{$entry->actual}'" : $entry->actual;
     }
 
-    private static function reportUndefinedError(UndefinedError $error): UndefinedErrorReport
+    private static function formatExpectedType(string $union): string
     {
-        $size = count($error->context->entries);
-
-        $last = $error->context->entries[$size - 1];
-        $rest = array_slice($error->context->entries, offset: 0, length: $size - 1);
-
-        $path = !empty($rest) ? self::pathFromContext(new Context($rest)) : '$';
-
-        return new UndefinedErrorReport($path, $last->key);
-    }
-
-    private static function formatExpectedType(string $type): string
-    {
-        $types = explode(' | ', $type);
-        $formatted = [];
-
-        foreach ($types as $type) {
-            $formatted[] = class_exists($type)
-                ? (new ReflectionClass($type))->getShortName()
-                : $type;
-        }
+        $formatted = map(explode(' | ', $union), fn($atomic) => class_exists($atomic)
+            ? (new ReflectionClass($atomic))->getShortName()
+            : $atomic);
 
         return implode(' | ', $formatted);
     }

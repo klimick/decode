@@ -8,6 +8,7 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Constraint\Valid;
 use Klimick\Decode\Context;
+use function Fp\Collection\map;
 use function Klimick\Decode\Constraint\valid;
 use function Klimick\Decode\Constraint\invalids;
 
@@ -25,7 +26,7 @@ final class AnyOfConstraint implements ConstraintInterface
 
     public function name(): string
     {
-        $constraints = implode(', ', array_map(fn($c) => $c->name(), $this->constraints));
+        $constraints = implode(', ', map($this->constraints, fn($c) => $c->name()));
 
         return "ANY_OF({$constraints})";
     }

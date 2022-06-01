@@ -5,6 +5,7 @@ namespace Klimick\Decode\Internal;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
+use function Fp\Collection\map;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\valid;
 
@@ -22,13 +23,13 @@ final class LiteralDecoder extends AbstractDecoder
 
     public function name(): string
     {
-        return implode(' | ', array_map(
+        return implode(' | ', map(
+            $this->literals,
             fn($literal) => match(true) {
                 is_string($literal) => "'$literal'",
                 is_bool($literal) => $literal ? 'true' : 'false',
                 default => (string) $literal,
             },
-            $this->literals
         ));
     }
 

@@ -10,6 +10,7 @@ use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
+use function Fp\Collection\keys;
 use function Klimick\Decode\Decoder\arrayOf;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\invalid;
@@ -43,13 +44,13 @@ final class ArrListDecoder extends AbstractDecoder
     {
         $count = count($arr);
 
-        return 0 === $count || array_keys($arr) === range(0, $count - 1);
+        return 0 === $count || keys($arr) === range(0, $count - 1);
     }
 
     public function decode(mixed $value, Context $context): Either
     {
         if (is_array($value)) {
-            foreach (array_keys($value) as $k) {
+            foreach (keys($value) as $k) {
                 if (is_int($k)) continue;
                 return invalid($context);
             }

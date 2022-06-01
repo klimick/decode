@@ -29,6 +29,16 @@ final class Context
         return new self([...$this->entries, new ContextEntry($name, $actual, $key)]);
     }
 
+    public function firstEntry(): ContextEntry
+    {
+        return $this->entries[0];
+    }
+
+    public function lastEntry(): ContextEntry
+    {
+        return $this->entries[count($this->entries) - 1];
+    }
+
     public function path(): string
     {
         $pathParts = [];

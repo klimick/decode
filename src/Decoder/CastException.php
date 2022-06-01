@@ -9,20 +9,18 @@ use Klimick\Decode\Report\ErrorReport;
 
 final class CastException extends Exception
 {
-    private ErrorReport $report;
-
-    public function __construct(ErrorReport $report)
+    public function __construct(private ErrorReport $report, private string $typename)
     {
-        $this->report = $report;
-        $reportAsString = (string) $report;
-
-        parent::__construct(
-            message: "Cast failed:\n{$reportAsString}"
-        );
+        parent::__construct("Cast to type '{$typename}' failed.\n{$report}");
     }
 
-    public function getErrorReport(): ErrorReport
+    public function getReport(): ErrorReport
     {
         return $this->report;
+    }
+
+    public function getTypename(): string
+    {
+        return $this->typename;
     }
 }

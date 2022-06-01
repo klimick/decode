@@ -19,7 +19,7 @@ final class ErrorReport implements JsonSerializable, Stringable
     /**
      * @param list<TypeErrorReport> $typeErrors
      * @param list<ConstraintErrorReport> $constraintErrors
-     * @param list<UndefinedErrorReport> $undefinedErrors
+     * @param list<string> $undefinedErrors
      */
     public function __construct(
         public array $typeErrors = [],
@@ -56,10 +56,10 @@ final class ErrorReport implements JsonSerializable, Stringable
             ->mkString(sep: PHP_EOL);
 
         $undefinedErrors = ArrayList::collect($this->undefinedErrors)
-            ->map(fn($e) => "[{$e->path}.{$e->property}]: Property is undefined")
+            ->map(fn($e) => "[{$e}]: Property is undefined")
             ->mkString(sep: PHP_EOL);
 
-        return implode(PHP_EOL, [$typeErrors, $constraintErrors, $undefinedErrors]);
+        return implode(PHP_EOL, [$typeErrors, $constraintErrors, $undefinedErrors, PHP_EOL]);
     }
 
     public function jsonSerialize(): array
