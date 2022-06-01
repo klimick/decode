@@ -70,6 +70,7 @@ final class DefaultReporterTest extends TestCase
                 new TypeErrorReport('$.age', 'int', "'foo'"),
                 new TypeErrorReport('$.application_ver', "'v1' | 'v2'", "'v3'"),
                 new TypeErrorReport('$.admin', 'Person', null),
+                new TypeErrorReport('$.privilege_id', 'int | null', "'100'"),
                 new TypeErrorReport('$.address.city', 'non-empty-string', "''"),
             ],
             $errorReport->typeErrors
