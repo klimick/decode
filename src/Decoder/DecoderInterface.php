@@ -37,7 +37,6 @@ interface DecoderInterface
      * @param ConstraintInterface<ContravariantT> $first
      * @param ConstraintInterface<ContravariantT> ...$rest
      * @return DecoderInterface<T>
-     * @psalm-mutation-free
      *
      * @see ConstrainedMethodReturnTypeProvider Contravariant check happens via plugin
      */
@@ -45,21 +44,18 @@ interface DecoderInterface
 
     /**
      * @return DecoderInterface<T>
-     * @psalm-mutation-free
      */
     public function optional(): DecoderInterface;
 
     /**
      * @param non-empty-string $with
      * @return DecoderInterface<T>
-     * @psalm-mutation-free
      */
     public function from(string $with): DecoderInterface;
 
     /**
      * @param T $value
      * @return DecoderInterface<T>
-     * @psalm-mutation-free
      */
     public function default(mixed $value): DecoderInterface;
 }
