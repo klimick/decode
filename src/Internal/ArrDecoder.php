@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Invalid;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\invalids;
 use function Klimick\Decode\Decoder\valid;
@@ -47,24 +45,19 @@ final class ArrDecoder extends AbstractDecoder
 
         /** @psalm-suppress MixedAssignment */
         foreach ($value as $k => $v) {
-            $decodedK = $this->keyDecoder
-                ->decode($k, $context($this->keyDecoder->name(), $k, (string) $k))
-                ->get();
+            $decodedK = $this->keyDecoder->decode($k, $context($this->keyDecoder->name(), $k, (string) $k));
+            $decodedV = $this->valDecoder->decode($v, $context($this->valDecoder->name(), $v, (string) $k));
 
-            $decodedV = $this->valDecoder
-                ->decode($v, $context($this->valDecoder->name(), $v, (string) $k))
-                ->get();
-
-            if ($decodedV instanceof Invalid) {
-                $errors = [...$errors, ...$decodedV->errors];
+            if ($decodedV->isLeft()) {
+                $errors = [...$errors, ...$decodedV->get()];
             }
 
-            if ($decodedK instanceof Invalid) {
-                $errors = [...$errors, ...$decodedK->errors];
+            if ($decodedK->isLeft()) {
+                $errors = [...$errors, ...$decodedK->get()];
             }
 
-            if ($decodedK instanceof Valid && $decodedV instanceof Valid) {
-                $decoded[$decodedK->value] = $decodedV->value;
+            if ($decodedK->isRight() && $decodedV->isRight()) {
+                $decoded[$decodedK->get()] = $decodedV->get();
             }
         }
 

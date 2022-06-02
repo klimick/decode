@@ -11,8 +11,7 @@ use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
-use Klimick\Decode\Decoder\Valid;
-use Klimick\Decode\Decoder\Invalid;
+use Klimick\Decode\Decoder\DecodeErrorInterface;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Decoder\valid;
@@ -37,7 +36,6 @@ final class DatetimeDecoder extends AbstractDecoder
     {
         return string()
             ->decode($value, $context)
-            ->map(fn($datetime) => $datetime->value)
             ->flatMap(null !== $this->fromFormat
                 ? self::createFromFormat($context, new DateTimeZone($this->timezone), $this->fromFormat)
                 : self::createWithConstructor($context, new DateTimeZone($this->timezone))
@@ -45,7 +43,7 @@ final class DatetimeDecoder extends AbstractDecoder
     }
 
     /**
-     * @return Closure(string): Either<Invalid, Valid<DateTimeImmutable>>
+     * @return Closure(string): Either<non-empty-list<DecodeErrorInterface>, DateTimeImmutable>
      * @psalm-pure
      */
     private static function createWithConstructor(Context $context, DateTimeZone $timezone): Closure
@@ -62,7 +60,7 @@ final class DatetimeDecoder extends AbstractDecoder
     }
 
     /**
-     * @return Closure(string): Either<Invalid, Valid<DateTimeImmutable>>
+     * @return Closure(string): Either<non-empty-list<DecodeErrorInterface>, DateTimeImmutable>
      * @psalm-pure
      */
     private static function createFromFormat(Context $context, DateTimeZone $timezone, string $format): Closure

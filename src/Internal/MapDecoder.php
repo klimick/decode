@@ -9,7 +9,6 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Valid;
 
 /**
  * @template TDecoded
@@ -35,8 +34,8 @@ final class MapDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
-        return $this->decoder->decode($value, $context)->map(
-            fn($valid) => new Valid(($this->map)($valid->value)),
-        );
+        return $this->decoder
+            ->decode($value, $context)
+            ->map($this->map);
     }
 }

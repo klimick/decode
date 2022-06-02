@@ -38,8 +38,8 @@ final class NonEmptyArrDecoder extends AbstractDecoder
     {
         return arrayOf($this->keyDecoder, $this->valDecoder)
             ->decode($value, $context)
-            ->flatMap(fn($valid) => 0 !== count($valid->value)
-                ? valid($valid->value)
+            ->flatMap(fn($valid) => 0 !== count($valid)
+                ? valid($valid)
                 : invalid($context));
     }
 }

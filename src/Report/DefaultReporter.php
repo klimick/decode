@@ -8,7 +8,6 @@ use Klimick\Decode\ContextEntry;
 use Klimick\Decode\Decoder\DecodeErrorInterface;
 use ReflectionClass;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\TypeError;
 use Klimick\Decode\Decoder\ConstraintsError;
 use Klimick\Decode\Decoder\UndefinedError;
@@ -20,9 +19,12 @@ final class DefaultReporter
     private const INDEXED_ACCESS_WITHOUT_BRACKETS = "~\.(\d+)~";
     private const TO_INDEXED_ACCESS_WITH_BRACKETS = '[$1]';
 
-    public static function report(Invalid $invalid, bool $useShortClassNames = false): ErrorReport
+    /**
+     * @param non-empty-list<DecodeErrorInterface> $errors
+     */
+    public static function report(array $errors, bool $useShortClassNames = false): ErrorReport
     {
-        return self::reportErrors($invalid->errors, $useShortClassNames);
+        return self::reportErrors($errors, $useShortClassNames);
     }
 
     /**

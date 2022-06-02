@@ -6,8 +6,8 @@ namespace Klimick\Decode\Internal\Shape;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Valid;
-use Klimick\Decode\Decoder\Invalid;
+use Klimick\Decode\Decoder\DecodeErrorInterface;
+use Klimick\Decode\Decoder\UndefinedError;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
@@ -17,14 +17,14 @@ use function Klimick\Decode\Decoder\valid;
 use function Klimick\Decode\Decoder\invalid;
 
 /**
- * @template-covariant TShape of array
- * @extends AbstractDecoder<TShape>
+ * @template-covariant TVal
+ * @extends AbstractDecoder<array<string, TVal>>
  * @psalm-immutable
  */
 final class ShapeDecoder extends AbstractDecoder
 {
     /**
-     * @param array<string, DecoderInterface> $decoders
+     * @param array<string, DecoderInterface<TVal>> $decoders
      */
     public function __construct(
         public array $decoders,
@@ -54,19 +54,31 @@ final class ShapeDecoder extends AbstractDecoder
         $errors = [];
 
         foreach ($this->decoders as $key => $decoder) {
-            $decodedKV = ShapeAccessor::decodeProperty($context, $decoder, $key, $value)->get();
+            $decodedKV = ShapeAccessor::decodeProperty($context, $decoder, $key, $value);
 
-            if ($decodedKV instanceof Valid) {
-                /** @psalm-suppress MixedAssignment */
-                $decoded[$key] = $decodedKV->value;
-            } elseif ($decodedKV->isUndefined() && $decoder instanceof HighOrderDecoder && $decoder->isOptional()) {
+            if ($decodedKV->isRight()) {
+                $decoded[$key] = $decodedKV->get();
                 continue;
-            } else {
-                $errors = [...$errors, ...$decodedKV->errors];
             }
+
+            if (self::isUndefinedAndOptional($decodedKV->get(), $decoder)) {
+                continue;
+            }
+
+            $errors = [...$errors, ...$decodedKV->get()];
         }
 
-        /** @var Either<Invalid, Valid<TShape>> */
         return !empty($errors) ? invalids($errors) : valid($decoded);
+    }
+
+    /**
+     * @param non-empty-list<DecodeErrorInterface> $errors
+     * @psalm-pure
+     */
+    private static function isUndefinedAndOptional(array $errors, DecoderInterface $decoder): bool
+    {
+        return 1 === count($errors)
+            && $errors[0] instanceof UndefinedError
+            && $decoder instanceof HighOrderDecoder && $decoder->isOptional();
     }
 }

@@ -8,7 +8,6 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Valid;
 use function Fp\Collection\map;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\invalids;
@@ -49,14 +48,12 @@ final class IntersectionDecoder extends AbstractDecoder
         foreach ($this->decoders as $decoder) {
             $typename = $decoder->name();
 
-            $decoded = $decoder
-                ->decode($value, $context($typename, $value))
-                ->get();
+            $decoded = $decoder->decode($value, $context($typename, $value));
 
-            if ($decoded instanceof Valid) {
-                $merged = array_merge($merged, $decoded->value);
+            if ($decoded->isRight()) {
+                $merged = array_merge($merged, $decoded->get());
             } else {
-                $errors = array_merge($errors, $decoded->errors);
+                $errors = array_merge($errors, $decoded->get());
             }
         }
 

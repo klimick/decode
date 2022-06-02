@@ -22,7 +22,7 @@ interface DecoderInterface
     public function name(): string;
 
     /**
-     * @return Either<Invalid, Valid<T>>
+     * @return Either<non-empty-list<DecodeErrorInterface>, T>
      */
     public function decode(mixed $value, Context $context): Either;
 

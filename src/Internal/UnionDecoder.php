@@ -6,7 +6,6 @@ namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
 use function Fp\Collection\map;
@@ -37,12 +36,10 @@ final class UnionDecoder extends AbstractDecoder
         foreach ($this->decoders as $decoder) {
             $typename = $decoder->name();
 
-            $decoded = $decoder
-                ->decode($value, $context($typename, $value))
-                ->get();
+            $decoded = $decoder->decode($value, $context($typename, $value));
 
-            if ($decoded instanceof Valid) {
-                return valid($decoded->value);
+            if ($decoded->isRight()) {
+                return valid($decoded->get());
             }
 
             $invalidTypes[] = $typename;

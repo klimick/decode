@@ -8,7 +8,6 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Invalid;
 use function Fp\Collection\map;
 use function Klimick\Decode\Decoder\invalid;
 use function Klimick\Decode\Decoder\invalids;
@@ -39,7 +38,6 @@ final class TupleDecoder extends AbstractDecoder
     {
         return nonEmptyListOf(mixed())
             ->decode($value, $context)
-            ->map(fn($valid) => $valid->value)
             ->flatMap(function($tuple) use ($context) {
                 if (count($tuple) !== count($this->decoders)) {
                     return invalid($context);
@@ -49,14 +47,12 @@ final class TupleDecoder extends AbstractDecoder
                 $errors = [];
 
                 foreach ($this->decoders as $k => $decoder) {
-                    $result = $decoder
-                        ->decode($tuple[$k], $context($decoder->name(), $tuple[$k], (string) $k))
-                        ->get();
+                    $result = $decoder->decode($tuple[$k], $context($decoder->name(), $tuple[$k], (string) $k));
 
-                    if ($result instanceof Invalid) {
-                        $errors = [...$errors, ...$result->errors];
+                    if ($result->isLeft()) {
+                        $errors = [...$errors, ...$result->get()];
                     } else {
-                        $decoded[] = $result->value;
+                        $decoded[] = $result->get();
                     }
                 }
 

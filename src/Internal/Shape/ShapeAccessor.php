@@ -7,10 +7,9 @@ namespace Klimick\Decode\Internal\Shape;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Context;
+use Klimick\Decode\Decoder\DecodeErrorInterface;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\UndefinedError;
-use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Internal\ConstantDecoder;
 use Klimick\Decode\Internal\HighOrder\HighOrderDecoder;
 use function Fp\Collection\at;
@@ -26,7 +25,7 @@ final class ShapeAccessor
      * @template TDecoded
      *
      * @param DecoderInterface<TDecoded> $decoder
-     * @return Either<Invalid, Valid<TDecoded>>
+     * @return Either<non-empty-list<DecodeErrorInterface>, TDecoded>
      * @psalm-pure
      */
     public static function decodeProperty(
@@ -114,24 +113,25 @@ final class ShapeAccessor
     }
 
     /**
+     * @return non-empty-list<DecodeErrorInterface>
      * @psalm-pure
      */
-    private static function undefined(Context $context, DecoderInterface $decoder, int|string $key): Invalid
+    private static function undefined(Context $context, DecoderInterface $decoder, int|string $key): array
     {
-        return new Invalid([
+        return [
             new UndefinedError($context(
                 name: $decoder->name(),
                 actual: null,
                 key: (string)$key,
             )),
-        ]);
+        ];
     }
 
     /**
      * @template TDecoded
      *
      * @param DecoderInterface<TDecoded> $decoder
-     * @return Either<Invalid, Valid<TDecoded>>
+     * @return Either<non-empty-list<DecodeErrorInterface>, TDecoded>
      * @psalm-pure
      */
     private static function decode(DecoderInterface $decoder, mixed $value, int|string $key, Context $context): Either

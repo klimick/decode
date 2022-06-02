@@ -45,7 +45,7 @@ use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
  * @psalm-pure
  *
  * @param DecoderInterface<T> $with
- * @return Either<Invalid, Valid<T>>
+ * @return Either<non-empty-list<DecodeErrorInterface>, T>
  */
 function decode(mixed $value, DecoderInterface $with): Either
 {
@@ -61,11 +61,11 @@ function decode(mixed $value, DecoderInterface $with): Either
  */
 function cast(mixed $value, DecoderInterface $to): Option
 {
-    $decoded = decode($value, $to)->get();
+    $decoded = decode($value, $to);
 
-    return $decoded instanceof Invalid
+    return $decoded->isLeft()
         ? Option::none()
-        : Option::some($decoded->value);
+        : Option::some($decoded->get());
 }
 
 /**
@@ -79,28 +79,28 @@ function cast(mixed $value, DecoderInterface $to): Option
  */
 function tryCast(mixed $value, DecoderInterface $to): mixed
 {
-    $decoded = decode($value, $to)->get();
+    $decoded = decode($value, $to);
 
-    return $decoded instanceof Invalid
-        ? throw new CastException(DefaultReporter::report($decoded), $to->name())
-        : $decoded->value;
+    return $decoded->isLeft()
+        ? throw new CastException(DefaultReporter::report($decoded->get()), $to->name())
+        : $decoded->get();
 }
 
 /**
  * @psalm-pure
  *
  * @param non-empty-list<DecodeErrorInterface> $errors
- * @return Either<Invalid, empty>
+ * @return Either<non-empty-list<DecodeErrorInterface>, empty>
  */
 function invalids(array $errors): Either
 {
-    return Either::left(new Invalid($errors));
+    return Either::left($errors);
 }
 
 /**
  * @psalm-pure
  *
- * @return Either<Invalid, empty>
+ * @return Either<non-empty-list<DecodeErrorInterface>, empty>
  */
 function invalid(Context $context): Either
 {
@@ -114,11 +114,11 @@ function invalid(Context $context): Either
  * @psalm-pure
  *
  * @param T $value
- * @return Either<empty, Valid<T>>
+ * @return Either<empty, T>
  */
 function valid(mixed $value): Either
 {
-    return Either::right(new Valid($value));
+    return Either::right($value);
 }
 
 /**

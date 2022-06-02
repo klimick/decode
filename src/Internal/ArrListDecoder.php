@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Decoder\Valid;
-use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\AbstractDecoder;
 use Klimick\Decode\Decoder\DecoderInterface;
@@ -56,14 +54,8 @@ final class ArrListDecoder extends AbstractDecoder
             }
         }
 
-        /**
-         * @var Either<Invalid, Valid<list<A>>>
-         */
         return arrayOf(int(), $this->decoder)
             ->decode($value, $context)
-            ->flatMap(fn(Valid $valid) => self::isList($valid->value)
-                ? valid($valid->value)
-                : invalid($context)
-            );
+            ->flatMap(fn($valid) => self::isList($valid) ? valid($valid) : invalid($context));
     }
 }

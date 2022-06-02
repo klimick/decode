@@ -43,7 +43,7 @@ final class ObjectDecoder extends AbstractDecoder
             ->decode($value, $context)
             ->flatMap(function($validShape) {
                 /** @psalm-suppress MixedMethodCall */
-                $instance = new ($this->objectClass)(...$validShape->value);
+                $instance = new ($this->objectClass)(...$validShape);
 
                 return valid($instance);
             });

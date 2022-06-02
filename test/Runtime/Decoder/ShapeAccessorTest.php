@@ -7,9 +7,7 @@ namespace Klimick\Decode\Test\Runtime\Decoder;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Invalid;
 use Klimick\Decode\Decoder\UndefinedError;
-use Klimick\Decode\Decoder\Valid;
 use Klimick\Decode\Internal\Shape\ShapeAccessor;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Decoder\mixed;
@@ -46,19 +44,17 @@ final class ShapeAccessorTest extends TestCase
         $decoder = mixed();
         $field = 'any_field_name';
 
-        $valid = fn(mixed $val): Either => Either::right(new Valid($val));
+        $valid = fn(mixed $val): Either => Either::right($val);
 
-        $undefinedProperty = Either::left(
-            new Invalid([
-                new UndefinedError(
-                    Context::root(name: $decoder->name(), actual: [])(
-                        name: $decoder->name(),
-                        actual: null,
-                        key: $field,
-                    ),
-                )
-            ])
-        );
+        $undefinedProperty = Either::left([
+            new UndefinedError(
+                Context::root(name: $decoder->name(), actual: [])(
+                    name: $decoder->name(),
+                    actual: null,
+                    key: $field,
+                ),
+            )
+        ]);
 
         yield 'field does not exist' => [
             'decoder' => $decoder,
