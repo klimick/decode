@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
+namespace Klimick\PsalmDecode\Hook\AfterExpressionAnalysis;
 
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
@@ -18,7 +18,7 @@ use function Fp\Evidence\proveNonEmptyArray;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
 
-final class PropsMethodReturnTypeProvider implements AfterExpressionAnalysisInterface
+final class PropsInferTypeAfterExpressionAnalysis implements AfterExpressionAnalysisInterface
 {
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
