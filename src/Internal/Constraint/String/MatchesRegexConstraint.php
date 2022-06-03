@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\String;
 
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use function Klimick\Decode\Constraint\invalid;
-use function Klimick\Decode\Constraint\valid;
 
 /**
  * @implements ConstraintInterface<string>
@@ -28,10 +26,12 @@ final class MatchesRegexConstraint implements ConstraintInterface
         return ['mustMatchesTo' => $this->regex];
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
-        return 1 !== preg_match($this->regex, $value, $m)
-            ? invalid($context, $this)
-            : valid();
+        if (1 === preg_match($this->regex, $value)) {
+            return;
+        }
+
+        yield invalid($context, $this);
     }
 }

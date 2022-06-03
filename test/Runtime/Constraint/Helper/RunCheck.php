@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Runtime\Constraint\Helper;
 
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Constraint\Invalid;
-use Klimick\Decode\Constraint\Valid;
 use Klimick\Decode\Context;
-use function PHPUnit\Framework\assertInstanceOf;
+use function Fp\Cast\asList;
+use function PHPUnit\Framework\assertEmpty;
+use function PHPUnit\Framework\assertNotEmpty;
 
 final class RunCheck
 {
@@ -21,10 +21,11 @@ final class RunCheck
     {
         $context = Context::root($this->constraint->name(), $actual);
 
-        $result = $this->constraint
-            ->check(context: $context, value: $actual)
-            ->get();
+        $result = asList($this->constraint->check($context, $actual));
+        $message = json_encode(['actual' => $actual]);
 
-        assertInstanceOf($this->isValid ? Valid::class : Invalid::class, $result, json_encode(['actual' => $actual]));
+        $this->isValid
+            ? assertEmpty($result, $message)
+            : assertNotEmpty($result, $message);
     }
 }

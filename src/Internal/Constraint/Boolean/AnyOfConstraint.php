@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\Boolean;
 
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Constraint\Valid;
 use Klimick\Decode\Context;
 use function Fp\Collection\map;
-use function Klimick\Decode\Constraint\valid;
-use function Klimick\Decode\Constraint\invalids;
 
 /**
  * @template T
@@ -33,25 +29,22 @@ final class AnyOfConstraint implements ConstraintInterface
 
     public function payload(): array
     {
-        return [];
+        return map($this->constraints, fn(ConstraintInterface $c) => $c->payload());
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
-        $errors = [];
+        $hasErrors = false;
 
         foreach ($this->constraints as $constraint) {
-            $result = $constraint
-                ->check($context($constraint->name(), $value), $value)
-                ->get();
-
-            if ($result instanceof Valid) {
-                return valid();
+            foreach ($constraint->check($context($constraint->name(), $value), $value) as $error) {
+                yield $error;
+                $hasErrors = true;
             }
 
-            $errors = [...$errors, ...$result->errors];
+            if (!$hasErrors) {
+                return;
+            }
         }
-
-        return invalids($errors);
     }
 }

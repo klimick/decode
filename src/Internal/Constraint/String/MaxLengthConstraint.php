@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\String;
 
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use function Klimick\Decode\Constraint\valid;
 use function Klimick\Decode\Constraint\invalid;
 
 /**
@@ -33,12 +31,12 @@ final class MaxLengthConstraint implements ConstraintInterface
         ];
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
         if (mb_strlen($value) <= $this->maxLength) {
-            return valid();
+            return;
         }
 
-        return invalid($context, $this);
+        yield invalid($context, $this);
     }
 }

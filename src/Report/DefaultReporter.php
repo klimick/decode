@@ -24,15 +24,6 @@ final class DefaultReporter
      */
     public static function report(array $errors, bool $useShortClassNames = false): ErrorReport
     {
-        return self::reportErrors($errors, $useShortClassNames);
-    }
-
-    /**
-     * @param non-empty-list<DecodeErrorInterface> $errors
-     * @return ErrorReport
-     */
-    private static function reportErrors(array $errors, bool $useShortClassNames = false): ErrorReport
-    {
         $typeErrors = [];
         $constraintErrors = [];
         $undefinedErrors = [];

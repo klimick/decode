@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\Generic;
 
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use function Klimick\Decode\Constraint\invalid;
-use function Klimick\Decode\Constraint\valid;
 
 /**
  * @template T
@@ -32,10 +30,12 @@ final class EqualConstraint implements ConstraintInterface
         return ['mustBeEqualTo' => $this->equalTo];
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
-        return $value !== $this->equalTo
-            ? invalid($context, $this)
-            : valid();
+        if ($value === $this->equalTo) {
+            return;
+        }
+
+        yield invalid($context, $this);
     }
 }

@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\String;
 
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use function Klimick\Decode\Constraint\invalid;
-use function Klimick\Decode\Constraint\valid;
 
 /**
  * @implements ConstraintInterface<string>
@@ -31,10 +29,12 @@ final class EndsWithConstraint implements ConstraintInterface
         return ['mustEndsWith' => $this->value];
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
-        return !str_ends_with($value, $this->value)
-            ? invalid($context, $this)
-            : valid();
+        if (str_ends_with($value, $this->value)) {
+            return;
+        }
+
+        yield invalid($context, $this);
     }
 }

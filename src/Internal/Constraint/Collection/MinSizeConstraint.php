@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\Collection;
 
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use function Klimick\Decode\Constraint\invalid;
-use function Klimick\Decode\Constraint\valid;
 
 /**
  * @implements ConstraintInterface<array>
@@ -33,12 +31,12 @@ final class MinSizeConstraint implements ConstraintInterface
         ];
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
         if (count($value) >= $this->minSize) {
-            return valid();
+            return;
         }
 
-        return invalid($context, $this);
+        yield invalid($context, $this);
     }
 }

@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Klimick\Decode\Internal\Constraint\Numeric;
 
 use Closure;
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use function Klimick\Decode\Constraint\invalid;
-use function Klimick\Decode\Constraint\valid;
 
 /**
  * @implements ConstraintInterface<numeric>
@@ -48,11 +46,15 @@ final class ComparisonConstraint implements ConstraintInterface
         return [$prop => $this->value];
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
-        return !(self::getOp($this->type))($value, $this->value)
-            ? invalid($context, $this)
-            : valid();
+        $op = self::getOp($this->type);
+
+        if ($op($value, $this->value)) {
+            return;
+        }
+
+        yield invalid($context, $this);
     }
 
     /**

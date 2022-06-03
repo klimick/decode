@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\Collection;
 
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use function Klimick\Decode\Constraint\invalid;
-use function Klimick\Decode\Constraint\valid;
 
 /**
  * @template T
@@ -32,14 +30,14 @@ final class InCollectionConstraint implements ConstraintInterface
         return ['mustBePresent' => $this->item];
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
         foreach ($value as $v) {
             if ($this->item === $v) {
-                return valid();
+                return;
             }
         }
 
-        return invalid($context, $this);
+        yield invalid($context, $this);
     }
 }

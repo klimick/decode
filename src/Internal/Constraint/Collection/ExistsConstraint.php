@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\Collection;
 
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Constraint\Valid;
-use function Klimick\Decode\Constraint\invalids;
-use function Klimick\Decode\Constraint\valid;
+use function Klimick\Decode\Constraint\invalid;
 
 /**
  * @template TVal
@@ -33,22 +30,23 @@ final class ExistsConstraint implements ConstraintInterface
         return $this->constraint->payload();
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
-        $errors = [];
-
         foreach ($value as $k => $v) {
-            $result = $this->constraint
-                ->check($context($this->constraint->name(), $v, (string) $k), $v)
-                ->get();
+            $hasErrors = false;
 
-            if ($result instanceof Valid) {
-                return valid();
+            foreach ($this->constraint->check($context($this->constraint->name(), $v, (string) $k), $v) as $_) {
+                $hasErrors = true;
             }
 
-            $errors = [...$errors, ...$result->errors];
+            if (!$hasErrors) {
+                return;
+            }
         }
 
-        return !empty($errors) ? invalids($errors) : valid();
+        yield invalid(
+            context: $context($this->constraint->name(), $value),
+            constraint: $this->constraint,
+        );
     }
 }

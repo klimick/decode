@@ -6,39 +6,13 @@ namespace Klimick\Decode\Constraint;
 
 use Klimick\Decode\Context;
 use Klimick\Decode\Internal\Constraint as C;
-use Fp\Functional\Either\Either;
 
 /**
  * @psalm-pure
- *
- * @return Either<empty, Valid>
  */
-function valid(): Either
+function invalid(Context $context, ConstraintInterface $constraint): ConstraintError
 {
-    return Either::right(new Valid());
-}
-
-/**
- * @psalm-pure
- *
- * @return Either<Invalid, empty>
- */
-function invalid(Context $context, ConstraintInterface $constraint): Either
-{
-    return invalids([
-        new ConstraintError($context, $constraint->name(), $constraint->payload())
-    ]);
-}
-
-/**
- * @psalm-pure
- *
- * @param non-empty-list<ConstraintError> $errors
- * @return Either<Invalid, empty>
- */
-function invalids(array $errors): Either
-{
-    return Either::left(new Invalid($errors));
+    return new ConstraintError($context, $constraint->name(), $constraint->payload());
 }
 
 /**

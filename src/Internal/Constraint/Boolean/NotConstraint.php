@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Internal\Constraint\Boolean;
 
-use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Constraint\Valid;
 use Klimick\Decode\Context;
-use function Klimick\Decode\Constraint\valid;
 use function Klimick\Decode\Constraint\invalid;
 
 /**
@@ -33,17 +30,20 @@ final class NotConstraint implements ConstraintInterface
         return $this->constraint->payload();
     }
 
-    public function check(Context $context, mixed $value): Either
+    public function check(Context $context, mixed $value): iterable
     {
-        $result = $this->constraint
-            ->check($context($this->constraint->name(), $value), $value)
-            ->get();
+        $hasErrors = false;
 
-        return $result instanceof Valid
-            ? invalid(
+        foreach ($this->constraint->check($context($this->constraint->name(), $value), $value) as $_) {
+            $hasErrors = true;
+            break;
+        }
+
+        if (!$hasErrors) {
+            yield invalid(
                 context: $context($this->constraint->name(), $value),
                 constraint: $this->constraint,
-            )
-            : valid();
+            );
+        }
     }
 }
