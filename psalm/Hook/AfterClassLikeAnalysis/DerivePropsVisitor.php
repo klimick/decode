@@ -20,6 +20,7 @@ use Psalm\Storage\MethodStorage;
 use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TKeyedArray;
 use Psalm\Type\Atomic\TNamedObject;
+use Psalm\Type\Atomic\TNull;
 use Psalm\Type\Union;
 use function Fp\Collection\at;
 use function Fp\Collection\filter;
@@ -114,6 +115,11 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
         }
 
         foreach ($properties as $property_mame => $property_type) {
+            if ($property_type->possibly_undefined) {
+                $property_type = clone $property_type;
+                $property_type->addType(new TNull());
+            }
+
             $to->pseudo_property_get_types['$' . $property_mame] = $property_type;
         }
 
