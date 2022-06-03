@@ -9,6 +9,7 @@ use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\Derive;
 use Klimick\PsalmDecode\Helper\DecoderType;
 use PhpParser\Node\Expr\StaticCall;
+use PhpParser\Node\Identifier;
 use PhpParser\Node\Name;
 use Psalm\Plugin\EventHandler\AfterExpressionAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterExpressionAnalysisEvent;
@@ -23,7 +24,11 @@ final class PropsInferTypeAfterExpressionAnalysis implements AfterExpressionAnal
     public static function afterExpressionAnalysis(AfterExpressionAnalysisEvent $event): ?bool
     {
         Option::do(function() use ($event) {
-            $method_call = yield proveOf($event->getExpr(), StaticCall::class);
+            $method_call = yield proveOf($event->getExpr(), StaticCall::class)
+                ->filter(fn(StaticCall $call) => proveOf($call->name, Identifier::class)
+                    ->map(fn(Identifier $id) => $id->name)
+                    ->map(fn(string $name) => 'props' === $name)
+                    ->getOrElse(false));
 
             $properties = yield proveOf($method_call->class, Name::class)
                 ->flatMap(fn(Name $id) => proveString($id->getAttribute('resolvedName')))
