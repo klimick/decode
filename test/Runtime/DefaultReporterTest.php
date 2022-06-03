@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Runtime;
 
 use Klimick\Decode\Report\ConstraintErrorReport;
-use Klimick\Decode\Report\DecodeResultHandler;
+use Klimick\Decode\Report\DefaultReporter;
 use Klimick\Decode\Report\ErrorReport;
 use Klimick\Decode\Report\TypeErrorReport;
 use Klimick\Decode\Test\Static\Fixtures\Person;
@@ -56,10 +56,9 @@ final class DefaultReporterTest extends TestCase
             ]
         ];
 
-        $errorReport = DecodeResultHandler::handle(
-            value: decode($data, $decoder),
-            useShortClassNames: true
-        );
+        $errorReport = decode($data, $decoder)
+            ->mapLeft(fn(array $v): ErrorReport => DefaultReporter::report($v, useShortClassNames: true))
+            ->get();
 
         assertInstanceOf(ErrorReport::class, $errorReport);
 
