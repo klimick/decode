@@ -23,6 +23,7 @@ final class Project implements Derive\Props
         return t\shape(
             id: t\int(),
             name: t\string()->constrained(maxLength(is: 10)),
+            description: t\string()->optional(),
         );
     }
 }
