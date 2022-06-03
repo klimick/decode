@@ -4,7 +4,6 @@ namespace Klimick\Decode\Decoder\Derive;
 
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\ObjectDecoder;
-use RuntimeException;
 
 /**
  * @psalm-require-implements Props
@@ -24,7 +23,7 @@ trait Decoder
 
     public function __get(string $name): mixed
     {
-        return $this->properties[$name] ?? throw new RuntimeException("Property with name '{$name}' is not defined!");
+        return $this->properties[$name] ?? null;
     }
 
     /**

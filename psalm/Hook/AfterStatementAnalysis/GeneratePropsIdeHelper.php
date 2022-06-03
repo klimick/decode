@@ -9,8 +9,8 @@ use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\PsalmDecode\Plugin;
 use Psalm\Aliases;
 use Psalm\Storage\ClassLikeStorage;
+use Psalm\Type\Atomic\TNull;
 use Psalm\Type\Union;
-use function Fp\Collection\keys;
 use function Fp\Collection\map;
 use const PHP_EOL;
 
@@ -35,10 +35,6 @@ final class GeneratePropsIdeHelper
     private const PROP = <<<TEMPLATE
         /** @var %s */
         public $%s;
-    TEMPLATE;
-
-    private const NATIVE_PARAM = <<<TEMPLATE
-            $%s,';
     TEMPLATE;
 
     /**
@@ -84,11 +80,14 @@ final class GeneratePropsIdeHelper
             '{{MIXIN_NAME}}' => PsalmApi::$classlikes->toShortName($storage) . 'Props',
             '{{PROPS_LIST}}' => implode(PHP_EOL, map(
                 $return,
-                fn($type, $name) => sprintf(self::PROP, PsalmApi::$types->toDocblockString($type), $name),
-            )),
-            '{{PARAM_LIST}}' => implode(PHP_EOL, map(
-                keys($return),
-                fn($param) => sprintf(self::NATIVE_PARAM, $param),
+                function(Union $type, string $name) {
+                    if ($type->possibly_undefined) {
+                        $type = clone $type;
+                        $type->addType(new TNull());
+                    }
+
+                    return sprintf(self::PROP, PsalmApi::$types->toDocblockString($type), $name);
+                },
             )),
         ];
 
