@@ -19,7 +19,6 @@ use Klimick\Decode\Internal\FloatDecoder;
 use Klimick\Decode\Internal\FromJsonDecoder;
 use Klimick\Decode\Internal\InstanceofDecoder;
 use Klimick\Decode\Internal\IntDecoder;
-use Klimick\Decode\Internal\IntersectionDecoder;
 use Klimick\Decode\Internal\LiteralDecoder;
 use Klimick\Decode\Internal\MixedDecoder;
 use Klimick\Decode\Internal\NonEmptyArrDecoder;
@@ -433,16 +432,23 @@ function tagged(string $with): TaggedUnionDecoderFactory
 /**
  * @template T of array
  *
- * @param DecoderInterface<T> $first
- * @param DecoderInterface<T> $second
- * @param DecoderInterface<T> ...$rest
+ * @param ShapeDecoder<T> $first
+ * @param ShapeDecoder<T> $second
+ * @param ShapeDecoder<T> ...$rest
  * @psalm-pure
  * @no-named-arguments
  * @see IntersectionReturnTypeProvider
  */
-function intersection(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): DecoderInterface
+function intersection(ShapeDecoder $first, ShapeDecoder $second, ShapeDecoder ...$rest): DecoderInterface
 {
-    return new IntersectionDecoder([$first, $second, ...$rest]);
+    $toMerge = array_map(
+        fn(ShapeDecoder $decoder) => $decoder->partial
+            ? array_map(fn(DecoderInterface $d) => $d->optional(), $decoder->decoders)
+            : $decoder->decoders,
+        [$first, $second, ...$rest],
+    );
+
+    return new ShapeDecoder(array_merge(...$toMerge));
 }
 
 /**

@@ -213,19 +213,14 @@ final class DecoderTest extends PsalmTest
 
     public function testIntersectionDecoder(): void
     {
-        $expected_decoder_type = t::generic(
-            ofType: DecoderInterface::class,
-            withParams: [
-                t::shape([
-                    'prop1' => t::string(),
-                    'prop2' => t::string(),
-                    'prop3' => t::string(),
-                    'prop4' => t::string(),
-                    'prop5' => t::string(),
-                    'prop6' => t::string(),
-                ]),
-            ],
-        );
+        $shape = t::shape([
+            'prop1' => t::string(),
+            'prop2' => t::string(),
+            'prop3' => t::string(),
+            'prop4' => t::string(),
+            'prop5' => t::string(),
+            'prop6' => t::string(),
+        ]);
 
         StaticTestCase::describe('Intersection decoder')
             ->haveCode(fn() => intersection(
@@ -233,19 +228,38 @@ final class DecoderTest extends PsalmTest
                 shape(prop3: string(), prop4: string()),
                 shape(prop5: string(), prop6: string()),
             ))
-            ->seeReturnType($expected_decoder_type);
+            ->seeReturnType(
+                t::intersection([
+                    t::generic(DecoderInterface::class, [$shape]),
+                    t::generic(ShapeDecoder::class, [$shape]),
+                ]),
+            );
     }
 
-    public function testIntersectionDecoderIntersectionCollisionIssue(): void
+    public function testNestedIntersectionDecoder(): void
     {
-        StaticTestCase::describe('Intersection decoder: properties collision')
+        $shape = t::shape([
+            'prop1' => t::string(),
+            'prop2' => t::string(),
+            'prop3' => t::string(),
+            'prop4' => t::string(),
+            'prop5' => t::string(),
+            'prop6' => t::string(),
+        ]);
+
+        StaticTestCase::describe('Intersection decoder')
             ->haveCode(fn() => intersection(
                 shape(prop1: string(), prop2: string()),
-                shape(prop3: string(), prop2: string()),
+                intersection(
+                    shape(prop3: string(), prop4: string()),
+                    shape(prop5: string(), prop6: string()),
+                ),
             ))
-            ->seePsalmIssue(
-                type: 'IntersectionCollisionIssue',
-                message: 'Intersection collision: property "prop2" defined more than once.'
+            ->seeReturnType(
+                t::intersection([
+                    t::generic(DecoderInterface::class, [$shape]),
+                    t::generic(ShapeDecoder::class, [$shape]),
+                ]),
             );
     }
 }
