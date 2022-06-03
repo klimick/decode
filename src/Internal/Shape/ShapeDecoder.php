@@ -65,7 +65,7 @@ final class ShapeDecoder extends AbstractDecoder
                 continue;
             }
 
-            $errors = [...$errors, ...$decodedKV->get()];
+            $errors[] = $decodedKV->get();
         }
 
         return !empty($errors) ? invalids($errors) : valid($decoded);

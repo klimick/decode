@@ -50,7 +50,7 @@ final class TupleDecoder extends AbstractDecoder
                     $result = $decoder->decode($tuple[$k], $context($decoder->name(), $tuple[$k], (string) $k));
 
                     if ($result->isLeft()) {
-                        $errors = [...$errors, ...$result->get()];
+                        $errors[] = $result->get();
                     } else {
                         $decoded[] = $result->get();
                     }

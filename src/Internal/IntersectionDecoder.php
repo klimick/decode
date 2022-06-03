@@ -46,14 +46,12 @@ final class IntersectionDecoder extends AbstractDecoder
         $errors = [];
 
         foreach ($this->decoders as $decoder) {
-            $typename = $decoder->name();
-
-            $decoded = $decoder->decode($value, $context($typename, $value));
+            $decoded = $decoder->decode($value, $context($decoder->name(), $value));
 
             if ($decoded->isRight()) {
                 $merged = array_merge($merged, $decoded->get());
             } else {
-                $errors = array_merge($errors, $decoded->get());
+                $errors[] = $decoded->get();
             }
         }
 

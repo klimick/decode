@@ -49,11 +49,11 @@ final class ArrDecoder extends AbstractDecoder
             $decodedV = $this->valDecoder->decode($v, $context($this->valDecoder->name(), $v, (string) $k));
 
             if ($decodedV->isLeft()) {
-                $errors = [...$errors, ...$decodedV->get()];
+                $errors[] = $decodedV->get();
             }
 
             if ($decodedK->isLeft()) {
-                $errors = [...$errors, ...$decodedK->get()];
+                $errors[] = $decodedK->get();
             }
 
             if ($decodedK->isRight() && $decodedV->isRight()) {

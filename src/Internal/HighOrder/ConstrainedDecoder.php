@@ -71,7 +71,7 @@ final class ConstrainedDecoder extends HighOrderDecoder
 
                 return !empty($errors)
                     ? invalids([
-                        new ConstraintsError($errors)
+                        [new ConstraintsError($errors)],
                     ])
                     : valid($decoded);
             });

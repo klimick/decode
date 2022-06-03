@@ -18,7 +18,7 @@ interface ConstraintInterface
     public function name(): string;
 
     /**
-     * @return array<string, mixed>
+     * @return array<array-key, mixed>
      */
     public function payload(): array;
 

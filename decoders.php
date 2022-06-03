@@ -89,12 +89,12 @@ function tryCast(mixed $value, DecoderInterface $to): mixed
 /**
  * @psalm-pure
  *
- * @param non-empty-list<DecodeErrorInterface> $errors
+ * @param non-empty-list<non-empty-list<DecodeErrorInterface>> $errors
  * @return Either<non-empty-list<DecodeErrorInterface>, empty>
  */
 function invalids(array $errors): Either
 {
-    return Either::left($errors);
+    return Either::left(array_merge(...$errors));
 }
 
 /**
@@ -104,7 +104,7 @@ function invalids(array $errors): Either
  */
 function invalid(Context $context): Either
 {
-    return invalids([
+    return Either::left([
         new TypeError($context),
     ]);
 }
