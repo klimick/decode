@@ -7,6 +7,7 @@ namespace Klimick\PsalmDecode\Helper;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Psalm\Type;
 use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Union;
@@ -29,6 +30,23 @@ final class DecoderType
                 ]),
             ]),
         ]);
+    }
+
+    /**
+     * @return Option<Type\Union>
+     */
+    public static function withShapeDecoderIntersection(Union $mapped): Option
+    {
+        return Option::do(function() use ($mapped) {
+            $decoder = yield PsalmApi::$types->asSingleAtomicOf(Type\Atomic\TGenericObject::class, $mapped);
+            $shape = yield PsalmApi::$types->getFirstGeneric($decoder, DecoderInterface::class);
+
+            $decoder->addIntersectionType(
+                new Type\Atomic\TGenericObject(ShapeDecoder::class, [$shape]),
+            );
+
+            return new Type\Union([$decoder]);
+        });
     }
 
     /**

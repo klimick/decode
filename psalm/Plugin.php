@@ -14,6 +14,7 @@ use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\PropsMethodReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\TaggedUnionDecoderFactoryReturnTypeProvider;
 use Psalm\Config;
 use Psalm\Plugin\PluginEntryPointInterface;
@@ -56,6 +57,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(FromArgumentAnalysis::class);
         $register(DerivePropsIdeHelperGenerator::class);
         $register(DerivePropsVisitor::class);
+        $register(PropsMethodReturnTypeProvider::class);
     }
 
     /**
