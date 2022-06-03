@@ -7,7 +7,6 @@ namespace Klimick\PsalmDecode;
 use Fp\Functional\Option\Option;
 use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\DerivePropsVisitor;
 use Klimick\PsalmDecode\Hook\AfterExpressionAnalysis\PossiblyUndefinedToNullableAfterExpressionAnalysis;
-use Klimick\PsalmDecode\Hook\AfterExpressionAnalysis\PropsInferTypeAfterExpressionAnalysis;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\DecoderMethodsAnalysis;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\FromArgumentAnalysis;
 use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\DerivePropsIdeHelperGenerator;
@@ -58,7 +57,6 @@ final class Plugin implements PluginEntryPointInterface
         $register(FromArgumentAnalysis::class);
         $register(DerivePropsIdeHelperGenerator::class);
         $register(DerivePropsVisitor::class);
-        $register(PropsInferTypeAfterExpressionAnalysis::class);
         $register(PossiblyUndefinedToNullableAfterExpressionAnalysis::class);
     }
 
