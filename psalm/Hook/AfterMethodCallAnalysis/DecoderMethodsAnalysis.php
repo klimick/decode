@@ -81,7 +81,6 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
         }
 
         $brand_type = new Type\Atomic\TNamedObject($brand);
-        $brand_type->from_docblock = true;
 
         $with_brand = clone $atomic;
         $with_brand->addIntersectionType($brand_type);
