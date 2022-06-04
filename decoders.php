@@ -435,6 +435,8 @@ function tagged(string $with): TaggedUnionDecoderFactory
  * @param ShapeDecoder<T> $first
  * @param ShapeDecoder<T> $second
  * @param ShapeDecoder<T> ...$rest
+ * @return DecoderInterface<array<string, mixed>> & ShapeDecoder<array<string, mixed>>
+ *
  * @psalm-pure
  * @no-named-arguments
  * @see IntersectionReturnTypeProvider
