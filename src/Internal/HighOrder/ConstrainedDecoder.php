@@ -10,8 +10,6 @@ use Klimick\Decode\Context;
 use Klimick\Decode\ContextEntry;
 use Klimick\Decode\Decoder\ConstraintsError;
 use Klimick\Decode\Decoder\DecoderInterface;
-use function Klimick\Decode\Decoder\invalids;
-use function Klimick\Decode\Decoder\valid;
 
 /**
  * @template T
@@ -50,30 +48,26 @@ final class ConstrainedDecoder extends HighOrderDecoder
             ->decode($value, $context)
             ->flatMap(function($decoded) use ($context) {
                 if (null === $decoded) {
-                    return valid($decoded);
+                    return Either::right($decoded);
                 }
 
                 $errors = [];
 
                 foreach ($this->constraints as $constraint) {
-                    $constraintContext = new Context([
-                        new ContextEntry(
-                            name: $constraint->name(),
-                            actual: $decoded,
-                            key: $context->path(),
-                        ),
+                    $constraintCtx = new Context([
+                        new ContextEntry($constraint->name(), $decoded, $context->path()),
                     ]);
 
-                    foreach ($constraint->check($constraintContext, $decoded) as $error) {
+                    foreach ($constraint->check($constraintCtx, $decoded) as $error) {
                         $errors[] = $error;
                     }
                 }
 
                 return !empty($errors)
-                    ? invalids([
-                        [new ConstraintsError($errors)],
+                    ? Either::left([
+                        new ConstraintsError($errors),
                     ])
-                    : valid($decoded);
+                    : Either::right($decoded);
             });
     }
 }
