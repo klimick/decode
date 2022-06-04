@@ -54,7 +54,7 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
         $storage->populated = true;
 
         $type = Option::do(function() use ($event, $storage) {
-            $props_expr = yield GetPropsExpr::from($event->getStmt());
+            $props_expr = yield GetPropsExpr::from($event);
             $analyzer = yield CreateStatementsAnalyzer::for($event);
 
             return yield PsalmApi::$types->analyzeType(

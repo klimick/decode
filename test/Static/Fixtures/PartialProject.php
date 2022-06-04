@@ -7,25 +7,22 @@ namespace Klimick\Decode\Test\Static\Fixtures;
 use Klimick\Decode\Decoder\Derive;
 use Klimick\Decode\Decoder as t;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use Psalm\Mixins\Klimick\Decode\Test\Static\Fixtures\ProjectProps;
+use Psalm\Mixins\Klimick\Decode\Test\Static\Fixtures\PartialProjectProps;
 use function Klimick\Decode\Constraint\maxLength;
 
 /**
  * @implements Derive\Props<Project>
- * @mixin ProjectProps
+ * @mixin PartialProjectProps
  */
-final class Project implements Derive\Props
+final class PartialProject implements Derive\Props
 {
     use Derive\Decoder;
 
     public static function props(): ShapeDecoder
     {
-        return t\intersection(
-            t\shape(
-                id: t\int(),
-                name: t\string()->constrained(maxLength(is: 10)),
-            ),
-            t\shape(description: t\string()->optional()),
+        return t\partialShape(
+            id: t\int(),
+            name: t\string()->constrained(maxLength(is: 10)),
         );
     }
 }

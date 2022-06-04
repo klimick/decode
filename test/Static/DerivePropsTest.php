@@ -7,6 +7,7 @@ namespace Klimick\Decode\Test\Static;
 use Fp\PsalmToolkit\StaticTest\NoCode;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\Decode\Test\Static\Fixtures\PartialProject;
 use Klimick\Decode\Test\Static\Fixtures\Project;
 use Klimick\Decode\Test\Static\Fixtures\User;
 use Fp\PsalmToolkit\StaticTest\PsalmTest;
@@ -48,6 +49,14 @@ final class DerivePropsTest extends PsalmTest
             })
             ->seeReturnType(
                 t::union([t::string(), t::null()])
+            );
+
+        StaticTestCase::describe('Possibly undefined to nullable (partial shape)')
+            ->haveCode(function(PartialProject $p) {
+                return $p->id;
+            })
+            ->seeReturnType(
+                t::union([t::int(), t::null()])
             );
 
         $user = t::shape([

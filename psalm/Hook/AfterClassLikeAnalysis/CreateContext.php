@@ -8,7 +8,6 @@ use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Derive;
 use PhpParser\Node;
-use PhpParser\Node\Expr\FuncCall;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
 use Psalm\Context;
@@ -21,7 +20,7 @@ use function Fp\Evidence\proveString;
 
 final class CreateContext
 {
-    public static function for(string $self, FuncCall $props_expr, NodeTypeProvider $node_data): Context
+    public static function for(string $self, Node\Expr $props_expr, NodeTypeProvider $node_data): Context
     {
         $visitor = new class($node_data) extends NodeVisitorAbstract {
             /** @var list<string> */
