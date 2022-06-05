@@ -11,7 +11,6 @@ use Klimick\Decode\Decoder\InferShape;
 use Klimick\Decode\Decoder\ObjectInstance;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\PsalmDecode\Helper\DecoderType;
-use Klimick\PsalmDecode\Plugin;
 use Psalm\Internal\MethodIdentifier;
 use Psalm\Internal\Type\TypeAlias\ClassTypeAlias;
 use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
@@ -132,11 +131,6 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
 
     private static function removePropsMixin(ClassLikeStorage $from): void
     {
-        Option::do(function() use ($from) {
-            $config = yield Plugin::getMixinConfig();
-            $namespace = $config['namespace'];
-
-            $from->namedMixins = filter($from->namedMixins, fn($t) => !str_starts_with($t->value, $namespace));
-        });
+        $from->namedMixins = filter($from->namedMixins, fn($t) => $t->value !== "{$from->name}MetaMixin");
     }
 }

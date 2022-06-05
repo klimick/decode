@@ -6,26 +6,26 @@ namespace Klimick\PsalmDecode\Hook\AfterStatementAnalysis;
 
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
-use Klimick\PsalmDecode\Plugin;
 use Psalm\Aliases;
+use Psalm\StatementsSource;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Type\Atomic\TNull;
 use Psalm\Type\Union;
 use function Fp\Collection\map;
+use function str_ends_with;
+use function str_replace;
 use const PHP_EOL;
 
-/**
- * @psalm-import-type MixinConfig from Plugin
- */
-final class GeneratePropsIdeHelper
+final class MetaMixinGenerator
 {
     private const TEMPLATE = <<<TEMPLATE
     <?php
     
     declare(strict_types=1);
     
-    namespace {{MIXIN_NAMESPACE}};
+    {{MIXIN_NAMESPACE}}
     
+    /** @psalm-suppress MissingConstructor */
     final class {{MIXIN_NAME}}
     {
     {{PROPS_LIST}}
@@ -39,45 +39,33 @@ final class GeneratePropsIdeHelper
 
     /**
      * @param array<string, Union> $types
-     * @psalm-param MixinConfig $config
      */
-    public static function for(ClassLikeStorage $storage, array $config, array $types): void
+    public static function forShape(ClassLikeStorage $storage, StatementsSource $source, array $types): void
     {
-        $filename = PsalmApi::$classlikes->toShortName($storage) . 'Props.php';
-        $path = self::createFolder($storage, $config['directory']);
+        $class = $source->getClassName();
+        $path = $source->getRootFilePath();
 
-        file_put_contents("{$path}/{$filename}", self::generateTemplate($storage, $types, $config['namespace']));
-    }
-
-    private static function createFolder(ClassLikeStorage $storage, string $inDir): string
-    {
-        $directories = Option::fromNullable($storage->aliases)
-            ->flatMap(fn(Aliases $aliases) => Option::fromNullable($aliases->namespace))
-            ->map(fn(string $namespace) => explode('\\', $namespace))
-            ->getOrElse([]);
-
-        foreach ($directories as $directory) {
-            $inDir = "{$inDir}/{$directory}";
-
-            if (!is_dir($inDir)) {
-                mkdir($inDir);
-            }
+        if (null === $class || !str_ends_with($path, "{$class}.php")) {
+            return;
         }
 
-        return $inDir;
+        $in_dir = str_replace("/{$class}.php", '', $path);
+        $filename = PsalmApi::$classlikes->toShortName($storage) . 'MetaMixin.php';
+
+        file_put_contents("{$in_dir}/{$filename}", self::generateShapeMixin($storage, $types));
     }
 
     /**
      * @param array<string, Union> $return
      */
-    private static function generateTemplate(ClassLikeStorage $storage, array $return, string $namespace): string
+    private static function generateShapeMixin(ClassLikeStorage $storage, array $return): string
     {
         $replacements = [
             '{{MIXIN_NAMESPACE}}' => Option::fromNullable($storage->aliases)
                 ->flatMap(fn(Aliases $aliases) => Option::fromNullable($aliases->namespace))
-                ->map(fn(string $class_namespace) => "{$namespace}\\$class_namespace")
-                ->getOrElse($namespace),
-            '{{MIXIN_NAME}}' => PsalmApi::$classlikes->toShortName($storage) . 'Props',
+                ->map(fn(string $class_namespace) => "namespace {$class_namespace};")
+                ->getOrElse(''),
+            '{{MIXIN_NAME}}' => PsalmApi::$classlikes->toShortName($storage) . 'MetaMixin',
             '{{PROPS_LIST}}' => implode(PHP_EOL, map(
                 $return,
                 function(Union $type, string $name) {

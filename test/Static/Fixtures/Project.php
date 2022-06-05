@@ -7,10 +7,9 @@ namespace Klimick\Decode\Test\Static\Fixtures;
 use Klimick\Decode\Decoder as t;
 use Klimick\Decode\Constraint as c;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use Psalm\Mixins\Klimick\Decode\Test\Static\Fixtures\ProjectProps;
 
 /**
- * @mixin ProjectProps
+ * @mixin ProjectMetaMixin
  */
 final class Project implements t\InferShape
 {
