@@ -6,9 +6,6 @@ namespace Klimick\Decode\Decoder;
 
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 
-/**
- * @template T of object
- */
 interface InferShape
 {
     /**

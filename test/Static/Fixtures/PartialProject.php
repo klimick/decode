@@ -10,7 +10,6 @@ use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Psalm\Mixins\Klimick\Decode\Test\Static\Fixtures\PartialProjectProps;
 
 /**
- * @implements t\InferShape<Project>
  * @mixin PartialProjectProps
  */
 final class PartialProject implements t\InferShape

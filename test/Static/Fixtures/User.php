@@ -10,7 +10,6 @@ use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Psalm\Mixins\Klimick\Decode\Test\Static\Fixtures\UserProps;
 
 /**
- * @implements t\InferShape<User>
  * @mixin UserProps
  */
 final class User implements t\InferShape
