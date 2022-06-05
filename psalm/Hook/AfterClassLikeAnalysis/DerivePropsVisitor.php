@@ -8,6 +8,7 @@ use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Derive;
 use Klimick\Decode\Decoder\Derive\Decoder;
+use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\PsalmDecode\Helper\DecoderType;
 use Klimick\PsalmDecode\Plugin;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
@@ -21,8 +22,9 @@ use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TKeyedArray;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Atomic\TNull;
+use Psalm\Type\Atomic\TTypeAlias;
 use Psalm\Type\Union;
-use function Fp\Collection\at;
+use function array_key_exists;
 use function Fp\Collection\filter;
 use function Fp\Evidence\proveNonEmptyArray;
 use function Fp\Evidence\proveTrue;
@@ -38,7 +40,7 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
                 ->flatMap(fn() => self::getPropsType($event));
 
             self::addTypeMethod(to: $storage);
-            self::fixPropsMethod($props, to: $storage);
+            self::fixPropsMethod(to: $storage);
             self::addProperties($props, to: $storage);
             self::addShapeTypeAlias($props, to: $storage);
             self::removePropsMixin(from: $storage);
@@ -78,14 +80,20 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
     /**
      * @param non-empty-array<string, Union> $properties
      */
-    private static function fixPropsMethod(array $properties, ClassLikeStorage $to): void
+    private static function fixPropsMethod(ClassLikeStorage $to): void
     {
-        Option::do(function() use ($to, $properties) {
-            $props_method = yield at($to->methods, 'props');
-            $props_method->return_type = yield DecoderType::withShapeDecoderIntersection(
-                DecoderType::createShapeDecoder($properties),
-            );
-        });
+        if (!array_key_exists('props', $to->methods)) {
+            return;
+        }
+
+        $shape_type_param = new Union([
+            new TTypeAlias($to->name, PsalmApi::$classlikes->toShortName($to) . 'Shape'),
+        ]);
+
+        $decoder_type = new TGenericObject(DecoderInterface::class, [$shape_type_param]);
+        $decoder_type->addIntersectionType(new TGenericObject(ShapeDecoder::class, [$shape_type_param]));
+
+        $to->methods['props']->return_type = new Union([$decoder_type]);
     }
 
     /**
