@@ -411,7 +411,7 @@ function rec(callable $type): DecoderInterface
  * @param DecoderInterface<T> $first
  * @param DecoderInterface<T> $second
  * @param DecoderInterface<T> ...$rest
- * @return DecoderInterface<T>
+ * @return DecoderInterface<T> & UnionDecoder<T>
  * @psalm-pure
  * @no-named-arguments
  */

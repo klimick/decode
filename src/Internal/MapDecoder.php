@@ -29,7 +29,7 @@ final class MapDecoder extends AbstractDecoder
 
     public function name(): string
     {
-        return 'unknown-mapped-type';
+        return $this->decoder->name();
     }
 
     public function decode(mixed $value, Context $context): Either

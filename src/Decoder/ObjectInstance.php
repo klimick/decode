@@ -6,7 +6,6 @@ use Klimick\Decode\Internal\ObjectDecoder;
 
 /**
  * @psalm-require-implements InferShape
- * @psalm-seal-properties
  */
 trait ObjectInstance
 {

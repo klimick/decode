@@ -17,7 +17,7 @@ use Fp\PsalmToolkit\StaticType\StaticTypes as t;
 /**
  * @psalm-import-type ProjectShape from Project
  */
-final class DerivePropsTest extends PsalmTest
+final class InferShapeTest extends PsalmTest
 {
     /**
      * @return ProjectShape

@@ -143,7 +143,7 @@ final class GetMethodReturnType
             ) {}
 
             /**
-             * @return Option<TGenericObject>
+             * @return Option<array{string, TGenericObject}>
              */
             private static function fromStaticCall(Node $node): Option
             {
@@ -159,16 +159,18 @@ final class GetMethodReturnType
                         ->filter(fn($c) => class_exists($c) && is_subclass_of($c, InferShape::class))
                         ->filter(fn() => 'type' === $method_name);
 
-                    return new TGenericObject(DecoderInterface::class, [
+                    $decoder = new TGenericObject(DecoderInterface::class, [
                         new Union([
                             new TNamedObject($class_name),
                         ]),
                     ]);
+
+                    return [$class_name, $decoder];
                 });
             }
 
             /**
-             * @return Option<TNamedObject>
+             * @return Option<array{string, TNamedObject}>
              */
             private static function fromNew(Node $node): Option
             {
@@ -176,7 +178,7 @@ final class GetMethodReturnType
                     ->filterOf(Node\Expr\New_::class)
                     ->flatMap(fn($n) => proveOf($n->class, Node\Name::class))
                     ->flatMap(fn($n) => proveString($n->getAttribute('resolvedName')))
-                    ->map(fn($n) => new TNamedObject($n));
+                    ->map(fn($n) => [$n, new TNamedObject($n)]);
             }
 
             public function leaveNode(Node $node): void
@@ -184,11 +186,11 @@ final class GetMethodReturnType
                 Option::do(function() use ($node) {
                     $expr = yield proveOf($node, Node\Expr::class);
 
-                    $named_object = yield self::fromStaticCall($expr)
+                    [$phantom, $named_object] = yield self::fromStaticCall($expr)
                         ->orElse(fn() => self::fromNew($expr));
 
                     $this->node_data->setType($expr, new Union([$named_object]));
-                    $this->phantom_classes[] = $named_object->value;
+                    $this->phantom_classes[] = $phantom;
                 });
             }
 

@@ -22,7 +22,7 @@ final class UnionDecoder extends AbstractDecoder
     /**
      * @param non-empty-list<DecoderInterface<T>> $decoders
      */
-    public function __construct(private array $decoders) { }
+    public function __construct(public array $decoders) { }
 
     public function name(): string
     {
@@ -31,20 +31,14 @@ final class UnionDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
-        $invalidTypes = [];
-
         foreach ($this->decoders as $decoder) {
-            $typename = $decoder->name();
-
-            $decoded = $decoder->decode($value, $context($typename, $value));
+            $decoded = $decoder->decode($value, $context);
 
             if ($decoded->isRight()) {
                 return valid($decoded->get());
             }
-
-            $invalidTypes[] = $typename;
         }
 
-        return invalid($context(implode(' | ', $invalidTypes), $value));
+        return invalid($context($this->name(), $value));
     }
 }

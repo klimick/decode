@@ -22,7 +22,7 @@ final class TaggedUnionDecoderFactory
      * @template T
      *
      * @param DecoderInterface<T> ...$decoders
-     * @return DecoderInterface<T>
+     * @return DecoderInterface<T> & TaggedUnionDecoder<T>
      */
     public function __invoke(DecoderInterface ...$decoders): DecoderInterface
     {
