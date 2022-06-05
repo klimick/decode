@@ -37,7 +37,9 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             $storage = $event->getStorage();
 
             $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, InferShape::class))
-                ->flatMap(fn() => self::getPropsType($event));
+                ->flatMap(fn() => GetMethodReturnType::from($event, 'shape'))
+                ->flatMap(fn($type) => DecoderType::getShapeProperties($type))
+                ->flatMap(fn($props) => proveNonEmptyArray($props));
 
             self::addTypeMethod(to: $storage);
             self::fixPropsMethod(to: $storage);
@@ -45,36 +47,6 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             self::addShapeTypeAlias($props, to: $storage);
             self::removePropsMixin(from: $storage);
         });
-    }
-
-    /**
-     * @return Option<non-empty-array<string, Union>>
-     */
-    private static function getPropsType(AfterClassLikeVisitEvent $event): Option
-    {
-        $storage = $event->getStorage();
-        $storage->populated = true;
-
-        $type = Option::do(function() use ($event, $storage) {
-            $props_expr = yield GetSingleReturnExpr::for($event, method_name: 'props');
-            $analyzer = yield CreateStatementsAnalyzer::for($event);
-
-            return yield PsalmApi::$types->analyzeType(
-                analyzer: $analyzer,
-                expr: $props_expr,
-                context: CreateContext::for(
-                    self: $storage->name,
-                    props_expr: $props_expr,
-                    node_data: $analyzer->getNodeTypeProvider(),
-                ),
-            );
-        });
-
-        $storage->populated = false;
-
-        return $type
-            ->flatMap(fn($type) => DecoderType::getShapeProperties($type))
-            ->flatMap(fn($props) => proveNonEmptyArray($props));
     }
 
     /**
