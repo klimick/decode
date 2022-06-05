@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode;
 
 use Fp\Functional\Option\Option;
-use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\DerivePropsVisitor;
+use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\InferShapeAfterClassLikeVisit;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\DecoderMethodsAnalysis;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\FromArgumentAnalysis;
 use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\DerivePropsIdeHelperGenerator;
@@ -55,7 +55,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(ConstrainedMethodReturnTypeProvider::class);
         $register(FromArgumentAnalysis::class);
         $register(DerivePropsIdeHelperGenerator::class);
-        $register(DerivePropsVisitor::class);
+        $register(InferShapeAfterClassLikeVisit::class);
     }
 
     /**

@@ -17,18 +17,18 @@ use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use function count;
 use function Fp\Collection\first;
 
-final class GetPropsExpr
+final class GetSingleReturnExpr
 {
     /**
      * @return Option<Expr>
      */
-    public static function from(AfterClassLikeVisitEvent $event): Option
+    public static function for(AfterClassLikeVisitEvent $event, string $method_name): Option
     {
         $class = $event->getStmt();
 
         return ArrayList::collect($class->stmts)
             ->filterOf(ClassMethod::class)
-            ->first(fn(ClassMethod $method) => $method->name->toString() === 'shape')
+            ->first(fn(ClassMethod $method) => $method->name->toString() === $method_name)
             ->flatMap(fn(ClassMethod $method) => self::getExprFromSingleReturn($event, $method));
     }
 
@@ -36,17 +36,17 @@ final class GetPropsExpr
      * @param list<Stmt> $method_stmts
      * @return Option<Expr>
      */
-    private static function getExprFromSingleReturn(AfterClassLikeVisitEvent $event, ClassMethod $props_method): Option
+    private static function getExprFromSingleReturn(AfterClassLikeVisitEvent $event, ClassMethod $method): Option
     {
         /** @var array<array-key, Return_> $returns */
-        $returns = (new NodeFinder())->findInstanceOf($props_method->stmts ?? [], Return_::class);
+        $returns = (new NodeFinder())->findInstanceOf($method->stmts ?? [], Return_::class);
 
         if (count($returns) > 1) {
             $storage = $event->getStorage();
 
             $storage->docblock_issues[] = new InvalidReturnStatement(
-                message: 'Props method must have only one return statement',
-                code_location: new CodeLocation($event->getStatementsSource(), $props_method),
+                message: "Method '{$method->name->name}' must have only one return statement",
+                code_location: new CodeLocation($event->getStatementsSource(), $method),
             );
 
             return Option::none();

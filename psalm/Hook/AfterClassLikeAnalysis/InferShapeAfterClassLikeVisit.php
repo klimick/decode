@@ -7,6 +7,7 @@ namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\Decode\Decoder\InferShape;
 use Klimick\Decode\Decoder\ObjectInstance;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\PsalmDecode\Helper\DecoderType;
@@ -28,14 +29,14 @@ use function Fp\Collection\filter;
 use function Fp\Evidence\proveNonEmptyArray;
 use function Fp\Evidence\proveTrue;
 
-final class DerivePropsVisitor implements AfterClassLikeVisitInterface
+final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterface
 {
     public static function afterClassLikeVisit(AfterClassLikeVisitEvent $event): void
     {
         Option::do(function() use ($event) {
             $storage = $event->getStorage();
 
-            $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, \Klimick\Decode\Decoder\InferShape::class))
+            $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, InferShape::class))
                 ->flatMap(fn() => self::getPropsType($event));
 
             self::addTypeMethod(to: $storage);
@@ -55,7 +56,7 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
         $storage->populated = true;
 
         $type = Option::do(function() use ($event, $storage) {
-            $props_expr = yield GetPropsExpr::from($event);
+            $props_expr = yield GetSingleReturnExpr::for($event, method_name: 'props');
             $analyzer = yield CreateStatementsAnalyzer::for($event);
 
             return yield PsalmApi::$types->analyzeType(
