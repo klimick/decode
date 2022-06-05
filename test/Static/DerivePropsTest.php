@@ -67,7 +67,7 @@ final class DerivePropsTest extends PsalmTest
 
         StaticTestCase::describe('Props method inference')
             ->haveCode(function() {
-                return User::props();
+                return User::shape();
             })
             ->seeReturnType(
                 t::intersection([

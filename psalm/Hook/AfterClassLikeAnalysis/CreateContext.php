@@ -6,7 +6,6 @@ namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Derive;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
@@ -44,7 +43,7 @@ final class CreateContext
                     $class_name = yield Option::some($node)
                         ->filterOf(Node\Expr\StaticCall::class)
                         ->flatMap(fn($c) => proveString($c->class->getAttribute('resolvedName')))
-                        ->filter(fn($c) => class_exists($c) && is_subclass_of($c, Derive\Props::class))
+                        ->filter(fn($c) => class_exists($c) && is_subclass_of($c, \Klimick\Decode\Decoder\InferShape::class))
                         ->filter(fn() => 'type' === $method_name);
 
                     return new TGenericObject(DecoderInterface::class, [

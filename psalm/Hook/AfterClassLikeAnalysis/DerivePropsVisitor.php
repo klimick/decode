@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
 
 use Fp\Functional\Option\Option;
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Derive;
-use Klimick\Decode\Decoder\Derive\Decoder;
+use Klimick\Decode\Decoder\ObjectInstance;
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 use Klimick\PsalmDecode\Helper\DecoderType;
 use Klimick\PsalmDecode\Plugin;
-use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Psalm\Internal\MethodIdentifier;
 use Psalm\Internal\Type\TypeAlias\ClassTypeAlias;
 use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
@@ -36,7 +35,7 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
         Option::do(function() use ($event) {
             $storage = $event->getStorage();
 
-            $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, Derive\Props::class))
+            $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, \Klimick\Decode\Decoder\InferShape::class))
                 ->flatMap(fn() => self::getPropsType($event));
 
             self::addTypeMethod(to: $storage);
@@ -82,7 +81,7 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
      */
     private static function fixPropsMethod(ClassLikeStorage $to): void
     {
-        if (!array_key_exists('props', $to->methods)) {
+        if (!array_key_exists('shape', $to->methods)) {
             return;
         }
 
@@ -93,7 +92,7 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
         $decoder_type = new TGenericObject(DecoderInterface::class, [$shape_type_param]);
         $decoder_type->addIntersectionType(new TGenericObject(ShapeDecoder::class, [$shape_type_param]));
 
-        $to->methods['props']->return_type = new Union([$decoder_type]);
+        $to->methods['shape']->return_type = new Union([$decoder_type]);
     }
 
     /**
@@ -118,7 +117,7 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
      */
     private static function addProperties(array $properties, ClassLikeStorage $to): void
     {
-        if (!array_key_exists(strtolower(Decoder::class), $to->used_traits)) {
+        if (!array_key_exists(strtolower(ObjectInstance::class), $to->used_traits)) {
             return;
         }
 
@@ -136,7 +135,7 @@ final class DerivePropsVisitor implements AfterClassLikeVisitInterface
 
     private static function addTypeMethod(ClassLikeStorage $to): void
     {
-        if (!array_key_exists(strtolower(Decoder::class), $to->used_traits)) {
+        if (!array_key_exists(strtolower(ObjectInstance::class), $to->used_traits)) {
             return;
         }
 

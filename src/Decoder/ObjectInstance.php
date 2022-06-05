@@ -1,15 +1,14 @@
 <?php
 
-namespace Klimick\Decode\Decoder\Derive;
+namespace Klimick\Decode\Decoder;
 
-use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Internal\ObjectDecoder;
 
 /**
- * @psalm-require-implements Props
+ * @psalm-require-implements InferShape
  * @psalm-seal-properties
  */
-trait Decoder
+trait ObjectInstance
 {
     private array $properties;
 
@@ -31,6 +30,6 @@ trait Decoder
      */
     public static function type(): DecoderInterface
     {
-        return new ObjectDecoder(static::class, self::props()->decoders);
+        return new ObjectDecoder(static::class, self::shape()->decoders);
     }
 }

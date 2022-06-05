@@ -28,7 +28,7 @@ final class GetPropsExpr
 
         return ArrayList::collect($class->stmts)
             ->filterOf(ClassMethod::class)
-            ->first(fn(ClassMethod $method) => $method->name->toString() === 'props')
+            ->first(fn(ClassMethod $method) => $method->name->toString() === 'shape')
             ->flatMap(fn(ClassMethod $method) => self::getExprFromSingleReturn($event, $method));
     }
 

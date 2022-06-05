@@ -6,7 +6,7 @@ namespace Klimick\PsalmDecode\Hook\AfterStatementAnalysis;
 
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
-use Klimick\Decode\Decoder\Derive\Props;
+use Klimick\Decode\Decoder\InferShape;
 use Klimick\PsalmDecode\Helper\DecoderType;
 use Klimick\PsalmDecode\Plugin;
 use PhpParser\Node\Stmt\Return_;
@@ -27,13 +27,13 @@ final class DerivePropsIdeHelperGenerator implements AfterStatementAnalysisInter
             $context = $event->getContext();
 
             $config = yield proveString($context->calling_method_id)
-                ->filter(fn($method) => str_ends_with($method, '::props'))
+                ->filter(fn($method) => str_ends_with($method, '::shape'))
                 ->flatMap(fn() => Plugin::getMixinConfig());
 
             $storage = yield proveString($context->self)
                 ->flatMap(fn($class) => PsalmApi::$classlikes->getStorage($class));
 
-            $property_types = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, Props::class))
+            $property_types = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, InferShape::class))
                 ->flatMap(fn() => proveOf($event->getStmt(), Return_::class))
                 ->flatMap(fn($return) => PsalmApi::$types->getType($event, $return))
                 ->flatMap(fn($type) => DecoderType::getShapeProperties($type));

@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Decoder\Derive;
+namespace Klimick\Decode\Decoder;
 
 use Klimick\Decode\Internal\Shape\ShapeDecoder;
 
 /**
  * @template T of object
  */
-interface Props
+interface InferShape
 {
     /**
      * @return ShapeDecoder<array<string, mixed>>
      */
-    public static function props(): ShapeDecoder;
+    public static function shape(): ShapeDecoder;
 }
