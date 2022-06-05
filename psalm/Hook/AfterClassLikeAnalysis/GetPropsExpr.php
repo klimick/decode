@@ -6,7 +6,6 @@ namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
 
 use Fp\Collections\ArrayList;
 use Fp\Functional\Option\Option;
-use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -40,10 +39,11 @@ final class GetPropsExpr
     private static function getExprFromSingleReturn(AfterClassLikeVisitEvent $event, ClassMethod $props_method): Option
     {
         /** @var array<array-key, Return_> $returns */
-        $returns = (new NodeFinder())->find($props_method->stmts ?? [], fn(Node $node) => $node instanceof Return_);
+        $returns = (new NodeFinder())->findInstanceOf($props_method->stmts ?? [], Return_::class);
 
         if (count($returns) > 1) {
             $storage = $event->getStorage();
+
             $storage->docblock_issues[] = new InvalidReturnStatement(
                 message: 'Props method must have only one return statement',
                 code_location: new CodeLocation($event->getStatementsSource(), $props_method),
