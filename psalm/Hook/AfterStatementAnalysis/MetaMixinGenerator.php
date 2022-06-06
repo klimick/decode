@@ -56,6 +56,7 @@ final class MetaMixinGenerator
          *
     {{MATCHER_LIST}}
          * @return T
+         * @psalm-suppress InvalidReturnType
          */
         public function match({{MATCHER_NATIVE_LIST}}): mixed
         {
@@ -66,6 +67,7 @@ final class MetaMixinGenerator
          *
          * @param class-string<T> \$class
          * @psalm-assert-if-true T \$this->value
+         * @psalm-suppress InvalidReturnType
          */
         public function is(string \$class): bool
         {
