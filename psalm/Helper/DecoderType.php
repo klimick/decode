@@ -41,11 +41,12 @@ final class DecoderType
             $decoder = yield PsalmApi::$types->asSingleAtomicOf(Type\Atomic\TGenericObject::class, $mapped);
             $shape = yield PsalmApi::$types->getFirstGeneric($decoder, DecoderInterface::class);
 
-            $decoder->addIntersectionType(
-                new Type\Atomic\TGenericObject(ShapeDecoder::class, [$shape]),
-            );
-
-            return new Type\Union([$decoder]);
+            return new Type\Union([
+                PsalmApi::$types->addIntersection(
+                    to: $decoder,
+                    type: new Type\Atomic\TGenericObject(ShapeDecoder::class, [$shape]),
+                ),
+            ]);
         });
     }
 

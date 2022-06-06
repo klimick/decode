@@ -11,7 +11,6 @@ use Psalm\StatementsSource;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Type\Atomic;
 use Psalm\Type\Atomic\TNamedObject;
-use Psalm\Type\Atomic\TNull;
 use Psalm\Type\Union;
 use function Fp\Collection\map;
 use function implode;
@@ -122,13 +121,11 @@ final class MetaMixinGenerator
             '{{MATCHER_LIST}}' => implode(PHP_EOL, map(
                 $union->getAtomicTypes(),
                 function(Atomic $atomic) {
-                    $param_type = PsalmApi::$types->toDocblockString(new Union([$atomic]));
-
                     $param_name = $atomic instanceof TNamedObject
                         ? PsalmApi::$classlikes->toShortName($atomic)
                         : $atomic->getId();
 
-                    return sprintf(self::CLOSURE, $param_type, $param_name);
+                    return sprintf(self::CLOSURE, PsalmApi::$types->toDocblockString($atomic), $param_name);
                 }
             )),
             '{{MATCHER_NATIVE_LIST}}' => implode(', ', map(
@@ -160,12 +157,13 @@ final class MetaMixinGenerator
             '{{PROPS_LIST}}' => implode(PHP_EOL, map(
                 $return,
                 function(Union $type, string $name) {
-                    if ($type->possibly_undefined) {
-                        $type = clone $type;
-                        $type->addType(new TNull());
-                    }
+                    $docblockString = PsalmApi::$types->toDocblockString(
+                        $type->possibly_undefined
+                            ? PsalmApi::$types->asNullable($type)
+                            : $type,
+                    );
 
-                    return sprintf(self::PROP, PsalmApi::$types->toDocblockString($type), $name);
+                    return sprintf(self::PROP, $docblockString, $name);
                 },
             )),
         ];

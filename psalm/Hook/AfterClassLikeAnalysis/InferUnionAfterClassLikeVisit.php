@@ -41,7 +41,7 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
         Option::do(function() use ($event) {
             $storage = $event->getStorage();
 
-            $cases = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, InferUnion::class))
+            $cases = yield proveTrue(PsalmApi::$classlikes->classImplements($storage, InferUnion::class))
                 ->flatMap(fn() => GetMethodReturnType::from($event, 'union'))
                 ->flatMap(fn($type) => DecoderType::getDecoderGeneric($type));
 
@@ -49,7 +49,7 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             self::addUnionMethod($storage);
             self::removeMetaMixin($storage);
 
-            if (array_key_exists(strtolower(UnionInstance::class), $storage->used_traits)) {
+            if (PsalmApi::$classlikes->isTraitUsed($storage, UnionInstance::class)) {
                 self::addValueProperty($storage, $cases);
                 self::addMatchMethod($storage, $cases);
                 self::addIsMethod($storage);
@@ -93,12 +93,10 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             new TTypeAlias($storage->name, PsalmApi::$classlikes->toShortName($storage) . 'Union'),
         ]);
 
-        $decoder_type = new TGenericObject(DecoderInterface::class, [$union_type_param]);
-        $decoder_type->addIntersectionType(
-            new TGenericObject(
-                $atomics[0]->getId() === UnionDecoder::class
-                    ? UnionDecoder::class
-                    : TaggedUnionDecoder::class,
+        $decoder_type = PsalmApi::$types->addIntersection(
+            to: new TGenericObject(DecoderInterface::class, [$union_type_param]),
+            type: new TGenericObject(
+                $atomics[0]->getId() === UnionDecoder::class ? UnionDecoder::class : TaggedUnionDecoder::class,
                 [$union_type_param],
             ),
         );

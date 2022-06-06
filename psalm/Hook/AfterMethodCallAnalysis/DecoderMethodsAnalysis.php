@@ -80,12 +80,7 @@ final class DecoderMethodsAnalysis implements AfterMethodCallAnalysisInterface
             IssueBuffer::accepts($issue, $source->getSuppressedIssues());
         }
 
-        $brand_type = new Type\Atomic\TNamedObject($brand);
-
-        $with_brand = clone $atomic;
-        $with_brand->addIntersectionType($brand_type);
-
-        return $with_brand;
+        return PsalmApi::$types->addIntersection($atomic, new Type\Atomic\TNamedObject($brand));
     }
 
     private static function hasBrandContradiction(string $brand, array $current_brands): bool

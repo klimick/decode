@@ -143,7 +143,7 @@ final class GetMethodReturnType
             ) {}
 
             /**
-             * @return Option<array{string, TGenericObject}>
+             * @return Option<array{string, Union}>
              */
             private static function fromStaticCall(Node $node): Option
             {
@@ -159,9 +159,11 @@ final class GetMethodReturnType
                         ->filter(fn($c) => class_exists($c) && is_subclass_of($c, InferShape::class))
                         ->filter(fn() => 'type' === $method_name);
 
-                    $decoder = new TGenericObject(DecoderInterface::class, [
-                        new Union([
-                            new TNamedObject($class_name),
+                    $decoder = new Union([
+                        new TGenericObject(DecoderInterface::class, [
+                            new Union([
+                                new TNamedObject($class_name),
+                            ]),
                         ]),
                     ]);
 
@@ -170,7 +172,7 @@ final class GetMethodReturnType
             }
 
             /**
-             * @return Option<array{string, TNamedObject}>
+             * @return Option<array{string, Union}>
              */
             private static function fromNew(Node $node): Option
             {
@@ -178,7 +180,11 @@ final class GetMethodReturnType
                     ->filterOf(Node\Expr\New_::class)
                     ->flatMap(fn($n) => proveOf($n->class, Node\Name::class))
                     ->flatMap(fn($n) => proveString($n->getAttribute('resolvedName')))
-                    ->map(fn($n) => [$n, new TNamedObject($n)]);
+                    ->map(fn($n) => new TNamedObject($n))
+                    ->map(fn($n) => [
+                        $n->value,
+                        new Union([$n]),
+                    ]);
             }
 
             public function leaveNode(Node $node): void
@@ -186,10 +192,10 @@ final class GetMethodReturnType
                 Option::do(function() use ($node) {
                     $expr = yield proveOf($node, Node\Expr::class);
 
-                    [$phantom, $named_object] = yield self::fromStaticCall($expr)
+                    [$phantom, $type] = yield self::fromStaticCall($expr)
                         ->orElse(fn() => self::fromNew($expr));
 
-                    $this->node_data->setType($expr, new Union([$named_object]));
+                    PsalmApi::$types->setType($this->node_data, $expr, $type);
                     $this->phantom_classes[] = $phantom;
                 });
             }

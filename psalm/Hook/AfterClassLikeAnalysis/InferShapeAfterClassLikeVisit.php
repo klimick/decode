@@ -20,7 +20,6 @@ use Psalm\Storage\MethodStorage;
 use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TKeyedArray;
 use Psalm\Type\Atomic\TNamedObject;
-use Psalm\Type\Atomic\TNull;
 use Psalm\Type\Atomic\TTypeAlias;
 use Psalm\Type\Union;
 use function array_key_exists;
@@ -35,23 +34,26 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
         Option::do(function() use ($event) {
             $storage = $event->getStorage();
 
-            $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage->name, InferShape::class))
+            $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage, InferShape::class))
                 ->flatMap(fn() => GetMethodReturnType::from($event, 'shape'))
                 ->flatMap(fn($type) => DecoderType::getShapeProperties($type))
                 ->flatMap(fn($props) => proveNonEmptyArray($props));
 
-            self::addTypeMethod(to: $storage);
-            self::fixPropsMethod(to: $storage);
-            self::addProperties($props, to: $storage);
+            self::fixShapeMethod(to: $storage);
             self::addShapeTypeAlias($props, to: $storage);
             self::removeMetaMixin(from: $storage);
+
+            if (PsalmApi::$classlikes->isTraitUsed($storage, ObjectInstance::class)) {
+                self::addTypeMethod(to: $storage);
+                self::addProperties($props, to: $storage);
+            }
         });
     }
 
     /**
      * @param non-empty-array<string, Union> $properties
      */
-    private static function fixPropsMethod(ClassLikeStorage $to): void
+    private static function fixShapeMethod(ClassLikeStorage $to): void
     {
         if (!array_key_exists('shape', $to->methods)) {
             return;
@@ -61,10 +63,12 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             new TTypeAlias($to->name, PsalmApi::$classlikes->toShortName($to) . 'Shape'),
         ]);
 
-        $decoder_type = new TGenericObject(DecoderInterface::class, [$shape_type_param]);
-        $decoder_type->addIntersectionType(new TGenericObject(ShapeDecoder::class, [$shape_type_param]));
-
-        $to->methods['shape']->return_type = new Union([$decoder_type]);
+        $to->methods['shape']->return_type = new Union([
+            PsalmApi::$types->addIntersection(
+                to: new TGenericObject(DecoderInterface::class, [$shape_type_param]),
+                type: new TGenericObject(ShapeDecoder::class, [$shape_type_param]),
+            ),
+        ]);
     }
 
     /**
@@ -89,17 +93,10 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
      */
     private static function addProperties(array $properties, ClassLikeStorage $to): void
     {
-        if (!array_key_exists(strtolower(ObjectInstance::class), $to->used_traits)) {
-            return;
-        }
-
         foreach ($properties as $property_mame => $property_type) {
-            if ($property_type->possibly_undefined) {
-                $property_type = clone $property_type;
-                $property_type->addType(new TNull());
-            }
-
-            $to->pseudo_property_get_types['$' . $property_mame] = $property_type;
+            $to->pseudo_property_get_types['$' . $property_mame] = $property_type->possibly_undefined
+                ? PsalmApi::$types->asNullable($property_type)
+                : $property_type;
         }
 
         $to->sealed_properties = true;
@@ -107,10 +104,6 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
 
     private static function addTypeMethod(ClassLikeStorage $to): void
     {
-        if (!array_key_exists(strtolower(ObjectInstance::class), $to->used_traits)) {
-            return;
-        }
-
         $name_lc = 'type';
 
         $method = new MethodStorage();
