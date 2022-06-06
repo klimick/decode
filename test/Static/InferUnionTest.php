@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Static;
 
 use Fp\PsalmToolkit\StaticTest\NoCode;
-use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Internal\UnionDecoder;
-use Klimick\Decode\Test\Static\Fixtures\Project;
-use Klimick\Decode\Test\Static\Fixtures\User;
 use Fp\PsalmToolkit\StaticTest\PsalmTest;
 use Fp\PsalmToolkit\StaticTest\StaticTestCase;
 use Fp\PsalmToolkit\StaticType\StaticTypes as t;
+use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\Decode\Decoder\UnionDecoder;
+use Klimick\Decode\Test\Static\Fixtures\Project;
+use Klimick\Decode\Test\Static\Fixtures\User;
 use Klimick\Decode\Test\Static\Fixtures\UserOrProject;
 use RuntimeException;
 

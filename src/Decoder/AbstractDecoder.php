@@ -5,12 +5,11 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Closure;
-use Klimick\Decode\Internal\HighOrder\FromDecoder;
-use Klimick\Decode\Internal\HighOrder\DefaultDecoder;
-use Klimick\Decode\Internal\HighOrder\OptionalDecoder;
-use Klimick\Decode\Internal\HighOrder\ConstrainedDecoder;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Internal\MapDecoder;
+use Klimick\Decode\Decoder\HighOrder\ConstrainedDecoder;
+use Klimick\Decode\Decoder\HighOrder\DefaultDecoder;
+use Klimick\Decode\Decoder\HighOrder\FromDecoder;
+use Klimick\Decode\Decoder\HighOrder\OptionalDecoder;
 
 /**
  * @template-covariant T

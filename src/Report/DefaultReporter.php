@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Report;
 
-use Klimick\Decode\ContextEntry;
-use Klimick\Decode\Decoder\DecodeErrorInterface;
-use ReflectionClass;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\TypeError;
-use Klimick\Decode\Decoder\ConstraintsError;
-use Klimick\Decode\Decoder\UndefinedError;
 use Klimick\Decode\Constraint\ConstraintError;
+use Klimick\Decode\Context;
+use Klimick\Decode\ContextEntry;
+use Klimick\Decode\Decoder\Error\ConstraintsError;
+use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
+use Klimick\Decode\Decoder\Error\TypeError;
+use Klimick\Decode\Decoder\Error\UndefinedError;
+use ReflectionClass;
 use function Fp\Collection\map;
 
 final class DefaultReporter

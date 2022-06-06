@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\TaggedUnionDecoderFactory;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
+use Klimick\Decode\Decoder\Factory\TaggedUnionDecoderFactory;
+use Klimick\PsalmDecode\Issue;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
 use Psalm\Type\Union;
-use Klimick\PsalmDecode\Issue;
 use function Fp\Evidence\proveTrue;
 
 final class TaggedUnionDecoderFactoryReturnTypeProvider implements MethodReturnTypeProviderInterface

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Static\Fixtures;
 
 use Klimick\Decode\Decoder as t;
-use Klimick\Decode\Internal\UnionDecoder;
+use Klimick\Decode\Decoder\UnionDecoder;
 
 /**
  * @mixin UserOrProjectMetaMixin

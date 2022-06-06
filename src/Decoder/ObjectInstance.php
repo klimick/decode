@@ -2,8 +2,6 @@
 
 namespace Klimick\Decode\Decoder;
 
-use Klimick\Decode\Internal\ObjectDecoder;
-
 /**
  * @psalm-require-implements InferShape
  */

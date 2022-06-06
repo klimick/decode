@@ -8,6 +8,7 @@ use Closure;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
+use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
 
 /**

@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace Klimick\Decode\Test\Static;
 
 use Fp\PsalmToolkit\StaticTest\NoCode;
-use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
-use Klimick\Decode\Test\Static\Fixtures\PartialProject;
-use Klimick\Decode\Test\Static\Fixtures\Project;
-use Klimick\Decode\Test\Static\Fixtures\User;
 use Fp\PsalmToolkit\StaticTest\PsalmTest;
 use Fp\PsalmToolkit\StaticTest\StaticTestCase;
 use Fp\PsalmToolkit\StaticType\StaticTypes as t;
+use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\Decode\Decoder\ShapeDecoder;
+use Klimick\Decode\Test\Static\Fixtures\PartialProject;
+use Klimick\Decode\Test\Static\Fixtures\Project;
+use Klimick\Decode\Test\Static\Fixtures\User;
 
 /**
  * @psalm-import-type ProjectShape from Project

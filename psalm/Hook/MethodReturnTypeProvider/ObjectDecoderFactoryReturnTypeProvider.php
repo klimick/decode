@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
 
-use Klimick\Decode\Decoder\ObjectDecoderFactory;
+use Klimick\Decode\Decoder\Factory\ObjectDecoderFactory;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
 use Psalm\Type;

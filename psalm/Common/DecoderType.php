@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Common;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\DecoderInterface;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\Decode\Decoder\ShapeDecoder;
 use Psalm\Type;
 use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Union;

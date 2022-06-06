@@ -7,11 +7,11 @@ namespace Klimick\Decode\Test\Runtime\Decoder;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\UndefinedError;
-use Klimick\Decode\Internal\Shape\ShapeAccessor;
+use Klimick\Decode\Decoder\Error\UndefinedError;
+use Klimick\Decode\Decoder\ShapeAccessor;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\Decoder\mixed;
 use function Klimick\Decode\Decoder\constant;
+use function Klimick\Decode\Decoder\mixed;
 use function PHPUnit\Framework\assertEquals;
 
 /**

@@ -9,7 +9,7 @@ use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\InferShape;
 use Klimick\Decode\Decoder\ObjectInstance;
-use Klimick\Decode\Internal\Shape\ShapeDecoder;
+use Klimick\Decode\Decoder\ShapeDecoder;
 use Klimick\PsalmDecode\Common\DecoderType;
 use Psalm\Internal\MethodIdentifier;
 use Psalm\Internal\Type\TypeAlias\ClassTypeAlias;
