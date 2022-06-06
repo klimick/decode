@@ -9,6 +9,7 @@ use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\InferUnionAfterClassLikeVisi
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\DecoderMethodsAnalysis;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\FromArgumentAnalysis;
 use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\GenerateShapeMetaMixinAfterStatementAnalysis;
+use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\GenerateUnionMetaMixinAfterStatementAnalysis;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
@@ -43,6 +44,7 @@ final class Plugin implements PluginEntryPointInterface
         $register(ConstrainedMethodReturnTypeProvider::class);
         $register(FromArgumentAnalysis::class);
         $register(GenerateShapeMetaMixinAfterStatementAnalysis::class);
+        $register(GenerateUnionMetaMixinAfterStatementAnalysis::class);
         $register(InferShapeAfterClassLikeVisit::class);
         $register(InferUnionAfterClassLikeVisit::class);
     }

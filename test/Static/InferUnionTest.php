@@ -51,11 +51,25 @@ final class InferUnionTest extends PsalmTest
             })
             ->seeReturnType(t::object(User::class));
 
-        StaticTestCase::describe('Value can be matched')
+        StaticTestCase::describe('Value can be matched (No type hints)')
             ->haveCode(function(UserOrProject $union) {
                 return $union->match(
                     fn($user) => [$user, 'user'],
                     fn($project) => [$project, 'project'],
+                );
+            })
+            ->seeReturnType(
+                t::union([
+                    t::shape([t::object(User::class), t::literal('user')]),
+                    t::shape([t::object(Project::class), t::literal('project')]),
+                ])
+            );
+
+        StaticTestCase::describe('Value can be matched (With type hints)')
+            ->haveCode(function(UserOrProject $union) {
+                return $union->match(
+                    fn(User $user) => [$user, 'user'],
+                    fn(Project $project) => [$project, 'project'],
                 );
             })
             ->seeReturnType(
