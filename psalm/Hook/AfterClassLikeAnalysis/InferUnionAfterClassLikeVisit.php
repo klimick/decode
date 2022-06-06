@@ -30,6 +30,7 @@ use Psalm\Type\Atomic\TTypeAlias;
 use Psalm\Type\Union;
 use function array_key_exists;
 use function Fp\Cast\asList;
+use function Fp\Collection\filter;
 use function Fp\Evidence\proveTrue;
 use function strtolower;
 
@@ -46,6 +47,7 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
 
             self::addTypeAlias($storage, $cases);
             self::addUnionMethod($storage);
+            self::removeMetaMixin($storage);
 
             if (array_key_exists(strtolower(UnionInstance::class), $storage->used_traits)) {
                 self::addValueProperty($storage, $cases);
@@ -215,5 +217,10 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
         $storage->declaring_method_ids[$name_lc] = new MethodIdentifier($storage->name, $name_lc);
         $storage->appearing_method_ids[$name_lc] = new MethodIdentifier($storage->name, $name_lc);
         $storage->methods[$name_lc] = $method;
+    }
+
+    private static function removeMetaMixin(ClassLikeStorage $from): void
+    {
+        $from->namedMixins = filter($from->namedMixins, fn($t) => $t->value !== "{$from->name}MetaMixin");
     }
 }

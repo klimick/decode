@@ -44,7 +44,7 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             self::fixPropsMethod(to: $storage);
             self::addProperties($props, to: $storage);
             self::addShapeTypeAlias($props, to: $storage);
-            self::removePropsMixin(from: $storage);
+            self::removeMetaMixin(from: $storage);
         });
     }
 
@@ -129,7 +129,7 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
         $to->methods[$name_lc] = $method;
     }
 
-    private static function removePropsMixin(ClassLikeStorage $from): void
+    private static function removeMetaMixin(ClassLikeStorage $from): void
     {
         $from->namedMixins = filter($from->namedMixins, fn($t) => $t->value !== "{$from->name}MetaMixin");
     }
