@@ -8,7 +8,7 @@ use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\PsalmDecode\Helper\DecoderType;
+use Klimick\PsalmDecode\Common\DecoderType;
 use Klimick\PsalmDecode\Issue\HighOrder\IncompatibleConstraintIssue;
 use Fp\PsalmToolkit\Toolkit\CallArg;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;

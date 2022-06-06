@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Helper;
+namespace Klimick\PsalmDecode\Common;
 
 use Fp\Functional\Option\Option;
 use Klimick\Decode\HighOrder\Brand\OptionalBrand;

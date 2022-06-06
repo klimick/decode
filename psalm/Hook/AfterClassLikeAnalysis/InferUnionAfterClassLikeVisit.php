@@ -11,7 +11,7 @@ use Klimick\Decode\Decoder\InferUnion;
 use Klimick\Decode\Decoder\UnionInstance;
 use Klimick\Decode\Internal\TaggedUnionDecoder;
 use Klimick\Decode\Internal\UnionDecoder;
-use Klimick\PsalmDecode\Helper\DecoderType;
+use Klimick\PsalmDecode\Common\DecoderType;
 use Psalm\Internal\MethodIdentifier;
 use Psalm\Internal\Type\TypeAlias\ClassTypeAlias;
 use Psalm\Issue\InvalidReturnType;

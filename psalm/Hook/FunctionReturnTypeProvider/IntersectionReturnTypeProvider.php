@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider;
 
 use Fp\PsalmToolkit\Toolkit\CallArg;
-use Klimick\PsalmDecode\Helper\DecoderType;
+use Klimick\PsalmDecode\Common\DecoderType;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;

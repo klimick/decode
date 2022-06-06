@@ -7,7 +7,7 @@ namespace Klimick\PsalmDecode\Hook\AfterStatementAnalysis;
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\InferUnion;
-use Klimick\PsalmDecode\Helper\DecoderType;
+use Klimick\PsalmDecode\Common\DecoderType;
 use PhpParser\Node\Stmt\Return_;
 use Psalm\Plugin\EventHandler\AfterStatementAnalysisInterface;
 use Psalm\Plugin\EventHandler\Event\AfterStatementAnalysisEvent;

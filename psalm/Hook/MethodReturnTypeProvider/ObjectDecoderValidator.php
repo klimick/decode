@@ -2,22 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Helper;
+namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
 
 use Fp\Functional\Option\Option;
-use Klimick\PsalmDecode\Issue\Object\NotPartialPropertyIssue;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
+use Klimick\PsalmDecode\Common\DecoderType;
+use Klimick\PsalmDecode\Common\NamedArgumentsMapper;
+use Klimick\PsalmDecode\Issue\Object\InvalidDecoderForPropertyIssue;
+use Klimick\PsalmDecode\Issue\Object\NonexistentPropertyObjectPropertyIssue;
+use Klimick\PsalmDecode\Issue\Object\NotPartialPropertyIssue;
+use Klimick\PsalmDecode\Issue\Object\RequiredObjectPropertyMissingIssue;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\StatementsSource;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Type;
+use function array_key_exists;
+use function array_keys;
 use function Fp\Cast\asList;
 use function Fp\Collection\first;
 use function Fp\Collection\second;
 
-final class ObjectVerifier
+final class ObjectDecoderValidator
 {
     public static function verify(MethodReturnTypeProviderEvent $event): void
     {
@@ -27,14 +34,13 @@ final class ObjectVerifier
 
             $call_info = yield self::extractCallInfo($event);
 
-            $validator = new ObjectPropertiesValidator(
+            self::checkPropertyTypes(
                 source: $event->getSource(),
                 actual_shape: $actual_shape,
                 expected_shape: $call_info['expected_shape'],
                 method_code_location: $call_info['call_location'],
                 arg_code_locations: $call_info['arg_locations'],
             );
-            $validator->validate();
         });
     }
 
@@ -141,5 +147,56 @@ final class ObjectVerifier
     {
         return PsalmApi::$types->asSingleAtomicOf(Type\Atomic\TNamedObject::class, $object_class)
             ->flatMap(fn($named_object) => PsalmApi::$classlikes->getStorage($named_object));
+    }
+
+    /**
+     * @param array<string, Type\Union> $actual_shape
+     * @param array<string, Type\Union> $expected_shape
+     * @param array<string, CodeLocation> $arg_code_locations
+     */
+    private static function checkPropertyTypes(
+        StatementsSource $source,
+        array $actual_shape,
+        array $expected_shape,
+        CodeLocation $method_code_location,
+        array $arg_code_locations,
+    ): void
+    {
+        $missing_properties = [];
+
+        foreach ($expected_shape as $property => $type) {
+            if (!array_key_exists($property, $actual_shape)) {
+                $missing_properties[] = $property;
+            } elseif (!PsalmApi::$types->isTypeContainedByType($actual_shape[$property], $type)) {
+                $issue = new InvalidDecoderForPropertyIssue(
+                    property: $property,
+                    actual_type: $actual_shape[$property],
+                    expected_type: $type,
+                    code_location: $arg_code_locations[$property] ?? $method_code_location,
+                );
+
+                IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+            }
+        }
+
+        if (!empty($missing_properties)) {
+            $issue = new RequiredObjectPropertyMissingIssue(
+                missing_properties: $missing_properties,
+                code_location: $method_code_location,
+            );
+
+            IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+        }
+
+        foreach (array_keys($actual_shape) as $property) {
+            if (!array_key_exists($property, $expected_shape)) {
+                $issue = new NonexistentPropertyObjectPropertyIssue(
+                    property: $property,
+                    code_location: $arg_code_locations[$property] ?? $method_code_location,
+                );
+
+                IssueBuffer::accepts($issue, $source->getSuppressedIssues());
+            }
+        }
     }
 }

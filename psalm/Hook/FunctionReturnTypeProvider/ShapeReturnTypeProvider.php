@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider;
 
-use Klimick\PsalmDecode\Helper\DecoderType;
-use Klimick\PsalmDecode\Helper\NamedArgumentsMapper;
+use Klimick\PsalmDecode\Common\DecoderType;
+use Klimick\PsalmDecode\Common\NamedArgumentsMapper;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
 use Psalm\Type;
