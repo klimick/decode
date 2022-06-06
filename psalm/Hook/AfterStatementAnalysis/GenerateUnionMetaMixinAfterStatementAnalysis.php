@@ -24,8 +24,8 @@ final class GenerateUnionMetaMixinAfterStatementAnalysis implements AfterStateme
                 ->filter(fn($ctx) => is_string($ctx->calling_method_id) && str_ends_with($ctx->calling_method_id, '::union'));
 
             $storage = yield proveString($context->self)
-                ->flatMap(fn($class) => PsalmApi::$classlikes->getStorage($class))
-                ->filter(fn($storage) => PsalmApi::$classlikes->classImplements($storage->name, InferUnion::class));
+                ->filter(fn($class) => PsalmApi::$classlikes->classImplements($class, InferUnion::class))
+                ->flatMap(fn($class) => PsalmApi::$classlikes->getStorage($class));
 
             $union = yield proveOf($event->getStmt(), Return_::class)
                 ->flatMap(fn($return) => PsalmApi::$types->getType($event, $return))

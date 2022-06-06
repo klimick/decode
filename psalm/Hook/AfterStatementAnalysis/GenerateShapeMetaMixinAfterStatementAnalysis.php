@@ -24,8 +24,8 @@ final class GenerateShapeMetaMixinAfterStatementAnalysis implements AfterStateme
                 ->filter(fn($ctx) => is_string($ctx->calling_method_id) && str_ends_with($ctx->calling_method_id, '::shape'));
 
             $storage = yield proveString($context->self)
-                ->flatMap(fn($class) => PsalmApi::$classlikes->getStorage($class))
-                ->filter(fn($storage) => PsalmApi::$classlikes->classImplements($storage->name, InferShape::class));
+                ->filter(fn($class) => PsalmApi::$classlikes->classImplements($class, InferShape::class))
+                ->flatMap(fn($class) => PsalmApi::$classlikes->getStorage($class));
 
             $property_types = yield proveOf($event->getStmt(), Return_::class)
                 ->flatMap(fn($return) => PsalmApi::$types->getType($event, $return))
