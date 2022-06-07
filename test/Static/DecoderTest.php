@@ -262,4 +262,146 @@ final class DecoderTest extends PsalmTest
                 ]),
             );
     }
+
+    public function testPickProps(): void
+    {
+        StaticTestCase::describe('Pick prop')
+            ->haveCode(function() {
+                $shape = shape(
+                    id: string(),
+                    name: string(),
+                    meta: string(),
+                );
+
+                return $shape->pick(['id']);
+            })
+            ->seeReturnType(
+                t::intersection([
+                    t::generic(DecoderInterface::class, [
+                        t::shape(['id' => t::string()])
+                    ]),
+                    t::generic(ShapeDecoder::class, [
+                        t::shape(['id' => t::string()])
+                    ]),
+                ])
+            );
+
+        StaticTestCase::describe('Pick multiple props')
+            ->haveCode(function() {
+                $shape = shape(
+                    id: string(),
+                    name: string(),
+                    meta: string(),
+                );
+
+                return $shape->pick(['id', 'name']);
+            })
+            ->seeReturnType(
+                t::intersection([
+                    t::generic(DecoderInterface::class, [
+                        t::shape(['id' => t::string(), 'name' => t::string()])
+                    ]),
+                    t::generic(ShapeDecoder::class, [
+                        t::shape(['id' => t::string(), 'name' => t::string()])
+                    ]),
+                ])
+            );
+
+        StaticTestCase::describe('Pick unknown prop')
+            ->haveCode(function() {
+                return shape(id: string())->pick(['unknown']);
+            })
+            ->seePsalmIssue(
+                type: 'UndefinedShapePropertyIssue',
+                message: 'Property #[property] is not defined on shape #[shape]',
+                args: [
+                    'property' => 'unknown',
+                    'shape' => 'array{id: string}',
+                ]
+            );
+
+        StaticTestCase::describe('Pick multiple unknown props')
+            ->haveCode(function() {
+                return shape(id: string())->pick(['unknown1', 'unknown2']);
+            })
+            ->seePsalmIssue(
+                type: 'UndefinedShapePropertyIssue',
+                message: 'Properties #[properties] are not defined on shape #[shape]',
+                args: [
+                    'properties' => 'unknown1, unknown2',
+                    'shape' => 'array{id: string}',
+                ]
+            );
+    }
+
+    public function testOmitProps(): void
+    {
+        StaticTestCase::describe('Omit prop')
+            ->haveCode(function() {
+                $shape = shape(
+                    id: string(),
+                    name: string(),
+                    meta: string(),
+                );
+
+                return $shape->omit(['id']);
+            })
+            ->seeReturnType(
+                t::intersection([
+                    t::generic(DecoderInterface::class, [
+                        t::shape(['name' => t::string(), 'meta' => t::string()])
+                    ]),
+                    t::generic(ShapeDecoder::class, [
+                        t::shape(['name' => t::string(), 'meta' => t::string()])
+                    ]),
+                ])
+            );
+
+        StaticTestCase::describe('Omit multiple props')
+            ->haveCode(function() {
+                $shape = shape(
+                    id: string(),
+                    name: string(),
+                    meta: string(),
+                );
+
+                return $shape->omit(['id', 'name']);
+            })
+            ->seeReturnType(
+                t::intersection([
+                    t::generic(DecoderInterface::class, [
+                        t::shape(['meta' => t::string()])
+                    ]),
+                    t::generic(ShapeDecoder::class, [
+                        t::shape(['meta' => t::string()])
+                    ]),
+                ])
+            );
+
+        StaticTestCase::describe('Omit unknown prop')
+            ->haveCode(function() {
+                return shape(id: string())->omit(['unknown']);
+            })
+            ->seePsalmIssue(
+                type: 'UndefinedShapePropertyIssue',
+                message: 'Property #[property] is not defined on shape #[shape]',
+                args: [
+                    'property' => 'unknown',
+                    'shape' => 'array{id: string}',
+                ]
+            );
+
+        StaticTestCase::describe('Pick multiple unknown props')
+            ->haveCode(function() {
+                return shape(id: string())->omit(['unknown1', 'unknown2']);
+            })
+            ->seePsalmIssue(
+                type: 'UndefinedShapePropertyIssue',
+                message: 'Properties #[properties] are not defined on shape #[shape]',
+                args: [
+                    'properties' => 'unknown1, unknown2',
+                    'shape' => 'array{id: string}',
+                ]
+            );
+    }
 }

@@ -9,7 +9,9 @@ use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
 use Klimick\Decode\Decoder\Error\UndefinedError;
 use Klimick\Decode\Decoder\HighOrder\HighOrderDecoder;
+use function Fp\Collection\filter;
 use function Fp\Collection\map;
+use function in_array;
 
 /**
  * @template-covariant TVal
@@ -37,6 +39,28 @@ final class ShapeDecoder extends AbstractDecoder
         }));
 
         return "array{{$properties}}";
+    }
+
+    /**
+     * @param non-empty-list<string> $props
+     */
+    public function omit(array $props): self
+    {
+        return new self(
+            decoders: filter($this->decoders, fn($_, $prop) => !in_array($prop, $props), preserveKeys: true),
+            partial: $this->partial,
+        );
+    }
+
+    /**
+     * @param non-empty-list<string> $props
+     */
+    public function pick(array $props): self
+    {
+        return new self(
+            decoders: filter($this->decoders, fn($_, $prop) => in_array($prop, $props), preserveKeys: true),
+            partial: $this->partial,
+        );
     }
 
     public function decode(mixed $value, Context $context): Either
