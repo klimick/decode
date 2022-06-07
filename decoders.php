@@ -116,9 +116,9 @@ function mixed(): DecoderInterface
  * @return DecoderInterface<T>
  * @psalm-pure
  */
-function constant(mixed $value): DecoderInterface
+function constantly(mixed $value): DecoderInterface
 {
-    return new ConstantDecoder($value);
+    return new ConstantlyDecoder($value);
 }
 
 /**

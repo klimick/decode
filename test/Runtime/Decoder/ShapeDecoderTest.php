@@ -13,7 +13,7 @@ use function Klimick\Decode\Decoder\cast;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
-use function Klimick\Decode\Decoder\constant;
+use function Klimick\Decode\Decoder\constantly;
 use function Klimick\Decode\Test\Helper\forAll;
 use function PHPUnit\Framework\assertEquals;
 use function PHPUnit\Framework\assertNotNull;
@@ -50,7 +50,7 @@ final class ShapeDecoderTest extends TestCase
             age: int()->from('$.person_age'),
             is_person: bool()->default(true),
             is_admin: bool()->optional(),
-            is_approved: constant(true),
+            is_approved: constantly(true),
         );
 
         $data = [

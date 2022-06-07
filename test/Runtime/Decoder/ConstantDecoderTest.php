@@ -7,7 +7,7 @@ namespace Klimick\Decode\Test\Runtime\Decoder;
 use Klimick\Decode\Test\Helper\Check;
 use Klimick\Decode\Test\Helper\Gen;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\Decoder\constant;
+use function Klimick\Decode\Decoder\constantly;
 use function Klimick\Decode\Test\Helper\forAll;
 
 final class ConstantDecoderTest extends TestCase
@@ -16,7 +16,7 @@ final class ConstantDecoderTest extends TestCase
     {
         forAll(Gen::mixed())
             ->then(function(mixed $value) {
-                Check::thatValidFor(constant($value))($value);
+                Check::thatValidFor(constantly($value))($value);
             });
     }
 }

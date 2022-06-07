@@ -12,7 +12,7 @@ use Klimick\Decode\Context;
  * @extends AbstractDecoder<T>
  * @psalm-immutable
  */
-final class ConstantDecoder extends AbstractDecoder
+final class ConstantlyDecoder extends AbstractDecoder
 {
     /**
      * @param T $constant

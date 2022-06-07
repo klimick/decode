@@ -10,7 +10,7 @@ use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Error\UndefinedError;
 use Klimick\Decode\Decoder\ShapeAccessor;
 use PHPUnit\Framework\TestCase;
-use function Klimick\Decode\Decoder\constant;
+use function Klimick\Decode\Decoder\constantly;
 use function Klimick\Decode\Decoder\mixed;
 use function PHPUnit\Framework\assertEquals;
 
@@ -99,7 +99,7 @@ final class ShapeAccessorTest extends TestCase
         ];
 
         yield 'constant field' => [
-            'decoder' => constant(10),
+            'decoder' => constantly(10),
             'field' => $field,
             'shape' => [],
             'expected' => $valid(10),

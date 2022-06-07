@@ -46,7 +46,7 @@ final class ShapeAccessor
      */
     private static function getConstant(DecoderInterface $decoder): Option
     {
-        return proveOf($decoder, ConstantDecoder::class)
+        return proveOf($decoder, ConstantlyDecoder::class)
             ->map(fn($decoder): mixed => $decoder->constant);
     }
 
