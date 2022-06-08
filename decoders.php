@@ -308,6 +308,32 @@ function fromJson(DecoderInterface $decoder): DecoderInterface
 }
 
 /**
+ * @template T
+ *
+ * @param DecoderInterface<T> $decoder
+ * @return DecoderInterface<Option<T>>
+ * @psalm-pure
+ */
+function option(DecoderInterface $decoder): DecoderInterface
+{
+    return new OptionDecoder($decoder);
+}
+
+/**
+ * @template TLeft
+ * @template TRight
+ *
+ * @param DecoderInterface<TLeft> $left
+ * @param DecoderInterface<TRight> $right
+ * @return DecoderInterface<Either<TLeft, TRight>>
+ * @psalm-pure
+ */
+function either(DecoderInterface $left, DecoderInterface $right): DecoderInterface
+{
+    return new EitherDecoder($left, $right);
+}
+
+/**
  * @return DecoderInterface<array<string, mixed>> & ShapeDecoder<array<string, mixed>>
  *
  * @psalm-pure

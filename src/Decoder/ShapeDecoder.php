@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
+use Fp\Functional\Option\Option;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
 use Klimick\Decode\Decoder\Error\UndefinedError;
@@ -80,8 +81,15 @@ final class ShapeDecoder extends AbstractDecoder
                 continue;
             }
 
-            if (self::isUndefinedAndOptional($decodedKV->get(), $decoder)) {
-                continue;
+            if (self::isUndefined($decodedKV->get())) {
+                if (self::canBeUndefined($decoder)) {
+                    continue;
+                }
+
+                if (self::isOptionDecoder($decoder)) {
+                    $decoded[$key] = Option::none();
+                    continue;
+                }
             }
 
             $errors[] = $decodedKV->get();
@@ -94,10 +102,18 @@ final class ShapeDecoder extends AbstractDecoder
      * @param non-empty-list<DecodeErrorInterface> $errors
      * @psalm-pure
      */
-    private static function isUndefinedAndOptional(array $errors, DecoderInterface $decoder): bool
+    private static function isUndefined(array $errors): bool
     {
-        return 1 === count($errors)
-            && $errors[0] instanceof UndefinedError
-            && $decoder instanceof HighOrderDecoder && $decoder->isOptional();
+        return 1 === count($errors) && $errors[0] instanceof UndefinedError;
+    }
+
+    private static function canBeUndefined(DecoderInterface $decoder): bool
+    {
+        return $decoder instanceof HighOrderDecoder && $decoder->isOptional();
+    }
+
+    private static function isOptionDecoder(DecoderInterface $decoder): bool
+    {
+        return $decoder instanceof OptionDecoder;
     }
 }
