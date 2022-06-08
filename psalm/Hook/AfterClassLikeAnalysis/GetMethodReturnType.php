@@ -134,20 +134,21 @@ final class GetMethodReturnType
 
     public static function createContext(string $self, Node\Expr $props_expr, NodeTypeProvider $node_data): Context
     {
-        $visitor = new class($node_data) extends NodeVisitorAbstract {
+        $visitor = new class($self, $node_data) extends NodeVisitorAbstract {
             /** @var list<string> */
             private array $phantom_classes = [];
 
             public function __construct(
+                private string $self,
                 private NodeTypeProvider $node_data,
             ) {}
 
             /**
              * @return Option<array{string, Union}>
              */
-            private static function fromStaticCall(Node $node): Option
+            private static function fromStaticCall(string $self, Node $node): Option
             {
-                return Option::do(function() use ($node) {
+                return Option::do(function() use ($self, $node) {
                     $method_name = yield Option::some($node)
                         ->filterOf(Node\Expr\StaticCall::class)
                         ->flatMap(fn($c) => proveOf($c->name, Node\Identifier::class))
@@ -156,6 +157,7 @@ final class GetMethodReturnType
                     $class_name = yield Option::some($node)
                         ->filterOf(Node\Expr\StaticCall::class)
                         ->flatMap(fn($c) => proveString($c->class->getAttribute('resolvedName')))
+                        ->map(fn($c) => 'self' === $c ? $self : $c)
                         ->filter(fn($c) => class_exists($c) && is_subclass_of($c, InferShape::class))
                         ->filter(fn() => 'type' === $method_name);
 
@@ -192,7 +194,7 @@ final class GetMethodReturnType
                 Option::do(function() use ($node) {
                     $expr = yield proveOf($node, Node\Expr::class);
 
-                    [$phantom, $type] = yield self::fromStaticCall($expr)
+                    [$phantom, $type] = yield self::fromStaticCall($this->self, $expr)
                         ->orElse(fn() => self::fromNew($expr));
 
                     PsalmApi::$types->setType($this->node_data, $expr, $type);
