@@ -11,5 +11,11 @@ use Klimick\Decode\Context;
  */
 final class UndefinedError implements DecodeErrorInterface
 {
-    public function __construct(public Context $context) { }
+    /**
+     * @param list<string> $aliases
+     */
+    public function __construct(
+        public Context $context,
+        public array $aliases = [],
+    ) { }
 }

@@ -106,11 +106,14 @@ final class ShapeAccessor
     private static function undefined(Context $context, DecoderInterface $decoder, int|string $key): array
     {
         return [
-            new UndefinedError($context(
-                name: $decoder->name(),
-                actual: null,
-                key: (string)$key,
-            )),
+            new UndefinedError(
+                $context(
+                    name: $decoder->name(),
+                    actual: null,
+                    key: (string) $key,
+                ),
+                $decoder->getAliases(),
+            ),
         ];
     }
 

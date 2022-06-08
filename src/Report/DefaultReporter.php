@@ -36,7 +36,7 @@ final class DefaultReporter
                     $constraintErrors[] = self::reportConstraintError($e);
                 }
             } elseif ($error instanceof UndefinedError) {
-                $undefinedErrors[] = self::pathFromContext($error->context);
+                $undefinedErrors[] = new UndefinedErrorReport(self::pathFromContext($error->context), $error->aliases);
             }
         }
 
