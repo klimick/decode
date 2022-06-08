@@ -5,46 +5,51 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Common;
 
 use Fp\Functional\Option\Option;
+use Fp\PsalmToolkit\Toolkit\CallArg;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
-use PhpParser\Node;
-use Psalm\StatementsSource;
 use Psalm\Type;
 use Psalm\Type\Union;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Atomic\TObjectWithProperties;
 use function array_key_exists;
 use function Fp\Collection\at;
+use function Fp\Collection\map;
 use function Fp\Evidence\proveString;
 
 final class NamedArgumentsMapper
 {
     /**
-     * @param non-empty-list<Node\Arg> $call_args
-     * @return Union
+     * @param non-empty-list<CallArg> $call_args
+     * @return non-empty-array<int|string, Union>
      */
-    public static function map(StatementsSource $source, array $call_args): Union
+    public static function namedArgsToArray(array $call_args): array
     {
         $properties = [];
 
         foreach ($call_args as $offset => $arg) {
-            $arg_type = PsalmApi::$types
-                ->getType($source, $arg->value)
-                ->getOrElse(Type::getMixed());
-
-            $property = Option::fromNullable($arg->name)
+            $property = Option::fromNullable($arg->node->name)
                 ->flatMap(fn($id) => proveString($id->name))
                 ->getOrElse($offset);
 
-            $type = DecoderType::getGeneric($arg_type)
-                ->map(fn($type) => self::isOptional($arg_type)
-                    ? PsalmApi::$types->asPossiblyUndefined($type)
-                    : $type)
-                ->getOrElse(Type::getMixed());
-
-            $properties[$property] = $type;
+            $properties[$property] = $arg->type;
         }
 
-        return DecoderType::createShape($properties);
+        return $properties;
+    }
+
+    /**
+     * @param non-empty-array<int|string, Union> $decoder_types
+     */
+    public static function mapDecoders(array $decoder_types): Union
+    {
+        return DecoderType::createShape(map(
+            $decoder_types,
+            fn($type) => DecoderType::getGeneric($type)
+                ->map(fn($generic) => self::isOptional($type)
+                    ? PsalmApi::$types->asPossiblyUndefined($generic)
+                    : $generic)
+                ->getOrElse(Type::getMixed())
+        ));
     }
 
     private static function isOptional(Union $union): bool

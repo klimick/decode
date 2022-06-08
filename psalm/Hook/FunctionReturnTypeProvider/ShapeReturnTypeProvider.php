@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider;
 
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\PsalmDecode\Common\NamedArgumentsMapper;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
 use Psalm\Type;
-use function Fp\Evidence\proveNonEmptyList;
 
 final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterface
 {
@@ -19,8 +19,9 @@ final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterfa
 
     public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
     {
-        return proveNonEmptyList($event->getCallArgs())
-            ->map(fn($args) => NamedArgumentsMapper::map($event->getStatementsSource(), $args))
+        return PsalmApi::$args->getNonEmptyCallArgs($event)
+            ->map(fn($args) => NamedArgumentsMapper::namedArgsToArray($args->toArray()))
+            ->map(fn($decoders) => NamedArgumentsMapper::mapDecoders($decoders))
             ->get();
     }
 }

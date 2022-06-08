@@ -22,7 +22,6 @@ use function array_key_exists;
 use function array_keys;
 use function Fp\Collection\first;
 use function Fp\Collection\map;
-use function Fp\Evidence\proveNonEmptyList;
 
 final class ObjectDecoderValidator
 {
@@ -31,8 +30,9 @@ final class ObjectDecoderValidator
         Option::do(function() use ($event) {
             self::checkPropertyTypes(
                 event: $event,
-                actual_shape: yield proveNonEmptyList($event->getCallArgs())
-                    ->map(fn($args) => NamedArgumentsMapper::map($event->getSource(), $args))
+                actual_shape: yield PsalmApi::$args->getNonEmptyCallArgs($event)
+                    ->map(fn($args) => NamedArgumentsMapper::namedArgsToArray($args->toArray()))
+                    ->map(fn($decoders) => NamedArgumentsMapper::mapDecoders($decoders))
                     ->flatMap(fn(Union $shape) => DecoderType::getShapeProperties($shape)),
                 expected_shape: yield Option::fromNullable($event->getTemplateTypeParameters())
                     ->flatMap(fn(array $templates) => first($templates))
