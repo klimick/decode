@@ -10,7 +10,6 @@ use Fp\PsalmToolkit\StaticTest\StaticTestCase;
 use Fp\PsalmToolkit\StaticType\StaticTypes as t;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\ShapeDecoder;
-use Klimick\Decode\Test\Static\Fixtures\PartialProject;
 use Klimick\Decode\Test\Static\Fixtures\Project;
 use Klimick\Decode\Test\Static\Fixtures\RecByFqn;
 use Klimick\Decode\Test\Static\Fixtures\RecBySelf;
@@ -51,14 +50,6 @@ final class InferShapeTest extends PsalmTest
             })
             ->seeReturnType(
                 t::union([t::string(), t::null()])
-            );
-
-        StaticTestCase::describe('Possibly undefined to nullable (partial shape)')
-            ->haveCode(function(PartialProject $p) {
-                return $p->id;
-            })
-            ->seeReturnType(
-                t::union([t::int(), t::null()])
             );
 
         $user = t::shape([

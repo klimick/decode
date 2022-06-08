@@ -24,7 +24,6 @@ use Psalm\Type\Atomic\TTypeAlias;
 use Psalm\Type\Union;
 use function array_key_exists;
 use function Fp\Collection\filter;
-use function Fp\Evidence\proveNonEmptyArray;
 use function Fp\Evidence\proveTrue;
 
 final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterface
@@ -36,8 +35,7 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
 
             $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage, InferShape::class))
                 ->flatMap(fn() => GetMethodReturnType::from($event, 'shape'))
-                ->flatMap(fn($type) => DecoderType::getShapeProperties($type))
-                ->flatMap(fn($props) => proveNonEmptyArray($props));
+                ->flatMap(fn($type) => DecoderType::getShapeProperties($type));
 
             self::fixShapeMethod(to: $storage);
             self::addShapeTypeAlias($props, to: $storage);

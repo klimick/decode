@@ -8,43 +8,45 @@ use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\ShapeDecoder;
-use Psalm\Type;
 use Psalm\Type\Atomic\TGenericObject;
+use Psalm\Type\Atomic\TKeyedArray;
 use Psalm\Type\Union;
+use function array_is_list;
+use function Fp\Collection\every;
 use function Fp\Collection\first;
-use function Fp\Collection\reindex;
+use function Fp\Evidence\proveString;
 
 final class DecoderType
 {
     /**
-     * @param array<int|string, Type\Union> $properties
+     * @param non-empty-array<int|string, Union> $properties
      */
-    public static function createShapeDecoder(array $properties): Type\Union
+    public static function createShapeDecoder(array $properties): Union
     {
-        return new Type\Union([
-            new Type\Atomic\TGenericObject(DecoderInterface::class, [
-                new Type\Union([
-                    empty($properties)
-                        ? new Type\Atomic\TArray([Type::getNever(), Type::getNever()])
-                        : new Type\Atomic\TKeyedArray($properties),
-                ]),
+        $shape = new TKeyedArray($properties);
+        $shape->is_list = array_is_list($properties);
+        $shape->sealed = every($properties, fn(Union $type) => !$type->possibly_undefined);
+
+        return new Union([
+            new TGenericObject(DecoderInterface::class, [
+                new Union([$shape]),
             ]),
         ]);
     }
 
     /**
-     * @return Option<Type\Union>
+     * @return Option<Union>
      */
     public static function withShapeDecoderIntersection(Union $mapped): Option
     {
         return Option::do(function() use ($mapped) {
-            $decoder = yield PsalmApi::$types->asSingleAtomicOf(Type\Atomic\TGenericObject::class, $mapped);
+            $decoder = yield PsalmApi::$types->asSingleAtomicOf(TGenericObject::class, $mapped);
             $shape = yield PsalmApi::$types->getFirstGeneric($decoder, DecoderInterface::class);
 
-            return new Type\Union([
+            return new Union([
                 PsalmApi::$types->addIntersection(
                     to: $decoder,
-                    type: new Type\Atomic\TGenericObject(ShapeDecoder::class, [$shape]),
+                    type: new TGenericObject(ShapeDecoder::class, [$shape]),
                 ),
             ]);
         });
@@ -61,29 +63,30 @@ final class DecoderType
     }
 
     /**
-     * @param Type\Union $shape_decoder_type
-     * @return Option<array<string, Type\Union>>
+     * @param Union $shape_decoder_type
+     * @return Option<non-empty-array<string, Union>>
      */
-    public static function getShapeProperties(Type\Union $shape_decoder_type): Option
+    public static function getShapeProperties(Union $shape_decoder_type): Option
     {
         return self::getDecoderGeneric($shape_decoder_type)
-            ->flatMap(fn($decoder_type_param) => PsalmApi::$types->asSingleAtomic($decoder_type_param)->flatMap(
-                fn($keyed_array) => Option::fromNullable(match (true) {
-                    ($keyed_array instanceof Type\Atomic\TArray) => [],
-                    ($keyed_array instanceof Type\Atomic\TKeyedArray) => self::remapKeys($keyed_array),
-                    default => null,
-                })
-            ));
+            ->flatMap(fn($generic) => PsalmApi::$types->asSingleAtomicOf(TKeyedArray::class, $generic))
+            ->flatMap(fn($shape) => self::remapKeys($shape));
     }
 
     /**
-     * @return array<string, Type\Union>
+     * @return Option<non-empty-array<string, Union>>
      */
-    private static function remapKeys(Type\Atomic\TKeyedArray $keyed_array): array
+    private static function remapKeys(TKeyedArray $keyed_array): Option
     {
-        return reindex(
-            $keyed_array->properties,
-            fn(Type\Union $_, int|string $property) => (string)$property,
-        );
+        return Option::do(function() use ($keyed_array) {
+            $remapped = [];
+
+            foreach ($keyed_array->properties as $property => $type) {
+                $asString = yield proveString($property);
+                $remapped[$asString] = $type;
+            }
+
+            return $remapped;
+        });
     }
 }

@@ -6,6 +6,7 @@ namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
+use function array_is_list;
 use function Fp\Collection\keys;
 
 /**
@@ -25,20 +26,6 @@ final class ArrListDecoder extends AbstractDecoder
         return "list<{$this->decoder->name()}>";
     }
 
-    /**
-     * @template T
-     * @psalm-pure
-     *
-     * @param array<array-key, T> $arr
-     * @psalm-assert-if-true list<T> $arr
-     */
-    public static function isList(array $arr): bool
-    {
-        $count = count($arr);
-
-        return 0 === $count || keys($arr) === range(0, $count - 1);
-    }
-
     public function decode(mixed $value, Context $context): Either
     {
         if (is_array($value)) {
@@ -50,6 +37,6 @@ final class ArrListDecoder extends AbstractDecoder
 
         return arrayOf(int(), $this->decoder)
             ->decode($value, $context)
-            ->flatMap(fn($valid) => self::isList($valid) ? valid($valid) : invalid($context));
+            ->flatMap(fn($valid) => array_is_list($valid) ? valid($valid) : invalid($context));
     }
 }

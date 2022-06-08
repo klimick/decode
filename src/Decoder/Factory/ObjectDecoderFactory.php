@@ -10,19 +10,16 @@ use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturn
 
 /**
  * @template TObjectClass of object
- * @template TPartial of bool
  * @psalm-immutable
  */
 final class ObjectDecoderFactory
 {
     /**
      * @param class-string<TObjectClass> $objectClass
-     * @param TPartial $partial,
      */
     public function __construct(
         public string $objectClass,
-        public bool $partial = false,
-    ) { }
+    ) {}
 
     /**
      * @return DecoderInterface<TObjectClass>
@@ -34,6 +31,6 @@ final class ObjectDecoderFactory
          * Validated via psalm plugin hook at this moment
          * @psalm-var array<string, DecoderInterface<mixed>> $decoders
          */
-        return new ObjectDecoder($this->objectClass, $decoders, $this->partial);
+        return new ObjectDecoder($this->objectClass, $decoders);
     }
 }

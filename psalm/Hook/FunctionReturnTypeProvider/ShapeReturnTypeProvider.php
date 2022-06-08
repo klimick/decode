@@ -9,23 +9,19 @@ use Klimick\PsalmDecode\Common\NamedArgumentsMapper;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
 use Psalm\Type;
+use function Fp\Evidence\proveNonEmptyList;
 
 final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterface
 {
     public static function getFunctionIds(): array
     {
-        return ['klimick\decode\decoder\shape', 'klimick\decode\decoder\partialshape'];
+        return ['klimick\decode\decoder\shape'];
     }
 
     public static function getFunctionReturnType(FunctionReturnTypeProviderEvent $event): ?Type\Union
     {
-        $mapped = NamedArgumentsMapper::map(
-            call_args: $event->getCallArgs(),
-            source: $event->getStatementsSource(),
-            partial: 'klimick\decode\decoder\partialshape' === $event->getFunctionId(),
-        );
-
-        return $mapped
+        return proveNonEmptyList($event->getCallArgs())
+            ->map(fn($args) => NamedArgumentsMapper::map($event->getStatementsSource(), $args))
             ->flatMap(fn($type) => DecoderType::withShapeDecoderIntersection($type))
             ->get();
     }

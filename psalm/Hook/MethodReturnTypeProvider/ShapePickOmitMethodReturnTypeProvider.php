@@ -21,6 +21,7 @@ use function array_key_exists;
 use function Fp\Collection\everyMap;
 use function Fp\Collection\filter;
 use function Fp\Collection\first;
+use function Fp\Evidence\proveNonEmptyArray;
 use function in_array;
 
 final class ShapePickOmitMethodReturnTypeProvider implements MethodReturnTypeProviderInterface
@@ -73,7 +74,8 @@ final class ShapePickOmitMethodReturnTypeProvider implements MethodReturnTypePro
                 preserveKeys: true,
             );
 
-            return yield Option::some(DecoderType::createShapeDecoder($filtered_shape))
+            return yield proveNonEmptyArray($filtered_shape)
+                ->map(fn($filtered) => DecoderType::createShapeDecoder($filtered))
                 ->flatMap(fn($decoder) => DecoderType::withShapeDecoderIntersection($decoder));
         });
 

@@ -12,6 +12,7 @@ use Klimick\Decode\Decoder\Error\UndefinedError;
 use function Fp\Collection\filter;
 use function Fp\Collection\map;
 use function in_array;
+use function is_int;
 
 /**
  * @template TShape of array
@@ -21,16 +22,19 @@ use function in_array;
 final class ShapeDecoder extends AbstractDecoder
 {
     /**
-     * @param array<string, DecoderInterface> $decoders
+     * @param array<int|string, DecoderInterface<mixed>> $decoders
      */
     public function __construct(
         public array $decoders,
-        public bool $partial = false,
     ) { }
 
     public function name(): string
     {
-        $properties = implode(', ', map($this->decoders, function(DecoderInterface $decoder, string $property) {
+        $properties = implode(', ', map($this->decoders, function(DecoderInterface $decoder, int|string $property) {
+            if (is_int($property)) {
+                return $decoder->name();
+            }
+
             return $decoder->isPossiblyUndefined()
                 ? "{$property}?: {$decoder->name()}"
                 : "{$property}: {$decoder->name()}";
@@ -44,10 +48,7 @@ final class ShapeDecoder extends AbstractDecoder
      */
     public function omit(array $props): self
     {
-        return new self(
-            decoders: filter($this->decoders, fn($_, $prop) => !in_array($prop, $props), preserveKeys: true),
-            partial: $this->partial,
-        );
+        return new self(filter($this->decoders, fn($_, $prop) => !in_array($prop, $props), preserveKeys: true));
     }
 
     /**
@@ -55,10 +56,7 @@ final class ShapeDecoder extends AbstractDecoder
      */
     public function pick(array $props): self
     {
-        return new self(
-            decoders: filter($this->decoders, fn($_, $prop) => in_array($prop, $props), preserveKeys: true),
-            partial: $this->partial,
-        );
+        return new self(filter($this->decoders, fn($_, $prop) => in_array($prop, $props), preserveKeys: true));
     }
 
     public function decode(mixed $value, Context $context): Either

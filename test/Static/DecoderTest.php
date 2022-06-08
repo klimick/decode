@@ -11,20 +11,16 @@ use Fp\PsalmToolkit\StaticType\StaticTypes as t;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\ShapeDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Department;
-use Klimick\Decode\Test\Static\Fixtures\PartialPerson;
 use Klimick\Decode\Test\Static\Fixtures\Person;
-use function Klimick\Decode\Decoder\bool;
 use function Klimick\Decode\Decoder\datetime;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\intersection;
 use function Klimick\Decode\Decoder\listOf;
 use function Klimick\Decode\Decoder\object;
-use function Klimick\Decode\Decoder\partialObject;
 use function Klimick\Decode\Decoder\rec;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Decoder\tagged;
-use function Klimick\Decode\Decoder\tuple;
 
 final class DecoderTest extends PsalmTest
 {
@@ -133,58 +129,6 @@ final class DecoderTest extends PsalmTest
                     'decoder' => DecoderInterface::class,
                 ],
             );
-    }
-
-    public function testPartialObjectDecoder(): void
-    {
-        StaticTestCase::describe('Partial object decoder')
-            ->haveCode(fn() => partialObject(PartialPerson::class)(
-                name: string(),
-                age: int(),
-            ))
-            ->seeReturnType(t::generic(
-                ofType: DecoderInterface::class,
-                withParams: [
-                    t::object(PartialPerson::class),
-                ],
-            ));
-    }
-
-    public function testPartialObjectAllPropertiesMustBeNullable(): void
-    {
-        StaticTestCase::describe('Partial object decoder: all properties must be nullable')
-            ->haveCode(fn() => partialObject(Person::class)(
-                name: string(),
-                age: int(),
-            ))
-            ->seePsalmIssue(
-                type: 'NotPartialProperty',
-                message: 'Property "name" must be nullable in source class.'
-            )
-            ->seePsalmIssue(
-                type: 'NotPartialProperty',
-                message: 'Property "age" must be nullable in source class.'
-            );
-    }
-
-    public function testTupleDecoder(): void
-    {
-        StaticTestCase::describe('Tuple decoder')
-            ->haveCode(fn() => tuple(
-                string(),
-                int(),
-                bool()->orUndefined()
-            ))
-            ->seeReturnType(t::generic(
-                ofType: DecoderInterface::class,
-                withParams: [
-                    t::shape([
-                        t::string(),
-                        t::int(),
-                        t::bool()->optional(),
-                    ]),
-                ],
-            ));
     }
 
     public function testShapeDecoder(): void

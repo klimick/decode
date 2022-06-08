@@ -17,7 +17,6 @@ use Klimick\Decode\Decoder\Factory\TaggedUnionDecoderFactory;
 use Klimick\Decode\Report\DefaultReporter;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
-use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
 
 /**
  * @template T
@@ -343,36 +342,21 @@ function shape(DecoderInterface ...$decoders): DecoderInterface
 {
     /**
      * Validated via psalm plugin hook at this moment
-     * @psalm-var array<string, DecoderInterface> $decoders
+     * @psalm-var array<int|string, DecoderInterface> $decoders
      */
     return new ShapeDecoder($decoders);
-}
-
-/**
- * @return DecoderInterface<array<string, mixed>> & ShapeDecoder<array<string, mixed>>
- *
- * @psalm-pure
- * @see ShapeReturnTypeProvider
- */
-function partialShape(DecoderInterface ...$decoders): DecoderInterface
-{
-    /**
-     * Validated via psalm plugin hook at this moment
-     * @psalm-var array<string, DecoderInterface> $decoders
-     */
-    return new ShapeDecoder($decoders, partial: true);
 }
 
 /**
  * @template T
  *
  * @param class-string<T> $objectClass
- * @return ObjectDecoderFactory<T, false>
+ * @return ObjectDecoderFactory<T>
  * @psalm-pure
  */
 function object(string $objectClass): ObjectDecoderFactory
 {
-    return new ObjectDecoderFactory($objectClass, partial: false);
+    return new ObjectDecoderFactory($objectClass);
 }
 
 /**
@@ -385,18 +369,6 @@ function object(string $objectClass): ObjectDecoderFactory
 function instance(string $of): DecoderInterface
 {
     return new InstanceofDecoder($of);
-}
-
-/**
- * @template T
- *
- * @param class-string<T> $objectClass
- * @return ObjectDecoderFactory<T, true>
- * @psalm-pure
- */
-function partialObject(string $objectClass): ObjectDecoderFactory
-{
-    return new ObjectDecoderFactory($objectClass, partial: true);
 }
 
 /**
@@ -450,21 +422,9 @@ function tagged(string $with): TaggedUnionDecoderFactory
 function intersection(ShapeDecoder $first, ShapeDecoder $second, ShapeDecoder ...$rest): DecoderInterface
 {
     $toMerge = array_map(
-        fn(ShapeDecoder $decoder) => $decoder->partial
-            ? array_map(fn(DecoderInterface $d) => $d->orUndefined(), $decoder->decoders)
-            : $decoder->decoders,
+        fn(ShapeDecoder $decoder) => $decoder->decoders,
         [$first, $second, ...$rest],
     );
 
     return new ShapeDecoder(array_merge(...$toMerge));
-}
-
-/**
- * @psalm-pure
- * @no-named-arguments
- * @see TupleReturnTypeProvider
- */
-function tuple(DecoderInterface $first, DecoderInterface ...$rest): DecoderInterface
-{
-    return new TupleDecoder([$first, ...$rest]);
 }

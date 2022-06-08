@@ -12,7 +12,6 @@ use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\GenerateShapeMetaMixinAfterS
 use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\GenerateUnionMetaMixinAfterStatementAnalysis;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
-use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\TupleReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ShapePickOmitMethodReturnTypeProvider;
@@ -21,34 +20,32 @@ use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
 use RuntimeException;
 use SimpleXMLElement;
+use function class_exists;
+use function Fp\Collection\forAll;
 
 final class Plugin implements PluginEntryPointInterface
 {
     public function __invoke(RegistrationInterface $registration, ?SimpleXMLElement $config = null): void
     {
-        $register = function(string $hook) use ($registration): void {
-            if (!class_exists($hook)) {
-                throw new RuntimeException('Something went wrong');
-            }
+        $hooks = [
+            ObjectDecoderFactoryReturnTypeProvider::class,
+            ShapeReturnTypeProvider::class,
+            ShapePickOmitMethodReturnTypeProvider::class,
+            IntersectionReturnTypeProvider::class,
+            TaggedUnionDecoderFactoryReturnTypeProvider::class,
+            ConstrainedMethodReturnTypeProvider::class,
+            DecoderFromAfterMethodCallAnalysis::class,
+            GenerateShapeMetaMixinAfterStatementAnalysis::class,
+            GenerateUnionMetaMixinAfterStatementAnalysis::class,
+            InferShapeAfterClassLikeVisit::class,
+            InferUnionAfterClassLikeVisit::class,
+            ShapePropertyFetchAfterExpressionAnalysis::class,
+        ];
 
-            $registration->registerHooksFromClass($hook);
-        };
-
-        $register(ObjectDecoderFactoryReturnTypeProvider::class);
-
-        $register(ShapeReturnTypeProvider::class);
-        $register(ShapePickOmitMethodReturnTypeProvider::class);
-
-        $register(IntersectionReturnTypeProvider::class);
-        $register(TupleReturnTypeProvider::class);
-        $register(TaggedUnionDecoderFactoryReturnTypeProvider::class);
-
-        $register(ConstrainedMethodReturnTypeProvider::class);
-        $register(DecoderFromAfterMethodCallAnalysis::class);
-        $register(GenerateShapeMetaMixinAfterStatementAnalysis::class);
-        $register(GenerateUnionMetaMixinAfterStatementAnalysis::class);
-        $register(InferShapeAfterClassLikeVisit::class);
-        $register(InferUnionAfterClassLikeVisit::class);
-        $register(ShapePropertyFetchAfterExpressionAnalysis::class);
+        forAll($hooks, function(string $hook) use ($registration): void {
+            class_exists($hook)
+                ? $registration->registerHooksFromClass($hook)
+                : throw new RuntimeException('Something went wrong');
+        });
     }
 }

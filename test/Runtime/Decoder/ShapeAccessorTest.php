@@ -46,21 +46,24 @@ final class ShapeAccessorTest extends TestCase
 
         $valid = fn(mixed $val): Either => Either::right($val);
 
-        $undefinedProperty = Either::left([
-            new UndefinedError(
-                Context::root(name: $decoder->name(), actual: [])(
-                    name: $decoder->name(),
-                    actual: null,
-                    key: $field,
-                ),
-            )
-        ]);
+        $undefinedProperty =
+            /** @param list<string> $aliases */
+            fn(array $aliases = []): Either => Either::left([
+                new UndefinedError(
+                    Context::root(name: $decoder->name(), actual: [])(
+                        name: $decoder->name(),
+                        actual: null,
+                        key: $field,
+                    ),
+                    $aliases,
+                )
+            ]);
 
         yield 'field does not exist' => [
             'decoder' => $decoder,
             'field' => $field,
             'shape' => [],
-            'expected' => $undefinedProperty,
+            'expected' => $undefinedProperty(),
         ];
 
         yield 'field exists' => [
@@ -74,7 +77,7 @@ final class ShapeAccessorTest extends TestCase
             'decoder' => $decoder->from('$.some_field.path'),
             'field' => $field,
             'shape' => [],
-            'expected' => $undefinedProperty,
+            'expected' => $undefinedProperty(['$.some_field.path']),
         ];
 
         yield 'aliased field exists' => [

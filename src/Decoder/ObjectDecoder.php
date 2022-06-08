@@ -20,12 +20,9 @@ final class ObjectDecoder extends AbstractDecoder
      * @param class-string<T> $objectClass
      * @param array<string, DecoderInterface<mixed>> $decoders
      */
-    public function __construct(
-        public string $objectClass,
-        public array $decoders,
-        public bool $partial = false,
-    ) {
-        $this->shape = new ShapeDecoder($decoders, $partial);
+    public function __construct(public string $objectClass, public array $decoders)
+    {
+        $this->shape = new ShapeDecoder($decoders);
     }
 
     public function name(): string

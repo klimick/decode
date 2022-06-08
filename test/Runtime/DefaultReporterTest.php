@@ -8,6 +8,7 @@ use Klimick\Decode\Report\ConstraintErrorReport;
 use Klimick\Decode\Report\DefaultReporter;
 use Klimick\Decode\Report\ErrorReport;
 use Klimick\Decode\Report\TypeErrorReport;
+use Klimick\Decode\Report\UndefinedErrorReport;
 use Klimick\Decode\Test\Static\Fixtures\Person;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Constraint\maxLength;
@@ -75,7 +76,7 @@ final class DefaultReporterTest extends TestCase
         );
 
         assertEquals(
-            ['$.is_approved'],
+            [new UndefinedErrorReport('$.is_approved', [])],
             $errorReport->undefinedErrors,
         );
 
