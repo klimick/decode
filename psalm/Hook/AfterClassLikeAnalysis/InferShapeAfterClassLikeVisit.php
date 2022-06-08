@@ -98,8 +98,6 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
                 ? PsalmApi::$types->asNullable($property_type)
                 : $property_type;
         }
-
-        $to->sealed_properties = true;
     }
 
     private static function addTypeMethod(ClassLikeStorage $to): void
