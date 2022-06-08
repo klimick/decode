@@ -8,11 +8,15 @@ use function implode;
 
 final class UndefinedErrorReport
 {
-    /**
-     * @param list<string> $aliases
-     */
     public function __construct(
+        /**
+         * @psalm-readonly
+         */
         public string $path,
+        /**
+         * @psalm-readonly
+         * @var list<string>
+         */
         public array $aliases,
     ) {}
 
