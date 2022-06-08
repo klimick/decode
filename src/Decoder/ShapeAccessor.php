@@ -6,10 +6,10 @@ namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
+use Fp\Streams\Stream;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
 use Klimick\Decode\Decoder\Error\UndefinedError;
-use Klimick\Decode\Decoder\HighOrder\HighOrderDecoder;
 use function Fp\Collection\at;
 use function Fp\Collection\tail;
 use function Fp\Evidence\proveOf;
@@ -35,7 +35,7 @@ final class ShapeAccessor
         return self::getConstant($decoder)
             ->orElse(fn() => self::getByAliasedKey($decoder, $shape))
             ->orElse(fn() => self::getByOriginalKey($key, $shape))
-            ->orElse(fn() => self::getDefault($decoder))
+            ->orElse(fn() => $decoder->getDefault())
             ->toRight(fn() => self::undefined($context, $decoder, $key))
             ->flatMap(fn($value) => self::decode($decoder, $value, $key, $context));
     }
@@ -56,11 +56,11 @@ final class ShapeAccessor
      */
     private static function getByAliasedKey(DecoderInterface $decoder, array $shape): Option
     {
-        return proveOf($decoder, HighOrderDecoder::class)
-            ->flatMap(fn($decoder) => Option::fromNullable($decoder->asFrom()))
-            ->flatMap(fn($decoder) => '$' !== $decoder->alias
-                ? self::dotAccess(tail(explode('.', $decoder->alias)), $shape)
-                : Option::some($shape));
+        return Stream::emits($decoder->getAliases())
+            ->filterMap(fn($alias) => '$' !== $alias
+                ? self::dotAccess(tail(explode('.', $alias)), $shape)
+                : Option::some($shape))
+            ->firstElement();
     }
 
     /**
@@ -70,17 +70,6 @@ final class ShapeAccessor
     private static function getByOriginalKey(int|string $key, array $shape): Option
     {
         return at($shape, $key);
-    }
-
-    /**
-     * @return Option<mixed>
-     * @psalm-pure
-     */
-    private static function getDefault(DecoderInterface $decoder): Option
-    {
-        return proveOf($decoder, HighOrderDecoder::class)
-            ->flatMap(fn($decoder) => Option::fromNullable($decoder->asDefault()))
-            ->map(fn($decoder): mixed => $decoder->default);
     }
 
     /**

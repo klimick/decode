@@ -6,6 +6,7 @@ namespace Klimick\Decode\Decoder;
 
 use Closure;
 use Fp\Functional\Either\Either;
+use Fp\Functional\Option\Option;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
@@ -40,21 +41,36 @@ interface DecoderInterface
     public function constrained(ConstraintInterface $first, ConstraintInterface ...$rest): DecoderInterface;
 
     /**
-     * @return DecoderInterface<T>
+     * @return DecoderInterface<T> & object{possiblyUndefined: true}
      */
-    public function optional(): DecoderInterface;
+    public function orUndefined(): DecoderInterface;
+
+    public function isPossiblyUndefined(): bool;
 
     /**
-     * @param non-empty-string $with
+     * @param non-empty-string $alias
+     * @param non-empty-string ...$rest
      * @return DecoderInterface<T>
+     *
+     * @no-named-arguments
      */
-    public function from(string $with): DecoderInterface;
+    public function from(string $alias, string ...$rest): DecoderInterface;
+
+    /**
+     * @return list<non-empty-string>
+     */
+    public function getAliases(): array;
 
     /**
      * @param T $value
      * @return DecoderInterface<T>
      */
     public function default(mixed $value): DecoderInterface;
+
+    /**
+     * @return Option<T>
+     */
+    public function getDefault(): Option;
 
     /**
      * @template TMapped

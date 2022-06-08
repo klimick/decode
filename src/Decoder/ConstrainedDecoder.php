@@ -2,40 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Decoder\HighOrder;
+namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
 use Klimick\Decode\ContextEntry;
-use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Error\ConstraintsError;
 
 /**
  * @template T
- * @extends HighOrderDecoder<T>
+ * @extends AbstractDecoder<T>
  * @psalm-immutable
  */
-final class ConstrainedDecoder extends HighOrderDecoder
+final class ConstrainedDecoder extends AbstractDecoder
 {
     /**
-     * @param DecoderInterface<T> $decoder
      * @param non-empty-list<ConstraintInterface> $constraints
+     * @param DecoderInterface<T> $decoder
      */
-    public function __construct(public array $constraints, DecoderInterface $decoder)
-    {
-        parent::__construct($decoder);
-    }
-
-    public function isConstrained(): bool
-    {
-        return true;
-    }
-
-    public function asConstrained(): ?ConstrainedDecoder
-    {
-        return $this;
-    }
+    public function __construct(
+        public array $constraints,
+        public DecoderInterface $decoder,
+    ) {}
 
     public function name(): string
     {

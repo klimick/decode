@@ -49,7 +49,7 @@ final class ShapeDecoderTest extends TestCase
             name: string()->from('$.person_name'),
             age: int()->from('$.person_age'),
             is_person: bool()->default(true),
-            is_admin: bool()->optional(),
+            is_admin: bool()->orUndefined(),
             is_approved: constantly(true),
         );
 

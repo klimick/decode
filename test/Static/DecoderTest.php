@@ -173,7 +173,7 @@ final class DecoderTest extends PsalmTest
             ->haveCode(fn() => tuple(
                 string(),
                 int(),
-                bool()->optional()
+                bool()->orUndefined()
             ))
             ->seeReturnType(t::generic(
                 ofType: DecoderInterface::class,
@@ -201,7 +201,7 @@ final class DecoderTest extends PsalmTest
             ->haveCode(fn() => shape(
                 name: string(),
                 age: int(),
-                bornAt: datetime()->optional(),
+                bornAt: datetime()->orUndefined(),
             ))
             ->seeReturnType(
                 t::intersection([

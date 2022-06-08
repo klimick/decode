@@ -9,7 +9,6 @@ use Fp\Functional\Option\Option;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
 use Klimick\Decode\Decoder\Error\UndefinedError;
-use Klimick\Decode\Decoder\HighOrder\HighOrderDecoder;
 use function Fp\Collection\filter;
 use function Fp\Collection\map;
 use function in_array;
@@ -32,11 +31,9 @@ final class ShapeDecoder extends AbstractDecoder
     public function name(): string
     {
         $properties = implode(', ', map($this->decoders, function(DecoderInterface $decoder, string $property) {
-            if ($decoder instanceof HighOrderDecoder && $decoder->isOptional()) {
-                return "{$property}?: {$decoder->name()}";
-            }
-
-            return "{$property}: {$decoder->name()}";
+            return $decoder->isPossiblyUndefined()
+                ? "{$property}?: {$decoder->name()}"
+                : "{$property}: {$decoder->name()}";
         }));
 
         return "array{{$properties}}";
@@ -83,11 +80,11 @@ final class ShapeDecoder extends AbstractDecoder
             }
 
             if (self::isUndefined($decodedKV->get())) {
-                if (self::canBeUndefined($decoder)) {
+                if ($decoder->isPossiblyUndefined()) {
                     continue;
                 }
 
-                if (self::isOptionDecoder($decoder)) {
+                if ($decoder instanceof OptionDecoder) {
                     $decoded[$key] = Option::none();
                     continue;
                 }
@@ -108,21 +105,5 @@ final class ShapeDecoder extends AbstractDecoder
     private static function isUndefined(array $errors): bool
     {
         return 1 === count($errors) && $errors[0] instanceof UndefinedError;
-    }
-
-    /**
-     * @psalm-pure
-     */
-    private static function canBeUndefined(DecoderInterface $decoder): bool
-    {
-        return $decoder instanceof HighOrderDecoder && $decoder->isOptional();
-    }
-
-    /**
-     * @psalm-pure
-     */
-    private static function isOptionDecoder(DecoderInterface $decoder): bool
-    {
-        return $decoder instanceof OptionDecoder;
     }
 }

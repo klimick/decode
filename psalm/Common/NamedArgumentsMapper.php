@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Common;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\HighOrder\Brand\OptionalBrand;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use PhpParser\Node;
 use Psalm\StatementsSource;
 use Psalm\Type;
+use Psalm\Type\Atomic\TNamedObject;
+use Psalm\Type\Atomic\TObjectWithProperties;
+use function array_key_exists;
+use function Fp\Collection\at;
 use function Fp\Evidence\proveString;
 
 final class NamedArgumentsMapper
@@ -59,9 +62,11 @@ final class NamedArgumentsMapper
 
     private static function isOptional(Type\Union $union): bool
     {
-        return PsalmApi::$types->asSingleAtomicOf(Type\Atomic\TNamedObject::class, $union)
-            ->map(fn($named_object) => $named_object->getIntersectionTypes() ?? [])
-            ->map(fn($intersections) => array_key_exists(OptionalBrand::class, $intersections))
+        return PsalmApi::$types
+            ->asSingleAtomicOf(Type\Atomic\TNamedObject::class, $union)
+            ->map(fn(TNamedObject $named_object) => $named_object->getIntersectionTypes() ?? [])
+            ->flatMap(fn(array $intersections) => at($intersections, 'object')->filterOf(TObjectWithProperties::class))
+            ->map(fn(TObjectWithProperties $object) => array_key_exists('possiblyUndefined', $object->properties))
             ->getOrElse(false);
     }
 }

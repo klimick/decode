@@ -16,11 +16,7 @@
         },
         "files": [
             "decoders.php",
-            "constraints.php",
-            "src/HighOrder/Brand/OptionalBrand.php",
-            "src/HighOrder/Brand/ConstrainedBrand.php",
-            "src/HighOrder/Brand/DefaultBrand.php",
-            "src/HighOrder/Brand/FromBrand.php"
+            "constraints.php"
         ]
     },
     "autoload-dev": {

@@ -451,7 +451,7 @@ function intersection(ShapeDecoder $first, ShapeDecoder $second, ShapeDecoder ..
 {
     $toMerge = array_map(
         fn(ShapeDecoder $decoder) => $decoder->partial
-            ? array_map(fn(DecoderInterface $d) => $d->optional(), $decoder->decoders)
+            ? array_map(fn(DecoderInterface $d) => $d->orUndefined(), $decoder->decoders)
             : $decoder->decoders,
         [$first, $second, ...$rest],
     );

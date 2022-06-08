@@ -22,7 +22,7 @@ final class Project implements t\InferShape
                 id: t\int(),
                 name: t\string()->constrained(c\maxLength(is: 10)),
             ),
-            t\shape(description: t\string()->optional()),
+            t\shape(description: t\string()->orUndefined()),
         );
     }
 }
