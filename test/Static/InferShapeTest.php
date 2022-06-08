@@ -8,7 +8,6 @@ use Fp\PsalmToolkit\StaticTest\NoCode;
 use Fp\PsalmToolkit\StaticTest\PsalmTest;
 use Fp\PsalmToolkit\StaticTest\StaticTestCase;
 use Fp\PsalmToolkit\StaticType\StaticTypes as t;
-use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\ShapeDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Project;
 use Klimick\Decode\Test\Static\Fixtures\RecByFqn;
@@ -52,21 +51,18 @@ final class InferShapeTest extends PsalmTest
                 t::union([t::string(), t::null()])
             );
 
-        $user = t::shape([
-            'name' => t::string(),
-            'age' => t::int(),
-            'projects' => t::list(t::object(Project::class)),
-        ]);
-
         StaticTestCase::describe('Props method inference')
             ->haveCode(function() {
                 return User::shape();
             })
             ->seeReturnType(
-                t::intersection([
-                    t::generic(DecoderInterface::class, [$user]),
-                    t::generic(ShapeDecoder::class, [$user]),
-                ])
+                t::generic(ShapeDecoder::class, [
+                    t::shape([
+                        'name' => t::string(),
+                        'age' => t::int(),
+                        'projects' => t::list(t::object(Project::class)),
+                    ]),
+                ]),
             );
 
         StaticTestCase::describe('Generated shape type alias')

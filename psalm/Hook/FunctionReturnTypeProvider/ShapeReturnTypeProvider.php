@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider;
 
-use Klimick\PsalmDecode\Common\DecoderType;
 use Klimick\PsalmDecode\Common\NamedArgumentsMapper;
 use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
@@ -22,7 +21,6 @@ final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterfa
     {
         return proveNonEmptyList($event->getCallArgs())
             ->map(fn($args) => NamedArgumentsMapper::map($event->getStatementsSource(), $args))
-            ->flatMap(fn($type) => DecoderType::withShapeDecoderIntersection($type))
             ->get();
     }
 }

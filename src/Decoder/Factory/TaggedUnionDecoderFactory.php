@@ -23,9 +23,9 @@ final class TaggedUnionDecoderFactory
      * @template T
      *
      * @param DecoderInterface<T> ...$decoders
-     * @return DecoderInterface<T> & TaggedUnionDecoder<T>
+     * @return TaggedUnionDecoder<T>
      */
-    public function __invoke(DecoderInterface ...$decoders): DecoderInterface
+    public function __invoke(DecoderInterface ...$decoders): TaggedUnionDecoder
     {
         /**
          * Validated via psalm plugin hook at this moment

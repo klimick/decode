@@ -333,12 +333,12 @@ function either(DecoderInterface $left, DecoderInterface $right): DecoderInterfa
 }
 
 /**
- * @return DecoderInterface<array<string, mixed>> & ShapeDecoder<array<string, mixed>>
+ * @return ShapeDecoder<array<string, mixed>>
  *
  * @psalm-pure
  * @see ShapeReturnTypeProvider
  */
-function shape(DecoderInterface ...$decoders): DecoderInterface
+function shape(DecoderInterface ...$decoders): ShapeDecoder
 {
     /**
      * Validated via psalm plugin hook at this moment
@@ -389,11 +389,11 @@ function rec(callable $type): DecoderInterface
  * @param DecoderInterface<T> $first
  * @param DecoderInterface<T> $second
  * @param DecoderInterface<T> ...$rest
- * @return DecoderInterface<T> & UnionDecoder<T>
+ * @return UnionDecoder<T>
  * @psalm-pure
  * @no-named-arguments
  */
-function union(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): DecoderInterface
+function union(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): UnionDecoder
 {
     return new UnionDecoder([$first, $second, ...$rest]);
 }
@@ -413,13 +413,13 @@ function tagged(string $with): TaggedUnionDecoderFactory
  * @param ShapeDecoder<T> $first
  * @param ShapeDecoder<T> $second
  * @param ShapeDecoder<T> ...$rest
- * @return DecoderInterface<array<string, mixed>> & ShapeDecoder<array<string, mixed>>
+ * @return ShapeDecoder<array<string, mixed>>
  *
  * @psalm-pure
  * @no-named-arguments
  * @see IntersectionReturnTypeProvider
  */
-function intersection(ShapeDecoder $first, ShapeDecoder $second, ShapeDecoder ...$rest): DecoderInterface
+function intersection(ShapeDecoder $first, ShapeDecoder $second, ShapeDecoder ...$rest): ShapeDecoder
 {
     $toMerge = array_map(
         fn(ShapeDecoder $decoder) => $decoder->decoders,

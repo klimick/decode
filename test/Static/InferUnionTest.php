@@ -84,13 +84,8 @@ final class InferUnionTest extends PsalmTest
                 return UserOrProject::union();
             })
             ->seeReturnType(
-                t::intersection([
-                    t::generic(DecoderInterface::class, [
-                        t::union([t::object(User::class), t::object(Project::class)]),
-                    ]),
-                    t::generic(UnionDecoder::class, [
-                        t::union([t::object(User::class), t::object(Project::class)]),
-                    ]),
+                t::generic(UnionDecoder::class, [
+                    t::union([t::object(User::class), t::object(Project::class)]),
                 ])
             );
 

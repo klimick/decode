@@ -133,14 +133,6 @@ final class DecoderTest extends PsalmTest
 
     public function testShapeDecoder(): void
     {
-        $shape = [
-            t::shape([
-                'name' => t::string(),
-                'age' => t::int(),
-                'bornAt' => t::object(DateTimeImmutable::class)->optional(),
-            ]),
-        ];
-
         StaticTestCase::describe('Shape decoder')
             ->haveCode(fn() => shape(
                 name: string(),
@@ -148,24 +140,18 @@ final class DecoderTest extends PsalmTest
                 bornAt: datetime()->orUndefined(),
             ))
             ->seeReturnType(
-                t::intersection([
-                    t::generic(DecoderInterface::class, $shape),
-                    t::generic(ShapeDecoder::class, $shape),
+                t::generic(ShapeDecoder::class, [
+                    t::shape([
+                        'name' => t::string(),
+                        'age' => t::int(),
+                        'bornAt' => t::object(DateTimeImmutable::class)->optional(),
+                    ]),
                 ])
             );
     }
 
     public function testIntersectionDecoder(): void
     {
-        $shape = t::shape([
-            'prop1' => t::string(),
-            'prop2' => t::string(),
-            'prop3' => t::string(),
-            'prop4' => t::string(),
-            'prop5' => t::string(),
-            'prop6' => t::string(),
-        ]);
-
         StaticTestCase::describe('Intersection decoder')
             ->haveCode(fn() => intersection(
                 shape(prop1: string(), prop2: string()),
@@ -173,24 +159,21 @@ final class DecoderTest extends PsalmTest
                 shape(prop5: string(), prop6: string()),
             ))
             ->seeReturnType(
-                t::intersection([
-                    t::generic(DecoderInterface::class, [$shape]),
-                    t::generic(ShapeDecoder::class, [$shape]),
-                ]),
+                t::generic(ShapeDecoder::class, [
+                    t::shape([
+                        'prop1' => t::string(),
+                        'prop2' => t::string(),
+                        'prop3' => t::string(),
+                        'prop4' => t::string(),
+                        'prop5' => t::string(),
+                        'prop6' => t::string(),
+                    ])
+                ])
             );
     }
 
     public function testNestedIntersectionDecoder(): void
     {
-        $shape = t::shape([
-            'prop1' => t::string(),
-            'prop2' => t::string(),
-            'prop3' => t::string(),
-            'prop4' => t::string(),
-            'prop5' => t::string(),
-            'prop6' => t::string(),
-        ]);
-
         StaticTestCase::describe('Intersection decoder')
             ->haveCode(fn() => intersection(
                 shape(prop1: string(), prop2: string()),
@@ -200,9 +183,15 @@ final class DecoderTest extends PsalmTest
                 ),
             ))
             ->seeReturnType(
-                t::intersection([
-                    t::generic(DecoderInterface::class, [$shape]),
-                    t::generic(ShapeDecoder::class, [$shape]),
+                t::generic(ShapeDecoder::class, [
+                    t::shape([
+                        'prop1' => t::string(),
+                        'prop2' => t::string(),
+                        'prop3' => t::string(),
+                        'prop4' => t::string(),
+                        'prop5' => t::string(),
+                        'prop6' => t::string(),
+                    ])
                 ]),
             );
     }
@@ -220,13 +209,8 @@ final class DecoderTest extends PsalmTest
                 return $shape->pick(['id']);
             })
             ->seeReturnType(
-                t::intersection([
-                    t::generic(DecoderInterface::class, [
-                        t::shape(['id' => t::string()])
-                    ]),
-                    t::generic(ShapeDecoder::class, [
-                        t::shape(['id' => t::string()])
-                    ]),
+                t::generic(ShapeDecoder::class, [
+                    t::shape(['id' => t::string()])
                 ])
             );
 
@@ -241,13 +225,8 @@ final class DecoderTest extends PsalmTest
                 return $shape->pick(['id', 'name']);
             })
             ->seeReturnType(
-                t::intersection([
-                    t::generic(DecoderInterface::class, [
-                        t::shape(['id' => t::string(), 'name' => t::string()])
-                    ]),
-                    t::generic(ShapeDecoder::class, [
-                        t::shape(['id' => t::string(), 'name' => t::string()])
-                    ]),
+                t::generic(ShapeDecoder::class, [
+                    t::shape(['id' => t::string(), 'name' => t::string()])
                 ])
             );
 
@@ -291,13 +270,8 @@ final class DecoderTest extends PsalmTest
                 return $shape->omit(['id']);
             })
             ->seeReturnType(
-                t::intersection([
-                    t::generic(DecoderInterface::class, [
-                        t::shape(['name' => t::string(), 'meta' => t::string()])
-                    ]),
-                    t::generic(ShapeDecoder::class, [
-                        t::shape(['name' => t::string(), 'meta' => t::string()])
-                    ]),
+                t::generic(ShapeDecoder::class, [
+                    t::shape(['name' => t::string(), 'meta' => t::string()])
                 ])
             );
 
@@ -312,13 +286,8 @@ final class DecoderTest extends PsalmTest
                 return $shape->omit(['id', 'name']);
             })
             ->seeReturnType(
-                t::intersection([
-                    t::generic(DecoderInterface::class, [
-                        t::shape(['meta' => t::string()])
-                    ]),
-                    t::generic(ShapeDecoder::class, [
-                        t::shape(['meta' => t::string()])
-                    ]),
+                t::generic(ShapeDecoder::class, [
+                    t::shape(['meta' => t::string()])
                 ])
             );
 

@@ -8,6 +8,8 @@ use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\ShapeDecoder;
+use Klimick\Decode\Decoder\TaggedUnionDecoder;
+use Klimick\Decode\Decoder\UnionDecoder;
 use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TKeyedArray;
 use Psalm\Type\Union;
@@ -15,6 +17,7 @@ use function array_is_list;
 use function Fp\Collection\every;
 use function Fp\Collection\first;
 use function Fp\Evidence\proveString;
+use function in_array;
 
 final class DecoderType
 {
@@ -28,7 +31,7 @@ final class DecoderType
         $shape->sealed = every($properties, fn(Union $type) => !$type->possibly_undefined);
 
         return new Union([
-            new TGenericObject(DecoderInterface::class, [
+            new TGenericObject(ShapeDecoder::class, [
                 new Union([$shape]),
             ]),
         ]);
@@ -37,28 +40,15 @@ final class DecoderType
     /**
      * @return Option<Union>
      */
-    public static function withShapeDecoderIntersection(Union $mapped): Option
-    {
-        return Option::do(function() use ($mapped) {
-            $decoder = yield PsalmApi::$types->asSingleAtomicOf(TGenericObject::class, $mapped);
-            $shape = yield PsalmApi::$types->getFirstGeneric($decoder, DecoderInterface::class);
-
-            return new Union([
-                PsalmApi::$types->addIntersection(
-                    to: $decoder,
-                    type: new TGenericObject(ShapeDecoder::class, [$shape]),
-                ),
-            ]);
-        });
-    }
-
-    /**
-     * @return Option<Union>
-     */
     public static function getDecoderGeneric(Union $decoder_type): Option
     {
         return PsalmApi::$types->asSingleAtomicOf(TGenericObject::class, $decoder_type)
-            ->filter(fn(TGenericObject $generic) => $generic->value === DecoderInterface::class)
+            ->filter(fn(TGenericObject $generic) => in_array($generic->value, [
+                DecoderInterface::class,
+                ShapeDecoder::class,
+                UnionDecoder::class,
+                TaggedUnionDecoder::class,
+            ]))
             ->flatMap(fn(TGenericObject $type) => first($type->type_params));
     }
 

@@ -15,7 +15,7 @@ use function in_array;
 use function is_int;
 
 /**
- * @template TShape of array
+ * @template-covariant TShape of array
  * @extends AbstractDecoder<TShape>
  * @psalm-immutable
  */

@@ -57,15 +57,12 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             return;
         }
 
-        $shape_type_param = new Union([
-            new TTypeAlias($to->name, PsalmApi::$classlikes->toShortName($to) . 'Shape'),
-        ]);
-
         $to->methods['shape']->return_type = new Union([
-            PsalmApi::$types->addIntersection(
-                to: new TGenericObject(DecoderInterface::class, [$shape_type_param]),
-                type: new TGenericObject(ShapeDecoder::class, [$shape_type_param]),
-            ),
+            new TGenericObject(ShapeDecoder::class, [
+                new Union([
+                    new TTypeAlias($to->name, PsalmApi::$classlikes->toShortName($to) . 'Shape'),
+                ]),
+            ]),
         ]);
     }
 

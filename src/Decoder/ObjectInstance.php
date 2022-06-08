@@ -27,6 +27,9 @@ trait ObjectInstance
      */
     public static function type(): DecoderInterface
     {
-        return new ObjectDecoder(static::class, self::shape()->decoders);
+        /** @var array<string, DecoderInterface<mixed>> $decoders */
+        $decoders = self::shape()->decoders;
+
+        return new ObjectDecoder(static::class, $decoders);
     }
 }

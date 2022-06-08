@@ -8,8 +8,6 @@ use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\InferUnion;
-use Klimick\Decode\Decoder\TaggedUnionDecoder;
-use Klimick\Decode\Decoder\UnionDecoder;
 use Klimick\Decode\Decoder\UnionInstance;
 use Klimick\PsalmDecode\Common\DecoderType;
 use Psalm\Internal\MethodIdentifier;
@@ -89,19 +87,13 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             return;
         }
 
-        $union_type_param = new Union([
-            new TTypeAlias($storage->name, PsalmApi::$classlikes->toShortName($storage) . 'Union'),
+        $storage->methods['union']->return_type = new Union([
+            new TGenericObject($atomics[0]->getId(), [
+                new Union([
+                    new TTypeAlias($storage->name, PsalmApi::$classlikes->toShortName($storage) . 'Union'),
+                ]),
+            ]),
         ]);
-
-        $decoder_type = PsalmApi::$types->addIntersection(
-            to: new TGenericObject(DecoderInterface::class, [$union_type_param]),
-            type: new TGenericObject(
-                $atomics[0]->getId() === UnionDecoder::class ? UnionDecoder::class : TaggedUnionDecoder::class,
-                [$union_type_param],
-            ),
-        );
-
-        $storage->methods['union']->return_type = new Union([$decoder_type]);
     }
 
     private static function addMatchMethod(ClassLikeStorage $storage, Union $cases): void

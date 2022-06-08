@@ -24,7 +24,6 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
             ->flatMap(fn($args) => $args->everyMap(fn(CallArg $arg) => DecoderType::getShapeProperties($arg->type)))
             ->map(fn($shapes) => array_merge(...$shapes->toArray()))
             ->map(fn($shapes) => DecoderType::createShapeDecoder($shapes))
-            ->flatMap(fn($merged) => DecoderType::withShapeDecoderIntersection($merged))
             ->get();
     }
 }

@@ -65,18 +65,16 @@ final class ShapePickOmitMethodReturnTypeProvider implements MethodReturnTypePro
                 );
             }
 
-            $filtered_shape = filter(
+            $filtered_shape = yield proveNonEmptyArray(filter(
                 collection: $shape->properties,
                 predicate: match ($method) {
                     'pick' => fn(Union $_, int|string $prop): bool => in_array($prop, $props),
                     'omit' => fn(Union $_, int|string $prop): bool => !in_array($prop, $props),
                 },
                 preserveKeys: true,
-            );
+            ));
 
-            return yield proveNonEmptyArray($filtered_shape)
-                ->map(fn($filtered) => DecoderType::createShapeDecoder($filtered))
-                ->flatMap(fn($decoder) => DecoderType::withShapeDecoderIntersection($decoder));
+            return DecoderType::createShapeDecoder($filtered_shape);
         });
 
         return $type->get();
