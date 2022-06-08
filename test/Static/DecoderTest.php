@@ -36,7 +36,7 @@ final class DecoderTest extends PsalmTest
                 type2: shape(id: int(), num: int()),
             ))
             ->seePsalmIssue(
-                type: 'NotNamedArgForTaggedUnionIssue',
+                type: 'NotNamedArgForTaggedUnion',
                 message: 'All args for tagged union must be named',
             );
 
@@ -45,7 +45,7 @@ final class DecoderTest extends PsalmTest
                 type1: shape(foo: string(), bar: int()),
             ))
             ->seePsalmIssue(
-                type: 'TooFewArgsForTaggedUnionIssue',
+                type: 'TooFewArgsForTaggedUnion',
                 message: 'Too few args passed for tagged',
             );
     }
@@ -97,7 +97,7 @@ final class DecoderTest extends PsalmTest
                 name: string(),
             ))
             ->seePsalmIssue(
-                type: 'RequiredObjectPropertyMissingIssue',
+                type: 'RequiredObjectPropertyMissing',
                 message: 'Required decoders for properties missed: "age"',
             );
     }
@@ -110,11 +110,11 @@ final class DecoderTest extends PsalmTest
                 age: int(),
             ))
             ->seePsalmIssue(
-                type: 'RequiredObjectPropertyMissingIssue',
+                type: 'RequiredObjectPropertyMissing',
                 message: 'Required decoders for properties missed: "name"',
             )
             ->seePsalmIssue(
-                type: 'NonexistentPropertyObjectPropertyIssue',
+                type: 'NonexistentPropertyObjectProperty',
                 message: 'Property "misspelled_name" does not exist.',
             );
     }
@@ -127,7 +127,7 @@ final class DecoderTest extends PsalmTest
                 age: string(),
             ))
             ->seePsalmIssue(
-                type: 'InvalidDecoderForPropertyIssue',
+                type: 'InvalidDecoderForProperty',
                 message: 'Invalid decoder for property "age". Expected: #[decoder]<int>. Actual: #[decoder]<string>.',
                 args: [
                     'decoder' => DecoderInterface::class,
@@ -158,11 +158,11 @@ final class DecoderTest extends PsalmTest
                 age: int(),
             ))
             ->seePsalmIssue(
-                type: 'NotPartialPropertyIssue',
+                type: 'NotPartialProperty',
                 message: 'Property "name" must be nullable in source class.'
             )
             ->seePsalmIssue(
-                type: 'NotPartialPropertyIssue',
+                type: 'NotPartialProperty',
                 message: 'Property "age" must be nullable in source class.'
             );
     }
@@ -312,7 +312,7 @@ final class DecoderTest extends PsalmTest
                 return shape(id: string())->pick(['unknown']);
             })
             ->seePsalmIssue(
-                type: 'UndefinedShapePropertyIssue',
+                type: 'UndefinedShapeProperty',
                 message: 'Property #[property] is not defined on shape #[shape]',
                 args: [
                     'property' => 'unknown',
@@ -325,7 +325,7 @@ final class DecoderTest extends PsalmTest
                 return shape(id: string())->pick(['unknown1', 'unknown2']);
             })
             ->seePsalmIssue(
-                type: 'UndefinedShapePropertyIssue',
+                type: 'UndefinedShapeProperty',
                 message: 'Properties #[properties] are not defined on shape #[shape]',
                 args: [
                     'properties' => 'unknown1, unknown2',
@@ -383,7 +383,7 @@ final class DecoderTest extends PsalmTest
                 return shape(id: string())->omit(['unknown']);
             })
             ->seePsalmIssue(
-                type: 'UndefinedShapePropertyIssue',
+                type: 'UndefinedShapeProperty',
                 message: 'Property #[property] is not defined on shape #[shape]',
                 args: [
                     'property' => 'unknown',
@@ -396,7 +396,7 @@ final class DecoderTest extends PsalmTest
                 return shape(id: string())->omit(['unknown1', 'unknown2']);
             })
             ->seePsalmIssue(
-                type: 'UndefinedShapePropertyIssue',
+                type: 'UndefinedShapeProperty',
                 message: 'Properties #[properties] are not defined on shape #[shape]',
                 args: [
                     'properties' => 'unknown1, unknown2',

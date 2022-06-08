@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Issue\HighOrder;
+namespace Klimick\PsalmDecode\Issue;
 
-use Psalm\Type;
 use Psalm\CodeLocation;
 use Psalm\Issue\CodeIssue;
+use Psalm\Type;
 
-final class IncompatibleConstraintIssue extends CodeIssue
+final class IncompatibleConstraint extends CodeIssue
 {
     public function __construct(
         Type\Union $constraints_type,

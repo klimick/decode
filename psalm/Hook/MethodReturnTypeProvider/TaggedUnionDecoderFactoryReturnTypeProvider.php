@@ -26,10 +26,10 @@ final class TaggedUnionDecoderFactoryReturnTypeProvider implements MethodReturnT
             $args = yield PsalmApi::$args->getCallArgs($event);
 
             yield proveTrue($args->count() >= 2)
-                ->orElse(Issue\TaggedUnion\TooFewArgsForTaggedUnionIssue::raise($event));
+                ->orElse(Issue\TooFewArgsForTaggedUnion::raise($event));
 
             yield proveTrue($args->every(fn($arg) => null !== $arg->node->name))
-                ->orElse(Issue\TaggedUnion\NotNamedArgForTaggedUnionIssue::raise($event));
+                ->orElse(Issue\NotNamedArgForTaggedUnion::raise($event));
         });
 
         return null;

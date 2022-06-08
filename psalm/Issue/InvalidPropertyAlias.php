@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Issue\HighOrder;
+namespace Klimick\PsalmDecode\Issue;
 
 use Psalm\CodeLocation;
 use Psalm\Issue\CodeIssue;
 
-final class InvalidPropertyAliasIssue extends CodeIssue
+final class InvalidPropertyAlias extends CodeIssue
 {
     public function __construct(CodeLocation $code_location)
     {

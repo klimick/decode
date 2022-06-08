@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Issue\Object;
+namespace Klimick\PsalmDecode\Issue;
 
-use Psalm\Type;
 use Psalm\CodeLocation;
 use Psalm\Issue\CodeIssue;
+use Psalm\Type;
 
-final class InvalidDecoderForPropertyIssue extends CodeIssue
+final class InvalidDecoderForProperty extends CodeIssue
 {
     public function __construct(
         string $property,

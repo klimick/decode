@@ -8,10 +8,7 @@ use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\PsalmDecode\Common\DecoderType;
 use Klimick\PsalmDecode\Common\NamedArgumentsMapper;
-use Klimick\PsalmDecode\Issue\Object\InvalidDecoderForPropertyIssue;
-use Klimick\PsalmDecode\Issue\Object\NonexistentPropertyObjectPropertyIssue;
-use Klimick\PsalmDecode\Issue\Object\NotPartialPropertyIssue;
-use Klimick\PsalmDecode\Issue\Object\RequiredObjectPropertyMissingIssue;
+use Klimick\PsalmDecode\Issue;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
@@ -96,7 +93,7 @@ final class ObjectDecoderValidator
                 : Type::getMixed();
 
             if ($partial && !$shape[$property]->isNullable()) {
-                $issue = new NotPartialPropertyIssue(
+                $issue = new Issue\NotPartialProperty(
                     property: $property,
                     code_location: $arg_locations[$property] ?? $call_location,
                 );
@@ -168,7 +165,7 @@ final class ObjectDecoderValidator
             if (!array_key_exists($property, $actual_shape)) {
                 $missing_properties[] = $property;
             } elseif (!PsalmApi::$types->isTypeContainedByType($actual_shape[$property], $type)) {
-                $issue = new InvalidDecoderForPropertyIssue(
+                $issue = new Issue\InvalidDecoderForProperty(
                     property: $property,
                     actual_type: $actual_shape[$property],
                     expected_type: $type,
@@ -180,7 +177,7 @@ final class ObjectDecoderValidator
         }
 
         if (!empty($missing_properties)) {
-            $issue = new RequiredObjectPropertyMissingIssue(
+            $issue = new Issue\RequiredObjectPropertyMissing(
                 missing_properties: $missing_properties,
                 code_location: $method_code_location,
             );
@@ -190,7 +187,7 @@ final class ObjectDecoderValidator
 
         foreach (array_keys($actual_shape) as $property) {
             if (!array_key_exists($property, $expected_shape)) {
-                $issue = new NonexistentPropertyObjectPropertyIssue(
+                $issue = new Issue\NonexistentPropertyObjectProperty(
                     property: $property,
                     code_location: $arg_code_locations[$property] ?? $method_code_location,
                 );

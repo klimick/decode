@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Issue\Object;
+namespace Klimick\PsalmDecode\Issue;
 
 use Psalm\CodeLocation;
 use Psalm\Issue\CodeIssue;
 use function Fp\Collection\map;
 
-final class RequiredObjectPropertyMissingIssue extends CodeIssue
+final class RequiredObjectPropertyMissing extends CodeIssue
 {
     /**
      * @param list<string> $missing_properties

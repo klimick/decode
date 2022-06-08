@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis;
 
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\PsalmDecode\Issue\HighOrder\InvalidPropertyAliasIssue;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
+use Klimick\Decode\Decoder\DecoderInterface;
+use Klimick\PsalmDecode\Issue;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
@@ -17,7 +17,7 @@ use Psalm\Type\Atomic\TLiteralString;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveTrue;
 
-final class FromArgumentAnalysis implements AfterMethodCallAnalysisInterface
+final class DecoderFromAfterMethodCallAnalysis implements AfterMethodCallAnalysisInterface
 {
     public static function afterMethodCallAnalysis(AfterMethodCallAnalysisEvent $event): void
     {
@@ -38,7 +38,7 @@ final class FromArgumentAnalysis implements AfterMethodCallAnalysisInterface
                 if (!$is_valid_literal) {
                     $source = $event->getStatementsSource();
 
-                    $issue = new InvalidPropertyAliasIssue(new CodeLocation($source, $method_call->name));
+                    $issue = new Issue\InvalidPropertyAlias(new CodeLocation($source, $method_call->name));
                     IssueBuffer::accepts($issue, $source->getSuppressedIssues());
                 }
             }

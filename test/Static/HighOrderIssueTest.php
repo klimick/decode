@@ -20,7 +20,7 @@ final class HighOrderIssueTest extends PsalmTest
                 prop: int()->from('person_age'),
             ))
             ->seePsalmIssue(
-                type: 'InvalidPropertyAliasIssue',
+                type: 'InvalidPropertyAlias',
                 message: 'Invalid argument for DecoderInterface::from. ' .
                 'Argument must be non-empty-string literal with "$." prefix or just "$"'
             );
@@ -30,7 +30,7 @@ final class HighOrderIssueTest extends PsalmTest
                 fn() => string()->constrained(greater(than: 10))
             )
             ->seePsalmIssue(
-                type: 'IncompatibleConstraintIssue',
+                type: 'IncompatibleConstraint',
                 message: 'Value of type string cannot be checked with constraints of type numeric',
             );
     }

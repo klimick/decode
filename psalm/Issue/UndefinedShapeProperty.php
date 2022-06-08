@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Issue\Shape;
+namespace Klimick\PsalmDecode\Issue;
 
 use Psalm\CodeLocation;
 use Psalm\Issue\CodeIssue;
 use Psalm\Type\Atomic\TKeyedArray;
 use function implode;
 
-final class UndefinedShapePropertyIssue extends CodeIssue
+final class UndefinedShapeProperty extends CodeIssue
 {
     /**
      * @param non-empty-list<string> $undefined_props

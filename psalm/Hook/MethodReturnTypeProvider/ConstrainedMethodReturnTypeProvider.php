@@ -6,12 +6,12 @@ namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
 
 use Fp\Collections\NonEmptyArrayList;
 use Fp\Functional\Option\Option;
+use Fp\PsalmToolkit\Toolkit\CallArg;
+use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\PsalmDecode\Common\DecoderType;
-use Klimick\PsalmDecode\Issue\HighOrder\IncompatibleConstraintIssue;
-use Fp\PsalmToolkit\Toolkit\CallArg;
-use Fp\PsalmToolkit\Toolkit\PsalmApi;
+use Klimick\PsalmDecode\Issue;
 use PhpParser\Node\Expr\MethodCall;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
@@ -77,7 +77,7 @@ final class ConstrainedMethodReturnTypeProvider implements MethodReturnTypeProvi
             }
 
             IssueBuffer::accepts(
-                new IncompatibleConstraintIssue($call_arg->type, $decoder_type_param, $call_arg->location),
+                new Issue\IncompatibleConstraint($call_arg->type, $decoder_type_param, $call_arg->location),
                 $source->getSuppressedIssues(),
             );
         }

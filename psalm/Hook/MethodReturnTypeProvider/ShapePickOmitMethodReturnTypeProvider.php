@@ -10,7 +10,7 @@ use Fp\PsalmToolkit\Toolkit\CallArg;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\ShapeDecoder;
 use Klimick\PsalmDecode\Common\DecoderType;
-use Klimick\PsalmDecode\Issue\Shape\UndefinedShapePropertyIssue;
+use Klimick\PsalmDecode\Issue;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
@@ -59,7 +59,7 @@ final class ShapePickOmitMethodReturnTypeProvider implements MethodReturnTypePro
                 $code_location = $event->getCodeLocation();
 
                 IssueBuffer::accepts(
-                    e: new UndefinedShapePropertyIssue($shape, $undefined, $code_location),
+                    e: new Issue\UndefinedShapeProperty($shape, $undefined, $code_location),
                     suppressed_issues: $source->getSuppressedIssues(),
                 );
             }
