@@ -15,14 +15,14 @@ use function Fp\Collection\map;
 use function in_array;
 
 /**
- * @template-covariant TVal
- * @extends AbstractDecoder<array<string, TVal>>
+ * @template TShape of array
+ * @extends AbstractDecoder<TShape>
  * @psalm-immutable
  */
 final class ShapeDecoder extends AbstractDecoder
 {
     /**
-     * @param array<string, DecoderInterface<TVal>> $decoders
+     * @param array<string, DecoderInterface> $decoders
      */
     public function __construct(
         public array $decoders,
@@ -77,6 +77,7 @@ final class ShapeDecoder extends AbstractDecoder
             $decodedKV = ShapeAccessor::decodeProperty($context, $decoder, $key, $value);
 
             if ($decodedKV->isRight()) {
+                /** @psalm-suppress MixedAssignment */
                 $decoded[$key] = $decodedKV->get();
                 continue;
             }
@@ -95,6 +96,8 @@ final class ShapeDecoder extends AbstractDecoder
             $errors[] = $decodedKV->get();
         }
 
+        /** @var TShape $decoded */;
+
         return !empty($errors) ? invalids($errors) : valid($decoded);
     }
 
@@ -107,11 +110,17 @@ final class ShapeDecoder extends AbstractDecoder
         return 1 === count($errors) && $errors[0] instanceof UndefinedError;
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function canBeUndefined(DecoderInterface $decoder): bool
     {
         return $decoder instanceof HighOrderDecoder && $decoder->isOptional();
     }
 
+    /**
+     * @psalm-pure
+     */
     private static function isOptionDecoder(DecoderInterface $decoder): bool
     {
         return $decoder instanceof OptionDecoder;
