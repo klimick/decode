@@ -74,7 +74,7 @@ final class ShapePickOmitMethodReturnTypeProvider implements MethodReturnTypePro
                 preserveKeys: true,
             ));
 
-            return DecoderType::createShapeDecoder($filtered_shape);
+            return DecoderType::createShape($filtered_shape);
         });
 
         return $type->get();

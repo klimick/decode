@@ -40,7 +40,7 @@ final class ConstrainedMethodReturnTypeProvider implements MethodReturnTypeProvi
                     ->flatMap(fn($call_args) => self::mapCallArgs($call_args)),
                 decoder_type_param: yield proveOf($event->getStmt(), MethodCall::class)
                     ->flatMap(fn($method_call) => PsalmApi::$types->getType($event, $method_call->var))
-                    ->flatMap(fn($atomic) => DecoderType::getDecoderGeneric($atomic))
+                    ->flatMap(fn($atomic) => DecoderType::getGeneric($atomic))
                     ->map(fn($type) => PsalmApi::$types->asAlwaysDefined($type)),
             );
         });

@@ -22,7 +22,6 @@ use Psalm\Storage\MethodStorage;
 use Psalm\Type;
 use Psalm\Type\Atomic;
 use Psalm\Type\Atomic\TCallable;
-use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Atomic\TTypeAlias;
 use Psalm\Type\Union;
@@ -41,7 +40,7 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
 
             $cases = yield proveTrue(PsalmApi::$classlikes->classImplements($storage, InferUnion::class))
                 ->flatMap(fn() => GetMethodReturnType::from($event, 'union'))
-                ->flatMap(fn($type) => DecoderType::getDecoderGeneric($type));
+                ->flatMap(fn($type) => DecoderType::getGeneric($type));
 
             self::addTypeAlias($storage, $cases);
             self::addUnionMethod($storage);
@@ -58,10 +57,13 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
 
     private static function addTypeAlias(ClassLikeStorage $storage, Union $cases): void
     {
-        $short_name = PsalmApi::$classlikes->toShortName($storage);
         $replacement_atomic_types = asList($cases->getAtomicTypes());
+        $storage->type_aliases[self::typeAlias($storage)->alias_name] = new ClassTypeAlias($replacement_atomic_types);
+    }
 
-        $storage->type_aliases["{$short_name}Union"] = new ClassTypeAlias($replacement_atomic_types);
+    private static function typeAlias(ClassLikeStorage $storage): TTypeAlias
+    {
+        return new TTypeAlias($storage->name, PsalmApi::$classlikes->toShortName($storage) . 'Union');
     }
 
     private static function addValueProperty(ClassLikeStorage $storage, Union $cases): void
@@ -87,13 +89,7 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             return;
         }
 
-        $storage->methods['union']->return_type = new Union([
-            new TGenericObject($atomics[0]->getId(), [
-                new Union([
-                    new TTypeAlias($storage->name, PsalmApi::$classlikes->toShortName($storage) . 'Union'),
-                ]),
-            ]),
-        ]);
+        $storage->methods['union']->return_type = DecoderType::create($atomics[0]->getId(), self::typeAlias($storage));
     }
 
     private static function addMatchMethod(ClassLikeStorage $storage, Union $cases): void
@@ -196,13 +192,7 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
         $method = new MethodStorage();
         $method->cased_name = $name_lc;
         $method->is_static = true;
-        $method->return_type = new Union([
-            new TGenericObject(DecoderInterface::class, [
-                new Union([
-                    new TNamedObject($storage->name),
-                ]),
-            ]),
-        ]);
+        $method->return_type = DecoderType::create(DecoderInterface::class, new TNamedObject($storage->name));
 
         $storage->declaring_method_ids[$name_lc] = new MethodIdentifier($storage->name, $name_lc);
         $storage->appearing_method_ids[$name_lc] = new MethodIdentifier($storage->name, $name_lc);

@@ -9,6 +9,7 @@ use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\InferShape;
+use Klimick\PsalmDecode\Common\DecoderType;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -29,7 +30,6 @@ use Psalm\Issue\InvalidReturnStatement;
 use Psalm\NodeTypeProvider;
 use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use Psalm\StatementsSource;
-use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Union;
 use function class_exists;
@@ -161,13 +161,7 @@ final class GetMethodReturnType
                         ->filter(fn($c) => class_exists($c) && is_subclass_of($c, InferShape::class))
                         ->filter(fn() => 'type' === $method_name);
 
-                    $decoder = new Union([
-                        new TGenericObject(DecoderInterface::class, [
-                            new Union([
-                                new TNamedObject($class_name),
-                            ]),
-                        ]),
-                    ]);
+                    $decoder = DecoderType::create(DecoderInterface::class, new TNamedObject($class_name));
 
                     return [$class_name, $decoder];
                 });

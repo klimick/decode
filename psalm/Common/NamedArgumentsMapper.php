@@ -35,7 +35,7 @@ final class NamedArgumentsMapper
                 ->flatMap(fn($id) => proveString($id->name))
                 ->getOrElse($offset);
 
-            $type = DecoderType::getDecoderGeneric($arg_type)
+            $type = DecoderType::getGeneric($arg_type)
                 ->map(fn($type) => self::isOptional($arg_type)
                     ? PsalmApi::$types->asPossiblyUndefined($type)
                     : $type)
@@ -44,7 +44,7 @@ final class NamedArgumentsMapper
             $properties[$property] = $type;
         }
 
-        return DecoderType::createShapeDecoder($properties);
+        return DecoderType::createShape($properties);
     }
 
     private static function isOptional(Union $union): bool

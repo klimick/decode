@@ -23,7 +23,7 @@ final class IntersectionReturnTypeProvider implements FunctionReturnTypeProvider
         return PsalmApi::$args->getNonEmptyCallArgs($event)
             ->flatMap(fn($args) => $args->everyMap(fn(CallArg $arg) => DecoderType::getShapeProperties($arg->type)))
             ->map(fn($shapes) => array_merge(...$shapes->toArray()))
-            ->map(fn($shapes) => DecoderType::createShapeDecoder($shapes))
+            ->map(fn($shapes) => DecoderType::createShape($shapes))
             ->get();
     }
 }

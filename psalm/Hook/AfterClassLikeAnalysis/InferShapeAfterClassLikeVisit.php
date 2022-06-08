@@ -17,7 +17,6 @@ use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
 use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Storage\MethodStorage;
-use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Atomic\TKeyedArray;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Atomic\TTypeAlias;
@@ -57,13 +56,12 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             return;
         }
 
-        $to->methods['shape']->return_type = new Union([
-            new TGenericObject(ShapeDecoder::class, [
-                new Union([
-                    new TTypeAlias($to->name, PsalmApi::$classlikes->toShortName($to) . 'Shape'),
-                ]),
-            ]),
-        ]);
+        $to->methods['shape']->return_type = DecoderType::create(ShapeDecoder::class, self::typeAlias($to));
+    }
+
+    private static function typeAlias(ClassLikeStorage $storage): TTypeAlias
+    {
+        return new TTypeAlias($storage->name, PsalmApi::$classlikes->toShortName($storage) . 'Shape');
     }
 
     /**
@@ -71,8 +69,7 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
      */
     private static function addShapeTypeAlias(array $properties, ClassLikeStorage $to): void
     {
-        $short_class_name = PsalmApi::$classlikes->toShortName($to);
-        $type_alias_name = "{$short_class_name}Shape";
+        $type_alias_name = self::typeAlias($to)->alias_name;
 
         if (array_key_exists($type_alias_name, $to->type_aliases)) {
             return;
@@ -102,13 +99,7 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
         $method = new MethodStorage();
         $method->cased_name = $name_lc;
         $method->is_static = true;
-        $method->return_type = new Union([
-            new TGenericObject(DecoderInterface::class, [
-                new Union([
-                    new TNamedObject($to->name),
-                ]),
-            ]),
-        ]);
+        $method->return_type = DecoderType::create(DecoderInterface::class, new TNamedObject($to->name));
 
         $to->declaring_method_ids[$name_lc] = new MethodIdentifier($to->name, $name_lc);
         $to->appearing_method_ids[$name_lc] = new MethodIdentifier($to->name, $name_lc);

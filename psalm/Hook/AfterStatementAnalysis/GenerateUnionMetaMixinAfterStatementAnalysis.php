@@ -29,7 +29,7 @@ final class GenerateUnionMetaMixinAfterStatementAnalysis implements AfterStateme
 
             $union = yield proveOf($event->getStmt(), Return_::class)
                 ->flatMap(fn($return) => PsalmApi::$types->getType($event, $return))
-                ->flatMap(fn($type) => DecoderType::getDecoderGeneric($type));
+                ->flatMap(fn($type) => DecoderType::getGeneric($type));
 
             MetaMixinGenerator::forUnion($storage, $event->getStatementsSource(), $union);
         });
