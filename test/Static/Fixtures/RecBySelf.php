@@ -13,7 +13,7 @@ use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
 
 /**
- * @mixin RecDepartmentMetaMixin
+ * @mixin RecBySelfMetaMixin
  */
 final class RecBySelf implements InferShape
 {
