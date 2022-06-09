@@ -21,7 +21,7 @@ final class ShapeReturnTypeProvider implements FunctionReturnTypeProviderInterfa
     {
         return PsalmApi::$args->getNonEmptyCallArgs($event)
             ->map(fn($args) => NamedArgumentsMapper::namedArgsToArray($args->toArray()))
-            ->map(fn($decoders) => NamedArgumentsMapper::mapDecoders($decoders))
+            ->flatMap(fn($decoders) => NamedArgumentsMapper::mapDecoders($decoders))
             ->get();
     }
 }

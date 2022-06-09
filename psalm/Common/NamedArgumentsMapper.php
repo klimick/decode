@@ -7,13 +7,12 @@ namespace Klimick\PsalmDecode\Common;
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\CallArg;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
-use Psalm\Type;
 use Psalm\Type\Union;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Atomic\TObjectWithProperties;
 use function array_key_exists;
 use function Fp\Collection\at;
-use function Fp\Collection\map;
+use function Fp\Collection\everyMap;
 use function Fp\Evidence\proveString;
 
 final class NamedArgumentsMapper
@@ -39,17 +38,15 @@ final class NamedArgumentsMapper
 
     /**
      * @param non-empty-array<int|string, Union> $decoder_types
+     * @return Option<Union>
      */
-    public static function mapDecoders(array $decoder_types): Union
+    public static function mapDecoders(array $decoder_types): Option
     {
-        return DecoderType::createShape(map(
-            $decoder_types,
-            fn($type) => DecoderType::getGeneric($type)
-                ->map(fn($generic) => self::isOptional($type)
-                    ? PsalmApi::$types->asPossiblyUndefined($generic)
-                    : $generic)
-                ->getOrElse(Type::getMixed())
-        ));
+        return everyMap($decoder_types, fn($type) => DecoderType::getGeneric($type)
+            ->map(fn($generic) => self::isOptional($type)
+                ? PsalmApi::$types->asPossiblyUndefined($generic)
+                : $generic))
+            ->map(fn($properties) => DecoderType::createShape($properties));
     }
 
     private static function isOptional(Union $union): bool

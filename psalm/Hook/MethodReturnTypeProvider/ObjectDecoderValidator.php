@@ -32,7 +32,7 @@ final class ObjectDecoderValidator
                 event: $event,
                 actual_shape: yield PsalmApi::$args->getNonEmptyCallArgs($event)
                     ->map(fn($args) => NamedArgumentsMapper::namedArgsToArray($args->toArray()))
-                    ->map(fn($decoders) => NamedArgumentsMapper::mapDecoders($decoders))
+                    ->flatMap(fn($decoders) => NamedArgumentsMapper::mapDecoders($decoders))
                     ->flatMap(fn(Union $shape) => DecoderType::getShapeProperties($shape)),
                 expected_shape: yield Option::fromNullable($event->getTemplateTypeParameters())
                     ->flatMap(fn(array $templates) => first($templates))
