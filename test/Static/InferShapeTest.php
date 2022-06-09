@@ -12,6 +12,9 @@ use Klimick\Decode\Decoder\ShapeDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Project;
 use Klimick\Decode\Test\Static\Fixtures\RecByFqn;
 use Klimick\Decode\Test\Static\Fixtures\RecBySelf;
+use Klimick\Decode\Test\Static\Fixtures\ShapeWithValueObject;
+use Klimick\Decode\Test\Static\Fixtures\SomeValueObjectWithSelfKeyword;
+use Klimick\Decode\Test\Static\Fixtures\SomeValueObjectWithTypeHint;
 use Klimick\Decode\Test\Static\Fixtures\User;
 
 /**
@@ -92,5 +95,17 @@ final class InferShapeTest extends PsalmTest
             ->seeReturnType(
                 t::list(t::object(RecBySelf::class))
             );
+
+        StaticTestCase::describe('Infer arbitrary static call (self keyword return type)')
+            ->haveCode(function(ShapeWithValueObject $shape) {
+                return $shape->withSelf;
+            })
+            ->seeReturnType(t::object(SomeValueObjectWithSelfKeyword::class));
+
+        StaticTestCase::describe('Infer arbitrary static call (type hint return type)')
+            ->haveCode(function(ShapeWithValueObject $shape) {
+                return $shape->withTypeHint;
+            })
+            ->seeReturnType(t::object(SomeValueObjectWithTypeHint::class));
     }
 }

@@ -32,12 +32,16 @@ use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use Psalm\StatementsSource;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Union;
+use ReflectionMethod;
+use ReflectionNamedType;
 use function class_exists;
 use function count;
 use function Fp\Collection\first;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
+use function Fp\Evidence\proveTrue;
 use function is_subclass_of;
+use function method_exists;
 use function strtolower;
 
 final class GetMethodReturnType
@@ -146,40 +150,74 @@ final class GetMethodReturnType
             /**
              * @return Option<array{string, Union}>
              */
-            private static function fromStaticCall(string $self, Node $node): Option
+            private static function inferFromTypeCall(string $self, Node $node): Option
             {
                 return Option::do(function() use ($self, $node) {
-                    $method_name = yield Option::some($node)
+                    $method = yield Option::some($node)
                         ->filterOf(Node\Expr\StaticCall::class)
                         ->flatMap(fn($c) => proveOf($c->name, Node\Identifier::class))
                         ->map(fn($id) => $id->name);
 
-                    $class_name = yield Option::some($node)
+                    $class = yield Option::some($node)
                         ->filterOf(Node\Expr\StaticCall::class)
-                        ->flatMap(fn($c) => proveString($c->class->getAttribute('resolvedName')))
-                        ->map(fn($c) => 'self' === $c ? $self : $c)
-                        ->filter(fn($c) => class_exists($c) && is_subclass_of($c, InferShape::class))
-                        ->filter(fn() => 'type' === $method_name);
+                        ->flatMap(fn($call) => proveString($call->class->getAttribute('resolvedName')))
+                        ->map(fn($class) => 'self' === $class ? $self : $class)
+                        ->filter(fn($class) => class_exists($class) && is_subclass_of($class, InferShape::class))
+                        ->filter(fn() => 'type' === $method);
 
-                    $decoder = DecoderType::create(DecoderInterface::class, new TNamedObject($class_name));
+                    $return = DecoderType::create(DecoderInterface::class, new TNamedObject($class));
 
-                    return [$class_name, $decoder];
+                    return [$class, $return];
                 });
             }
 
             /**
              * @return Option<array{string, Union}>
              */
-            private static function fromNew(Node $node): Option
+            private static function inferFromArbitraryStaticCall(string $self, Node $node): Option
+            {
+                return Option::do(function() use ($self, $node) {
+                    $method = yield Option::some($node)
+                        ->filterOf(Node\Expr\StaticCall::class)
+                        ->flatMap(fn($c) => proveOf($c->name, Node\Identifier::class))
+                        ->map(fn($id) => $id->name);
+
+                    $class = yield Option::some($node)
+                        ->filterOf(Node\Expr\StaticCall::class)
+                        ->flatMap(fn($call) => proveString($call->class->getAttribute('resolvedName')))
+                        ->filter(fn($class) => 'self' !== $class && $class !== $self)
+                        ->filter(fn($class) => class_exists($class));
+
+                    $return = yield proveTrue(method_exists($class, $method))
+                        ->map(fn() => new ReflectionMethod($class, $method))
+                        ->map(fn(ReflectionMethod $reflection) => $reflection->getReturnType())
+                        ->filterOf(ReflectionNamedType::class)
+                        ->map(fn(ReflectionNamedType $type) => $type->getName())
+                        ->map(fn($type) => $type === 'self' ? $class : $type);
+
+                    return [
+                        $class,
+                        new Union([
+                            new TNamedObject($return),
+                        ]),
+                    ];
+                });
+            }
+
+            /**
+             * @return Option<array{string, Union}>
+             */
+            private static function inferFromNewExpr(Node $node): Option
             {
                 return Option::some($node)
                     ->filterOf(Node\Expr\New_::class)
-                    ->flatMap(fn($n) => proveOf($n->class, Node\Name::class))
-                    ->flatMap(fn($n) => proveString($n->getAttribute('resolvedName')))
-                    ->map(fn($n) => new TNamedObject($n))
-                    ->map(fn($n) => [
-                        $n->value,
-                        new Union([$n]),
+                    ->flatMap(fn($new) => proveOf($new->class, Node\Name::class))
+                    ->flatMap(fn($class) => proveString($class->getAttribute('resolvedName')))
+                    ->map(fn($name) => [
+                        $name,
+                        new Union([
+                            new TNamedObject($name),
+                        ]),
                     ]);
             }
 
@@ -188,8 +226,9 @@ final class GetMethodReturnType
                 Option::do(function() use ($node) {
                     $expr = yield proveOf($node, Node\Expr::class);
 
-                    [$phantom, $type] = yield self::fromStaticCall($this->self, $expr)
-                        ->orElse(fn() => self::fromNew($expr));
+                    [$phantom, $type] = yield self::inferFromTypeCall($this->self, $expr)
+                        ->orElse(fn() => self::inferFromArbitraryStaticCall($this->self, $expr))
+                        ->orElse(fn() => self::inferFromNewExpr($expr));
 
                     PsalmApi::$types->setType($this->node_data, $expr, $type);
                     $this->phantom_classes[] = $phantom;
