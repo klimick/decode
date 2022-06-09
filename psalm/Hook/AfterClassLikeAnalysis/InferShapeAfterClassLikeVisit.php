@@ -33,7 +33,11 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             $storage = $event->getStorage();
 
             $props = yield proveTrue(PsalmApi::$classlikes->classImplements($storage, InferShape::class))
-                ->flatMap(fn() => GetMethodReturnType::from($event, 'shape'))
+                ->flatMap(fn() => GetMethodReturnType::from(
+                    class: $storage->name,
+                    method_name: 'shape',
+                    deps: [$storage->name],
+                ))
                 ->flatMap(fn($type) => DecoderType::getShapeProperties($type));
 
             self::fixShapeMethod(to: $storage);

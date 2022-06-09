@@ -39,7 +39,11 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             $storage = $event->getStorage();
 
             $cases = yield proveTrue(PsalmApi::$classlikes->classImplements($storage, InferUnion::class))
-                ->flatMap(fn() => GetMethodReturnType::from($event, 'union'))
+                ->flatMap(fn() => GetMethodReturnType::from(
+                    class: $storage->name,
+                    method_name: 'union',
+                    deps: [$storage->name],
+                ))
                 ->flatMap(fn($type) => DecoderType::getGeneric($type));
 
             self::addTypeAlias($storage, $cases);

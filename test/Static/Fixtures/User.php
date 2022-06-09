@@ -18,21 +18,12 @@ final class User implements t\InferShape
     public static function shape(): ShapeDecoder
     {
         return t\shape(
-            name: self::complexType(),
+            name: t\string()->constrained(
+                c\minLength(is: 3),
+                c\maxLength(is: 255),
+            ),
             age: t\int(),
             projects: t\listOf(Project::type()),
-        );
-    }
-
-    /**
-     * @return t\DecoderInterface<string>
-     * @psalm-pure
-     */
-    public static function complexType(): t\DecoderInterface
-    {
-        return t\string()->constrained(
-            c\minLength(is: 3),
-            c\maxLength(is: 255),
         );
     }
 }

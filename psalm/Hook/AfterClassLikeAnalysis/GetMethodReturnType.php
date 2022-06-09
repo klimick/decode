@@ -20,104 +20,121 @@ use PhpParser\Node\Stmt\Use_;
 use PhpParser\NodeFinder;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use Psalm\CodeLocation;
 use Psalm\Context;
 use Psalm\Internal\Analyzer\FileAnalyzer;
 use Psalm\Internal\Analyzer\NamespaceAnalyzer;
 use Psalm\Internal\Analyzer\ProjectAnalyzer;
 use Psalm\Internal\Analyzer\StatementsAnalyzer;
 use Psalm\Internal\Provider\NodeDataProvider;
-use Psalm\Issue\InvalidReturnStatement;
 use Psalm\NodeTypeProvider;
-use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use Psalm\StatementsSource;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Union;
+use ReflectionClass;
 use ReflectionMethod;
 use ReflectionNamedType;
 use function class_exists;
-use function count;
 use function Fp\Collection\first;
+use function Fp\Evidence\proveClassString;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
+use function in_array;
 use function is_subclass_of;
 use function method_exists;
-use function strtolower;
 
 final class GetMethodReturnType
 {
     /**
+     * @param list<string> $deps
      * @return Option<Union>
+     *
+     * @psalm-suppress InternalMethod
      */
-    public static function from(AfterClassLikeVisitEvent $event, string $method_name): Option
+    public static function from(string $class, string $method_name, array $deps = []): Option
     {
-        $storage = $event->getStorage();
-        $storage->populated = true;
+        $file_path = proveClassString($class)
+            ->map(fn($c) => (new ReflectionClass($c))->getFileName())
+            ->flatMap(fn($file) => proveString($file))
+            ->get();
 
-        $type = Option::do(function() use ($event, $storage, $method_name) {
-            $single_return_expr = yield self::getSingleReturnExpr($event, $method_name);
-            $statements_analyzer = yield self::createStatementsAnalyzer($event);
+        if (null === $file_path) {
+            return Option::none();
+        }
+
+        $class_storage_mocked = false;
+        $file_storage_mocked = false;
+
+        if (!PsalmApi::$codebase->classlike_storage_provider->has($class)) {
+            PsalmApi::$codebase->classlike_storage_provider->create($class);
+            $class_storage_mocked = true;
+        }
+
+        if (!PsalmApi::$codebase->file_storage_provider->has($file_path)) {
+            PsalmApi::$codebase->file_storage_provider->create($file_path);
+            $file_storage_mocked = true;
+        }
+
+        $type = Option::do(function() use ($class, $file_path, $method_name, $deps) {
+            $file_statements = yield Option::try(fn() => PsalmApi::$codebase->getStatementsForFile($file_path))
+                ->map(fn($stmts) => ArrayList::collect($stmts));
+
+            $single_return_expr = yield self::getSingleReturnExpr($file_statements, $method_name);
+            $statements_analyzer = yield self::createStatementsAnalyzer($file_statements, $file_path);
+
+            self::inferComplexTypes(
+                self: $class,
+                deps: $deps,
+                props_expr: $single_return_expr,
+                node_data: $statements_analyzer->getNodeTypeProvider(),
+            );
 
             return yield PsalmApi::$types->analyzeType(
                 analyzer: $statements_analyzer,
                 expr: $single_return_expr,
-                context: self::createContext(
-                    self: $storage->name,
-                    props_expr: $single_return_expr,
-                    node_data: $statements_analyzer->getNodeTypeProvider(),
-                ),
+                context: new Context(),
             );
         });
 
-        $storage->populated = false;
+        if ($class_storage_mocked) {
+            PsalmApi::$codebase->classlike_storage_provider->remove($class);
+        }
+
+        if ($file_storage_mocked) {
+            PsalmApi::$codebase->file_storage_provider->remove($file_path);
+        }
 
         return $type;
     }
 
     /**
+     * @param ArrayList<Node\Stmt> $file_statements
      * @return Option<Expr>
      */
-    private static function getSingleReturnExpr(AfterClassLikeVisitEvent $event, string $method_name): Option
+    private static function getSingleReturnExpr(ArrayList $file_statements, string $method_name): Option
     {
-        $class = $event->getStmt();
+        /** @var array<array-key, ClassMethod> $methods */
+        $methods = (new NodeFinder())->findInstanceOf($file_statements->toArray(), ClassMethod::class);
 
-        return ArrayList::collect($class->stmts)
-            ->filterOf(ClassMethod::class)
+        return ArrayList::collect($methods)
             ->first(fn(ClassMethod $method) => $method->name->toString() === $method_name)
-            ->flatMap(function(ClassMethod $method) use ($event) {
+            ->flatMap(function(ClassMethod $method) {
                 /** @var array<array-key, Return_> $returns */
                 $returns = (new NodeFinder())->findInstanceOf($method->stmts ?? [], Return_::class);
 
-                if (count($returns) > 1) {
-                    $storage = $event->getStorage();
-
-                    $storage->docblock_issues[] = new InvalidReturnStatement(
-                        message: "Method '{$method->name->name}' must have only one return statement",
-                        code_location: new CodeLocation($event->getStatementsSource(), $method),
-                    );
-
-                    return Option::none();
-                }
-
-                return first($returns)->flatMap(fn(Return_ $return) => Option::fromNullable($return->expr));
+                return first($returns)
+                    ->flatMap(fn(Return_ $return) => Option::fromNullable($return->expr));
             });
     }
 
     /**
+     * @param ArrayList<Node\Stmt> $stmts
      * @return Option<StatementsSource>
      * @psalm-suppress InternalClass
      * @psalm-suppress InternalMethod
      */
-    public static function createStatementsAnalyzer(AfterClassLikeVisitEvent $event): Option
+    public static function createStatementsAnalyzer(ArrayList $file_statements, string $file_path): Option
     {
-        return Option::do(function() use ($event) {
-            $source = $event->getStatementsSource();
-            $file_path = $source->getFilePath();
-
-            $file_statements = yield Option::try(fn() => PsalmApi::$codebase->getStatementsForFile($file_path))
-                ->map(fn($stmts) => ArrayList::collect($stmts));
-
-            $storage = $event->getStorage();
+        return Option::do(function() use ($file_path, $file_statements) {
             $node_data_provider = new NodeDataProvider();
             $namespace = $file_statements
                 ->firstOf(Namespace_::class)
@@ -128,7 +145,11 @@ final class GetMethodReturnType
                 ));
 
             return yield Option
-                ::try(fn() => ProjectAnalyzer::$instance->getFileAnalyzerForClassLike($storage->name))
+                ::try(fn() => new FileAnalyzer(
+                    project_analyzer: ProjectAnalyzer::$instance,
+                    file_path: $file_path,
+                    file_name: PsalmApi::$codebase->config->shortenFileName($file_path),
+                ))
                 ->map(fn(FileAnalyzer $analyzer) => new NamespaceAnalyzer($namespace, $analyzer))
                 ->tap(fn(NamespaceAnalyzer $analyzer) => $analyzer->collectAnalyzableInformation())
                 ->tap(fn(NamespaceAnalyzer $analyzer) => $analyzer->addSuppressedIssues(['all']))
@@ -136,14 +157,16 @@ final class GetMethodReturnType
         });
     }
 
-    public static function createContext(string $self, Node\Expr $props_expr, NodeTypeProvider $node_data): Context
+    /**
+     * @param list<string> $deps
+     */
+    public static function inferComplexTypes(string $self, array $deps, Node\Expr $props_expr, NodeTypeProvider $node_data): void
     {
-        $visitor = new class($self, $node_data) extends NodeVisitorAbstract {
-            /** @var list<string> */
-            private array $phantom_classes = [];
-
+        $visitor = new class($self, $deps, $node_data) extends NodeVisitorAbstract {
             public function __construct(
                 private string $self,
+                /** @var list<string> */
+                private array $deps,
                 private NodeTypeProvider $node_data,
             ) {}
 
@@ -169,26 +192,61 @@ final class GetMethodReturnType
             }
 
             /**
-             * @return Option<array{string, Union}>
+             * @return Option<Union>
              */
             private static function inferFromTypeCall(string $self, Node $node): Option
             {
-                return Option::do(function() use ($self, $node) {
-                    $class = yield self::getClassNameFromStaticCall($node)
-                        ->map(fn($class) => 'self' === $class ? $self : $class)
-                        ->filter(fn($class) => class_exists($class) && is_subclass_of($class, InferShape::class))
-                        ->filter(fn() => self::getStaticMethodName($node)
-                            ->map(fn($method) => 'type' === $method)
-                            ->getOrElse(false));
-
-                    $return = DecoderType::create(DecoderInterface::class, new TNamedObject($class));
-
-                    return [$class, $return];
-                });
+                return self::getClassNameFromStaticCall($node)
+                    ->map(fn($class) => 'self' === $class ? $self : $class)
+                    ->filter(fn($class) => class_exists($class) && is_subclass_of($class, InferShape::class))
+                    ->filter(fn() => self::getStaticMethodName($node)
+                        ->map(fn($method) => 'type' === $method)
+                        ->getOrElse(false))
+                    ->map(fn($class) => DecoderType::create(DecoderInterface::class, new TNamedObject($class)));
             }
 
             /**
-             * @return Option<array{string, Union}>
+             * @param list<string> $deps
+             * @return Option<Union>
+             */
+            private static function inferFromShapeCall(array $deps, string $self, Node $node): Option
+            {
+                return self::getClassNameFromStaticCall($node)
+                    ->map(fn($class) => 'self' === $class ? $self : $class)
+                    ->filter(fn($class) => !in_array($class, $deps))
+                    ->filter(fn($class) => class_exists($class) && is_subclass_of($class, InferShape::class))
+                    ->filter(fn() => self::getStaticMethodName($node)
+                        ->map(fn($method) => 'shape' === $method)
+                        ->getOrElse(false))
+                    ->flatMap(fn($class) => GetMethodReturnType::from(
+                        class: $class,
+                        method_name: 'shape',
+                        deps: [...$deps, $class],
+                    ));
+            }
+
+            /**
+             * @param list<string> $deps
+             * @return Option<Union>
+             */
+            private static function inferFromUnionCall(array $deps, string $self, Node $node): Option
+            {
+                return self::getClassNameFromStaticCall($node)
+                    ->map(fn($class) => 'self' === $class ? $self : $class)
+                    ->filter(fn($class) => !in_array($class, $deps))
+                    ->filter(fn($class) => class_exists($class) && is_subclass_of($class, InferUnion::class))
+                    ->filter(fn() => self::getStaticMethodName($node)
+                        ->map(fn($method) => 'union' === $method)
+                        ->getOrElse(false))
+                    ->flatMap(fn($class) => GetMethodReturnType::from(
+                        class: $class,
+                        method_name: 'union',
+                        deps: [...$deps, $class],
+                    ));
+            }
+
+            /**
+             * @return Option<Union>
              */
             private static function inferFromArbitraryStaticCall(string $self, Node $node): Option
             {
@@ -206,17 +264,14 @@ final class GetMethodReturnType
                         ->map(fn(ReflectionNamedType $type) => $type->getName())
                         ->map(fn(string $type) => $type === 'self' ? $class : $type);
 
-                    return [
-                        $class,
-                        new Union([
-                            new TNamedObject($return),
-                        ]),
-                    ];
+                    return new Union([
+                        new TNamedObject($return),
+                    ]);
                 });
             }
 
             /**
-             * @return Option<array{string, Union}>
+             * @return Option<Union>
              */
             private static function inferFromNewExpr(Node $node): Option
             {
@@ -224,12 +279,8 @@ final class GetMethodReturnType
                     ->filterOf(Node\Expr\New_::class)
                     ->flatMap(fn($new) => proveOf($new->class, Node\Name::class))
                     ->flatMap(fn($class) => proveString($class->getAttribute('resolvedName')))
-                    ->map(fn($name) => [
-                        $name,
-                        new Union([
-                            new TNamedObject($name),
-                        ]),
-                    ]);
+                    ->map(fn($name) => new TNamedObject($name))
+                    ->map(fn($name) => new Union([$name]));
             }
 
             public function leaveNode(Node $node): void
@@ -237,37 +288,19 @@ final class GetMethodReturnType
                 Option::do(function() use ($node) {
                     $expr = yield proveOf($node, Node\Expr::class);
 
-                    [$phantom, $type] = yield self::inferFromTypeCall($this->self, $expr)
+                    $type = yield self::inferFromTypeCall($this->self, $expr)
+                        ->orElse(fn() => self::inferFromShapeCall($this->deps, $this->self, $expr))
+                        ->orElse(fn() => self::inferFromUnionCall($this->deps, $this->self, $expr))
                         ->orElse(fn() => self::inferFromArbitraryStaticCall($this->self, $expr))
                         ->orElse(fn() => self::inferFromNewExpr($expr));
 
                     PsalmApi::$types->setType($this->node_data, $expr, $type);
-                    $this->phantom_classes[] = $phantom;
                 });
-            }
-
-            /**
-             * @return list<string>
-             */
-            public function getPhantomClasses(): array
-            {
-                return $this->phantom_classes;
             }
         };
 
         $traverser = new NodeTraverser();
         $traverser->addVisitor($visitor);
         $traverser->traverse([$props_expr]);
-
-        $context = new Context();
-        $context->inside_general_use = true;
-        $context->pure = true;
-        $context->self = $self;
-
-        foreach ($visitor->getPhantomClasses() as $phantom_class) {
-            $context->phantom_classes[strtolower($phantom_class)] = true;
-        }
-
-        return $context;
     }
 }

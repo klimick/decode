@@ -11,6 +11,7 @@ use Fp\PsalmToolkit\StaticType\StaticTypes as t;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\UnionDecoder;
 use Klimick\Decode\Test\Static\Fixtures\Project;
+use Klimick\Decode\Test\Static\Fixtures\ShapeWithOther;
 use Klimick\Decode\Test\Static\Fixtures\User;
 use Klimick\Decode\Test\Static\Fixtures\UserOrProject;
 use RuntimeException;
@@ -102,6 +103,17 @@ final class InferUnionTest extends PsalmTest
         StaticTestCase::describe('InferUnion have magic type alias')
             ->haveCode(function() {
                 return self::getUnion();
+            })
+            ->seeReturnType(
+                t::union([
+                    t::object(User::class),
+                    t::object(Project::class),
+                ]),
+            );
+
+        StaticTestCase::describe('Union inference inside other shape')
+            ->haveCode(function(ShapeWithOther $shape) {
+                return $shape->userOrProject;
             })
             ->seeReturnType(
                 t::union([
