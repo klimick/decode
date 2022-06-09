@@ -9,6 +9,7 @@ use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\InferShape;
+use Klimick\Decode\Decoder\InferUnion;
 use Klimick\PsalmDecode\Common\DecoderType;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
@@ -194,7 +195,9 @@ final class GetMethodReturnType
                 return Option::do(function() use ($self, $node) {
                     $class = yield self::getClassNameFromStaticCall($node)
                         ->filter(fn($class) => 'self' !== $class && $class !== $self)
-                        ->filter(fn($class) => class_exists($class));
+                        ->filter(fn($class) => class_exists($class))
+                        ->filter(fn($class) => !is_subclass_of($class, InferShape::class))
+                        ->filter(fn($class) => !is_subclass_of($class, InferUnion::class));
 
                     $return = yield self::getStaticMethodName($node)
                         ->filter(fn(string $method) => method_exists($class, $method))
