@@ -39,7 +39,6 @@ use function count;
 use function Fp\Collection\first;
 use function Fp\Evidence\proveOf;
 use function Fp\Evidence\proveString;
-use function Fp\Evidence\proveTrue;
 use function is_subclass_of;
 use function method_exists;
 use function strtolower;
@@ -148,22 +147,38 @@ final class GetMethodReturnType
             ) {}
 
             /**
+             * @return Option<string>
+             */
+            private static function getStaticMethodName(Node $node): Option
+            {
+                return Option::some($node)
+                    ->filterOf(Node\Expr\StaticCall::class)
+                    ->flatMap(fn($c) => proveOf($c->name, Node\Identifier::class))
+                    ->map(fn($id) => $id->name);
+            }
+
+            /**
+             * @return Option<string>
+             */
+            private static function getClassNameFromStaticCall(Node $node): Option
+            {
+                return Option::some($node)
+                    ->filterOf(Node\Expr\StaticCall::class)
+                    ->flatMap(fn($call) => proveString($call->class->getAttribute('resolvedName')));
+            }
+
+            /**
              * @return Option<array{string, Union}>
              */
             private static function inferFromTypeCall(string $self, Node $node): Option
             {
                 return Option::do(function() use ($self, $node) {
-                    $method = yield Option::some($node)
-                        ->filterOf(Node\Expr\StaticCall::class)
-                        ->flatMap(fn($c) => proveOf($c->name, Node\Identifier::class))
-                        ->map(fn($id) => $id->name);
-
-                    $class = yield Option::some($node)
-                        ->filterOf(Node\Expr\StaticCall::class)
-                        ->flatMap(fn($call) => proveString($call->class->getAttribute('resolvedName')))
+                    $class = yield self::getClassNameFromStaticCall($node)
                         ->map(fn($class) => 'self' === $class ? $self : $class)
                         ->filter(fn($class) => class_exists($class) && is_subclass_of($class, InferShape::class))
-                        ->filter(fn() => 'type' === $method);
+                        ->filter(fn() => self::getStaticMethodName($node)
+                            ->map(fn($method) => 'type' === $method)
+                            ->getOrElse(false));
 
                     $return = DecoderType::create(DecoderInterface::class, new TNamedObject($class));
 
@@ -177,23 +192,16 @@ final class GetMethodReturnType
             private static function inferFromArbitraryStaticCall(string $self, Node $node): Option
             {
                 return Option::do(function() use ($self, $node) {
-                    $method = yield Option::some($node)
-                        ->filterOf(Node\Expr\StaticCall::class)
-                        ->flatMap(fn($c) => proveOf($c->name, Node\Identifier::class))
-                        ->map(fn($id) => $id->name);
-
-                    $class = yield Option::some($node)
-                        ->filterOf(Node\Expr\StaticCall::class)
-                        ->flatMap(fn($call) => proveString($call->class->getAttribute('resolvedName')))
+                    $class = yield self::getClassNameFromStaticCall($node)
                         ->filter(fn($class) => 'self' !== $class && $class !== $self)
                         ->filter(fn($class) => class_exists($class));
 
-                    $return = yield proveTrue(method_exists($class, $method))
-                        ->map(fn() => new ReflectionMethod($class, $method))
-                        ->map(fn(ReflectionMethod $reflection) => $reflection->getReturnType())
-                        ->filterOf(ReflectionNamedType::class)
+                    $return = yield self::getStaticMethodName($node)
+                        ->filter(fn(string $method) => method_exists($class, $method))
+                        ->map(fn(string $method) => new ReflectionMethod($class, $method))
+                        ->flatMap(fn(ReflectionMethod $method) => proveOf($method->getReturnType(), ReflectionNamedType::class))
                         ->map(fn(ReflectionNamedType $type) => $type->getName())
-                        ->map(fn($type) => $type === 'self' ? $class : $type);
+                        ->map(fn(string $type) => $type === 'self' ? $class : $type);
 
                     return [
                         $class,
