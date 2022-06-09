@@ -6,7 +6,6 @@ namespace Klimick\PsalmDecode;
 
 use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\InferShapeAfterClassLikeVisit;
 use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\InferUnionAfterClassLikeVisit;
-use Klimick\PsalmDecode\Hook\AfterExpressionAnalysis\ShapePropertyFetchAfterExpressionAnalysis;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\DecoderFromAfterMethodCallAnalysis;
 use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\GenerateShapeMetaMixinAfterStatementAnalysis;
 use Klimick\PsalmDecode\Hook\AfterStatementAnalysis\GenerateUnionMetaMixinAfterStatementAnalysis;
@@ -39,7 +38,6 @@ final class Plugin implements PluginEntryPointInterface
             GenerateUnionMetaMixinAfterStatementAnalysis::class,
             InferShapeAfterClassLikeVisit::class,
             InferUnionAfterClassLikeVisit::class,
-            ShapePropertyFetchAfterExpressionAnalysis::class,
         ];
 
         forAll($hooks, function(string $hook) use ($registration): void {
