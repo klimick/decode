@@ -6,6 +6,9 @@ namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
+use Klimick\Decode\Decoder\Error\TypeError;
+use function array_key_last;
+use function is_int;
 
 /**
  * @template TKey of array-key
@@ -38,6 +41,8 @@ final class ArrDecoder extends AbstractDecoder
         $decoded = [];
         $errors = [];
 
+        $checkIntToStringCoercion = $this->keyDecoder instanceof StringDecoder;
+
         /** @psalm-suppress MixedAssignment */
         foreach ($value as $k => $v) {
             $decodedK = $this->keyDecoder->decode($k, $context($this->keyDecoder->name(), $k, (string) $k));
@@ -53,6 +58,13 @@ final class ArrDecoder extends AbstractDecoder
 
             if ($decodedK->isRight() && $decodedV->isRight()) {
                 $decoded[$decodedK->get()] = $decodedV->get();
+
+                // PHP don't see difference between '1' and 1 for array key.
+                if ($checkIntToStringCoercion && is_int(array_key_last($decoded))) {
+                    $errors[] = [
+                        new TypeError($context($this->keyDecoder->name(), (int) $k, (string) $k)),
+                    ];
+                }
             }
         }
 
