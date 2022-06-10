@@ -2,22 +2,25 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Hook\AfterStatementAnalysis;
+namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
 
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Psalm\Aliases;
-use Psalm\StatementsSource;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Type\Atomic;
 use Psalm\Type\Atomic\TNamedObject;
 use Psalm\Type\Union;
+use function array_keys;
+use function array_values;
+use function explode;
+use function file_put_contents;
 use function Fp\Collection\map;
 use function implode;
+use function is_dir;
 use function sprintf;
-use function str_ends_with;
+use function str_contains;
 use function str_replace;
-use function file_put_contents;
 use const PHP_EOL;
 
 final class MetaMixinGenerator
@@ -75,7 +78,6 @@ final class MetaMixinGenerator
     }
     PHP;
 
-
     private const PROP = <<<TEMPLATE
         /** @var %s */
         public $%s;
@@ -86,32 +88,81 @@ final class MetaMixinGenerator
     TEMPLATE;
 
     /**
-     * @param array<string, Union> $types
+     * @param array<string, Union> $props
      */
-    public static function forShape(ClassLikeStorage $storage, StatementsSource $source, array $types): void
+    public static function saveShapeMixinTemplate(string $mixin_dir, ClassLikeStorage $storage, array $props): void
     {
-        self::save($storage, $source, self::generateShapeMixin($storage, $types));
+        self::save($mixin_dir, $storage, self::shapeMixinTemplate($storage, $props));
     }
 
-    public static function forUnion(ClassLikeStorage $storage, StatementsSource $source, Union $union): void
+    /**
+     * @param array<string, Union> $return
+     */
+    public static function saveUnionMixinTemplate(string $mixin_dir, ClassLikeStorage $storage, Union $cases): void
     {
-        self::save($storage, $source, self::generateUnionMixin($storage, $union));
+        self::save($mixin_dir, $storage, self::generateUnionMixin($storage, $cases));
     }
 
-    private static function save(ClassLikeStorage $storage, StatementsSource $source, string $template): void
+    private static function save(string $mixin_dir, ClassLikeStorage $storage, string $template): void
     {
-        $class = $source->getClassName();
-        $path = $source->getRootFilePath();
+        $path = self::mkdir($mixin_dir, $storage);
+        $filename = PsalmApi::$classlikes->toShortName($storage) . 'MetaMixin.php';
 
-        if (null !== $class && str_ends_with($path, "{$class}.php")) {
-            $in_dir = str_replace("/{$class}.php", '', $path);
-            $filename = PsalmApi::$classlikes->toShortName($storage) . 'MetaMixin.php';
+        file_put_contents("{$path}/{$filename}", $template);
+    }
 
-            file_put_contents("{$in_dir}/{$filename}", $template);
+    private static function mkdir(string $mixin_dir, ClassLikeStorage $storage): string
+    {
+        $namespace = str_contains($storage->name, '\\')
+            ? str_replace('\\' . PsalmApi::$classlikes->toShortName($storage), '', $storage->name)
+            : $storage->name;
+
+        if (!is_dir($mixin_dir)) {
+            mkdir($mixin_dir);
         }
+
+        $current = $mixin_dir;
+
+        foreach (explode('\\', $namespace) as $dir) {
+            $current = "{$current}/{$dir}";
+
+            if (!is_dir($current)) {
+                mkdir($current);
+            }
+        }
+
+        return $current;
     }
 
-    private static function generateUnionMixin(ClassLikeStorage $storage, Union $union): string
+    /**
+     * @param array<string, Union> $return
+     */
+    private static function shapeMixinTemplate(ClassLikeStorage $storage, array $return): string
+    {
+        $replacements = [
+            '{{MIXIN_NAMESPACE}}' => Option::fromNullable($storage->aliases)
+                ->flatMap(fn(Aliases $aliases) => Option::fromNullable($aliases->namespace))
+                ->map(fn(string $class_namespace) => "namespace {$class_namespace};")
+                ->getOrElse(''),
+            '{{MIXIN_NAME}}' => PsalmApi::$classlikes->toShortName($storage) . 'MetaMixin',
+            '{{PROPS_LIST}}' => implode(PHP_EOL, map(
+                $return,
+                function(Union $type, string $name) {
+                    $docblockString = PsalmApi::$types->toDocblockString(
+                        $type->possibly_undefined
+                            ? PsalmApi::$types->asNullable($type)
+                            : $type,
+                    );
+
+                    return sprintf(self::PROP, $docblockString, $name);
+                },
+            )),
+        ];
+
+        return str_replace(array_keys($replacements), array_values($replacements), self::SHAPE_TEMPLATE);
+    }
+
+    private static function generateUnionMixin( ClassLikeStorage $storage, Union $union): string
     {
         $replacements = [
             '{{MIXIN_NAMESPACE}}' => Option::fromNullable($storage->aliases)
@@ -143,33 +194,5 @@ final class MetaMixinGenerator
         ];
 
         return str_replace(array_keys($replacements), array_values($replacements), self::UNION_TEMPLATE);
-    }
-
-    /**
-     * @param array<string, Union> $return
-     */
-    private static function generateShapeMixin(ClassLikeStorage $storage, array $return): string
-    {
-        $replacements = [
-            '{{MIXIN_NAMESPACE}}' => Option::fromNullable($storage->aliases)
-                ->flatMap(fn(Aliases $aliases) => Option::fromNullable($aliases->namespace))
-                ->map(fn(string $class_namespace) => "namespace {$class_namespace};")
-                ->getOrElse(''),
-            '{{MIXIN_NAME}}' => PsalmApi::$classlikes->toShortName($storage) . 'MetaMixin',
-            '{{PROPS_LIST}}' => implode(PHP_EOL, map(
-                $return,
-                function(Union $type, string $name) {
-                    $docblockString = PsalmApi::$types->toDocblockString(
-                        $type->possibly_undefined
-                            ? PsalmApi::$types->asNullable($type)
-                            : $type,
-                    );
-
-                    return sprintf(self::PROP, $docblockString, $name);
-                },
-            )),
-        ];
-
-        return str_replace(array_keys($replacements), array_values($replacements), self::SHAPE_TEMPLATE);
     }
 }

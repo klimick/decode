@@ -10,6 +10,7 @@ use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\InferUnion;
 use Klimick\Decode\Decoder\UnionInstance;
 use Klimick\PsalmDecode\Common\DecoderType;
+use Klimick\PsalmDecode\Plugin;
 use Psalm\Internal\MethodIdentifier;
 use Psalm\Internal\Type\TypeAlias\ClassTypeAlias;
 use Psalm\Issue\InvalidReturnType;
@@ -55,6 +56,10 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
                 self::addMatchMethod($storage, $cases);
                 self::addIsMethod($storage);
                 self::addTypeMethod($storage);
+            }
+
+            if (Plugin::isMixinGenerationEnabled()) {
+                MetaMixinGenerator::saveUnionMixinTemplate(Plugin::getFolderForMixins(), $storage, $cases);
             }
         });
     }

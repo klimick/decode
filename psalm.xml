@@ -16,7 +16,10 @@
         </ignoreFiles>
     </projectFiles>
     <plugins>
-        <pluginClass class="Klimick\PsalmDecode\Plugin"/>
+        <pluginClass class="Klimick\PsalmDecode\Plugin">
+            <generateMetaMixin>true</generateMetaMixin>
+            <metaMixinPath>mixin</metaMixinPath>
+        </pluginClass>
         <pluginClass class="Klimick\PsalmShowType\ShowTypePlugin"/>
         <pluginClass class="Fp\PsalmToolkit\Toolkit\Plugin"/>
         <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>

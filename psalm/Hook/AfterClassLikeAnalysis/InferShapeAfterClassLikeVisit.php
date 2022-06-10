@@ -11,6 +11,7 @@ use Klimick\Decode\Decoder\InferShape;
 use Klimick\Decode\Decoder\ObjectInstance;
 use Klimick\Decode\Decoder\ShapeDecoder;
 use Klimick\PsalmDecode\Common\DecoderType;
+use Klimick\PsalmDecode\Plugin;
 use Psalm\Internal\MethodIdentifier;
 use Psalm\Internal\Type\TypeAlias\ClassTypeAlias;
 use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
@@ -47,6 +48,10 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             if (PsalmApi::$classlikes->isTraitUsed($storage, ObjectInstance::class)) {
                 self::addTypeMethod(to: $storage);
                 self::addProperties($props, to: $storage);
+            }
+
+            if (Plugin::isMixinGenerationEnabled()) {
+                MetaMixinGenerator::saveShapeMixinTemplate(Plugin::getFolderForMixins(), $storage, $props);
             }
         });
     }
