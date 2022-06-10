@@ -16,7 +16,7 @@ use function is_int;
  * @extends AbstractDecoder<array<TKey, TVal>>
  * @psalm-immutable
  */
-final class ArrDecoder extends AbstractDecoder
+final class ArrayOfDecoder extends AbstractDecoder
 {
     /**
      * @param DecoderInterface<TKey> $keyDecoder

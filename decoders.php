@@ -223,9 +223,9 @@ function datetime(string $timezone = 'UTC', null|string $fromFormat = null): Dec
  * @return DecoderInterface<array-key>
  * @psalm-pure
  */
-function arrKey(): DecoderInterface
+function arrayKey(): DecoderInterface
 {
-    return new ArrKeyDecoder();
+    return new ArrayKeyDecoder();
 }
 
 /**
@@ -251,7 +251,7 @@ function literal(mixed $head, mixed ...$tail): DecoderInterface
  */
 function listOf(DecoderInterface $decoder): DecoderInterface
 {
-    return new ArrListDecoder($decoder);
+    return new ArrayListOfDecoder($decoder);
 }
 
 /**
@@ -263,7 +263,7 @@ function listOf(DecoderInterface $decoder): DecoderInterface
  */
 function nonEmptyListOf(DecoderInterface $decoder): DecoderInterface
 {
-    return new NonEmptyArrListDecoder($decoder);
+    return new NonEmptyArrayListOfDecoder($decoder);
 }
 
 /**
@@ -277,7 +277,7 @@ function nonEmptyListOf(DecoderInterface $decoder): DecoderInterface
  */
 function arrayOf(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): DecoderInterface
 {
-    return new ArrDecoder($keyDecoder, $valDecoder);
+    return new ArrayOfDecoder($keyDecoder, $valDecoder);
 }
 
 /**
@@ -291,7 +291,7 @@ function arrayOf(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): De
  */
 function nonEmptyArrayOf(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): DecoderInterface
 {
-    return new NonEmptyArrDecoder($keyDecoder, $valDecoder);
+    return new NonEmptyArrayOfDecoder($keyDecoder, $valDecoder);
 }
 
 /**

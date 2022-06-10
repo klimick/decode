@@ -12,7 +12,7 @@ use Klimick\Decode\Context;
  * @extends AbstractDecoder<non-empty-list<T>>
  * @psalm-immutable
  */
-final class NonEmptyArrListDecoder extends AbstractDecoder
+final class NonEmptyArrayListOfDecoder extends AbstractDecoder
 {
     /**
      * @param DecoderInterface<T> $decoder

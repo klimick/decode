@@ -13,7 +13,7 @@ use Klimick\Decode\Context;
  * @extends AbstractDecoder<non-empty-array<TKey, TVal>>
  * @psalm-immutable
  */
-final class NonEmptyArrDecoder extends AbstractDecoder
+final class NonEmptyArrayOfDecoder extends AbstractDecoder
 {
     /**
      * @param DecoderInterface<TKey> $keyDecoder

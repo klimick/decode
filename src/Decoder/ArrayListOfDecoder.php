@@ -14,7 +14,7 @@ use function Fp\Collection\keys;
  * @extends AbstractDecoder<list<A>>
  * @psalm-immutable
  */
-final class ArrListDecoder extends AbstractDecoder
+final class ArrayListOfDecoder extends AbstractDecoder
 {
     /**
      * @param DecoderInterface<A> $decoder

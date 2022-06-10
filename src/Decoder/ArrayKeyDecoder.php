@@ -11,7 +11,7 @@ use Klimick\Decode\Context;
  * @extends AbstractDecoder<array-key>
  * @psalm-immutable
  */
-final class ArrKeyDecoder extends AbstractDecoder
+final class ArrayKeyDecoder extends AbstractDecoder
 {
     public function name(): string
     {
