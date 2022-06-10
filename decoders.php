@@ -15,8 +15,8 @@ use Klimick\Decode\Decoder\Error\TypeError;
 use Klimick\Decode\Decoder\Factory\ObjectDecoderFactory;
 use Klimick\Decode\Decoder\Factory\TaggedUnionDecoderFactory;
 use Klimick\Decode\Report\DefaultReporter;
-use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionReturnTypeProvider;
-use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionFunctionReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeFunctionReturnTypeProvider;
 
 /**
  * @template T
@@ -336,7 +336,7 @@ function either(DecoderInterface $left, DecoderInterface $right): DecoderInterfa
  * @return ShapeDecoder<array<string, mixed>>
  *
  * @psalm-pure
- * @see ShapeReturnTypeProvider
+ * @see ShapeFunctionReturnTypeProvider
  */
 function shape(DecoderInterface ...$decoders): ShapeDecoder
 {
@@ -417,7 +417,7 @@ function tagged(string $with): TaggedUnionDecoderFactory
  *
  * @psalm-pure
  * @no-named-arguments
- * @see IntersectionReturnTypeProvider
+ * @see IntersectionFunctionReturnTypeProvider
  */
 function intersection(ShapeDecoder $first, ShapeDecoder $second, ShapeDecoder ...$rest): ShapeDecoder
 {

@@ -6,25 +6,39 @@ namespace Klimick\PsalmDecode\Hook\MethodReturnTypeProvider;
 
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
+use Klimick\Decode\Decoder\Factory\ObjectDecoderFactory;
 use Klimick\PsalmDecode\Common\DecoderType;
 use Klimick\PsalmDecode\Common\NamedArgumentsMapper;
 use Klimick\PsalmDecode\Issue;
 use Psalm\CodeLocation;
 use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
+use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
 use Psalm\StatementsSource;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Storage\PropertyStorage;
 use Psalm\Type;
-use Psalm\Type\Union;
 use Psalm\Type\Atomic\TNamedObject;
+use Psalm\Type\Union;
 use function array_key_exists;
 use function array_keys;
 use function Fp\Collection\first;
 use function Fp\Collection\map;
 
-final class ObjectDecoderValidator
+final class ObjectMethodReturnTypeProvider implements MethodReturnTypeProviderInterface
 {
+    public static function getClassLikeNames(): array
+    {
+        return [ObjectDecoderFactory::class];
+    }
+
+    public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Type\Union
+    {
+        self::verify($event);
+
+        return null;
+    }
+
     public static function verify(MethodReturnTypeProviderEvent $event): void
     {
         Option::do(function() use ($event) {

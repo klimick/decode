@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace Klimick\PsalmDecode;
 
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
-use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\InferShapeAfterClassLikeVisit;
-use Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis\InferUnionAfterClassLikeVisit;
+use Klimick\PsalmDecode\Hook\AfterClassLikeVisit\InferShapeAfterClassLikeVisit;
+use Klimick\PsalmDecode\Hook\AfterClassLikeVisit\InferUnionAfterClassLikeVisit;
 use Klimick\PsalmDecode\Hook\AfterMethodCallAnalysis\DecoderFromAfterMethodCallAnalysis;
-use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionReturnTypeProvider;
-use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionFunctionReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeFunctionReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
-use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectMethodReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ShapePickOmitMethodReturnTypeProvider;
-use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\TaggedUnionDecoderFactoryReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\TaggedMethodReturnTypeProvider;
 use Psalm\Plugin\PluginEntryPointInterface;
 use Psalm\Plugin\RegistrationInterface;
 use RuntimeException;
@@ -39,11 +39,11 @@ final class Plugin implements PluginEntryPointInterface
     public function __invoke(RegistrationInterface $registration, ?SimpleXMLElement $config = null): void
     {
         $hooks = [
-            ObjectDecoderFactoryReturnTypeProvider::class,
-            ShapeReturnTypeProvider::class,
+            ObjectMethodReturnTypeProvider::class,
+            ShapeFunctionReturnTypeProvider::class,
             ShapePickOmitMethodReturnTypeProvider::class,
-            IntersectionReturnTypeProvider::class,
-            TaggedUnionDecoderFactoryReturnTypeProvider::class,
+            IntersectionFunctionReturnTypeProvider::class,
+            TaggedMethodReturnTypeProvider::class,
             ConstrainedMethodReturnTypeProvider::class,
             DecoderFromAfterMethodCallAnalysis::class,
             InferShapeAfterClassLikeVisit::class,

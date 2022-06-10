@@ -13,7 +13,7 @@ use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
 use Psalm\Type\Union;
 use function Fp\Evidence\proveTrue;
 
-final class TaggedUnionDecoderFactoryReturnTypeProvider implements MethodReturnTypeProviderInterface
+final class TaggedMethodReturnTypeProvider implements MethodReturnTypeProviderInterface
 {
     public static function getClassLikeNames(): array
     {

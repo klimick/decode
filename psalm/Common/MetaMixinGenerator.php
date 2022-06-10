@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
+namespace Klimick\PsalmDecode\Common;
 
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
+namespace Klimick\PsalmDecode\Common;
 
 use Fp\Collections\ArrayList;
 use Fp\Functional\Option\Option;
@@ -10,7 +10,6 @@ use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\InferShape;
 use Klimick\Decode\Decoder\InferUnion;
-use Klimick\PsalmDecode\Common\DecoderType;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt\ClassMethod;

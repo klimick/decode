@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\PsalmDecode\Hook\AfterClassLikeAnalysis;
+namespace Klimick\PsalmDecode\Hook\AfterClassLikeVisit;
 
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
@@ -10,6 +10,8 @@ use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\InferUnion;
 use Klimick\Decode\Decoder\UnionInstance;
 use Klimick\PsalmDecode\Common\DecoderType;
+use Klimick\PsalmDecode\Common\GetMethodReturnType;
+use Klimick\PsalmDecode\Common\MetaMixinGenerator;
 use Klimick\PsalmDecode\Plugin;
 use Psalm\Internal\MethodIdentifier;
 use Psalm\Internal\Type\TypeAlias\ClassTypeAlias;

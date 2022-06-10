@@ -6,7 +6,7 @@ namespace Klimick\Decode\Decoder\Factory;
 
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\ObjectDecoder;
-use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectDecoderFactoryReturnTypeProvider;
+use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ObjectMethodReturnTypeProvider;
 
 /**
  * @template TObjectClass of object
@@ -23,7 +23,7 @@ final class ObjectDecoderFactory
 
     /**
      * @return DecoderInterface<TObjectClass>
-     * @see ObjectDecoderFactoryReturnTypeProvider
+     * @see ObjectMethodReturnTypeProvider
      */
     public function __invoke(DecoderInterface ...$decoders): DecoderInterface
     {

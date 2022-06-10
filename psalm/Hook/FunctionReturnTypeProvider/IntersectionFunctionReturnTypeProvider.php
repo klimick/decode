@@ -11,7 +11,7 @@ use Psalm\Plugin\EventHandler\Event\FunctionReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\FunctionReturnTypeProviderInterface;
 use Psalm\Type;
 
-final class IntersectionReturnTypeProvider implements FunctionReturnTypeProviderInterface
+final class IntersectionFunctionReturnTypeProvider implements FunctionReturnTypeProviderInterface
 {
     public static function getFunctionIds(): array
     {
