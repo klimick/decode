@@ -34,20 +34,14 @@ final class ObjectMethodReturnTypeProvider implements MethodReturnTypeProviderIn
 
     public static function getMethodReturnType(MethodReturnTypeProviderEvent $event): ?Type\Union
     {
-        self::verify($event);
-
-        return null;
-    }
-
-    public static function verify(MethodReturnTypeProviderEvent $event): void
-    {
         Option::do(function() use ($event) {
             self::checkPropertyTypes(
                 event: $event,
-                actual_shape: yield PsalmApi::$args->getNonEmptyCallArgs($event)
+                actual_shape: PsalmApi::$args->getNonEmptyCallArgs($event)
                     ->map(fn($args) => NamedArgumentsMapper::namedArgsToArray($args->toArray()))
                     ->flatMap(fn($decoders) => NamedArgumentsMapper::mapDecoders($decoders))
-                    ->flatMap(fn(Union $shape) => DecoderType::getShapeProperties($shape)),
+                    ->flatMap(fn(Union $shape) => DecoderType::getShapeProperties($shape))
+                    ->getOrElse([]),
                 expected_shape: yield Option::fromNullable($event->getTemplateTypeParameters())
                     ->flatMap(fn(array $templates) => first($templates))
                     ->flatMap(fn(Union $template) => PsalmApi::$types->asSingleAtomicOf(TNamedObject::class, $template))
@@ -56,6 +50,8 @@ final class ObjectMethodReturnTypeProvider implements MethodReturnTypeProviderIn
                 arg_locations: yield self::extractArgLocations($event, $event->getSource()),
             );
         });
+
+        return null;
     }
 
     /**
