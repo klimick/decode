@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Klimick\Decode\Report;
 
 use function class_exists;
-use function get_class;
-use function is_object;
-use function json_encode;
-use function trim;
-use const JSON_UNESCAPED_UNICODE;
 
 final class TypeErrorReport
 {
@@ -24,9 +19,7 @@ final class TypeErrorReport
 
     public function toString(): string
     {
-        $actualValue = is_object($this->actual)
-            ? get_class($this->actual) . '::class'
-            : trim(json_encode($this->actual, JSON_UNESCAPED_UNICODE), '"');
+        $actualValue = ActualValueToString::for($this->actual);
 
         $expectedValue = class_exists($this->expected)
             ? $this->expected . '::class'

@@ -32,19 +32,27 @@ final class ErrorReport implements JsonSerializable, Stringable
 
     public function __toString(): string
     {
-        $typeErrors = ArrayList::collect($this->typeErrors)
-            ->map(fn(TypeErrorReport $e) => $e->toString())
-            ->mkString(sep: PHP_EOL);
+        $parts = [];
 
-        $constraintErrors = ArrayList::collect($this->constraintErrors)
-            ->map(fn(ConstraintErrorReport $e) => $e->toString())
-            ->mkString(sep: PHP_EOL);
+        if (!empty($this->typeErrors)) {
+            $parts[] = ArrayList::collect($this->typeErrors)
+                ->map(fn(TypeErrorReport $e) => $e->toString())
+                ->mkString(sep: PHP_EOL);
+        }
 
-        $undefinedErrors = ArrayList::collect($this->undefinedErrors)
-            ->map(fn(UndefinedErrorReport $e) => $e->toString())
-            ->mkString(sep: PHP_EOL);
+        if (!empty($this->constraintErrors)) {
+            $parts[] = ArrayList::collect($this->constraintErrors)
+                ->map(fn(ConstraintErrorReport $e) => $e->toString())
+                ->mkString(sep: PHP_EOL);
+        }
 
-        return implode(PHP_EOL, [$typeErrors, $constraintErrors, $undefinedErrors, PHP_EOL]);
+        if (!empty($this->undefinedErrors)) {
+            $parts[] = ArrayList::collect($this->undefinedErrors)
+                ->map(fn(UndefinedErrorReport $e) => $e->toString())
+                ->mkString(sep: PHP_EOL);
+        }
+
+        return implode(PHP_EOL, $parts);
     }
 
     public function jsonSerialize(): array

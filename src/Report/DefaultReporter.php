@@ -6,7 +6,6 @@ namespace Klimick\Decode\Report;
 
 use Klimick\Decode\Constraint\ConstraintError;
 use Klimick\Decode\Context;
-use Klimick\Decode\ContextEntry;
 use Klimick\Decode\Decoder\Error\ConstraintsError;
 use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
 use Klimick\Decode\Decoder\Error\TypeError;
@@ -48,7 +47,7 @@ final class DefaultReporter
         return new ConstraintErrorReport(
             path: self::pathFromContext($error->context),
             constraint: $error->context->firstEntry()->name,
-            value: self::actualValue($error->context->lastEntry()),
+            value: $error->context->lastEntry()->actual,
             payload: $error->payload,
         );
     }
@@ -62,13 +61,8 @@ final class DefaultReporter
             expected: $useShortClassNames
                 ? self::formatExpectedType($lastErr->name)
                 : $lastErr->name,
-            actual: self::actualValue($lastErr),
+            actual: $lastErr->actual,
         );
-    }
-
-    private static function actualValue(ContextEntry $entry): mixed
-    {
-        return is_string($entry->actual) ? "'{$entry->actual}'" : $entry->actual;
     }
 
     private static function formatExpectedType(string $union): string
