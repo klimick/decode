@@ -6,6 +6,7 @@ namespace Klimick\PsalmDecode\Common;
 
 use Fp\Functional\Option\Option;
 use Fp\PsalmToolkit\Toolkit\PsalmApi;
+use Klimick\PsalmDecode\Plugin;
 use Psalm\Aliases;
 use Psalm\Storage\ClassLikeStorage;
 use Psalm\Type\Atomic;
@@ -18,6 +19,7 @@ use function file_put_contents;
 use function Fp\Collection\map;
 use function implode;
 use function is_dir;
+use function mkdir;
 use function sprintf;
 use function str_contains;
 use function str_replace;
@@ -32,7 +34,6 @@ final class MetaMixinGenerator
     
     {{MIXIN_NAMESPACE}}
     
-    /** @psalm-suppress MissingConstructor */
     final class {{MIXIN_NAME}}
     {
     {{PROPS_LIST}}
@@ -48,7 +49,6 @@ final class MetaMixinGenerator
     
     use Closure;
     
-    /** @psalm-suppress MissingConstructor */
     final class {{MIXIN_NAME}}
     {
         /** @var {{UNION_TYPE}} */
@@ -59,7 +59,6 @@ final class MetaMixinGenerator
          *
     {{MATCHER_LIST}}
          * @return T
-         * @psalm-suppress InvalidReturnType
          */
         public function match({{MATCHER_NATIVE_LIST}}): mixed
         {
@@ -70,7 +69,6 @@ final class MetaMixinGenerator
          *
          * @param class-string<T> \$class
          * @psalm-assert-if-true T \$this->value
-         * @psalm-suppress InvalidReturnType
          */
         public function is(string \$class): bool
         {
@@ -90,48 +88,43 @@ final class MetaMixinGenerator
     /**
      * @param array<string, Union> $props
      */
-    public static function saveShapeMixinTemplate(string $mixin_dir, ClassLikeStorage $storage, array $props): void
+    public static function createShapeMetaMixin(ClassLikeStorage $storage, array $props): void
     {
-        self::save($mixin_dir, $storage, self::shapeMixinTemplate($storage, $props));
+        self::save($storage, self::shapeMixinTemplate($storage, $props));
     }
 
     /**
      * @param array<string, Union> $return
      */
-    public static function saveUnionMixinTemplate(string $mixin_dir, ClassLikeStorage $storage, Union $cases): void
+    public static function createUnionMetaMixin(ClassLikeStorage $storage, Union $cases): void
     {
-        self::save($mixin_dir, $storage, self::generateUnionMixin($storage, $cases));
+        self::save($storage, self::generateUnionMixin($storage, $cases));
     }
 
-    private static function save(string $mixin_dir, ClassLikeStorage $storage, string $template): void
+    private static function save(ClassLikeStorage $storage, string $template): void
     {
-        $path = self::mkdir($mixin_dir, $storage);
+        $path = self::mkdir($storage);
         $filename = PsalmApi::$classlikes->toShortName($storage) . 'MetaMixin.php';
 
         file_put_contents("{$path}/{$filename}", $template);
     }
 
-    private static function mkdir(string $mixin_dir, ClassLikeStorage $storage): string
+    private static function mkdir(ClassLikeStorage $storage): string
     {
         $namespace = str_contains($storage->name, '\\')
             ? str_replace('\\' . PsalmApi::$classlikes->toShortName($storage), '', $storage->name)
             : $storage->name;
 
-        if (!is_dir($mixin_dir)) {
-            mkdir($mixin_dir);
+        $dir = implode('/', [
+            Plugin::getFolderForMixins(),
+            ...explode('\\', $namespace),
+        ]);
+
+        if (!is_dir($dir)) {
+            mkdir($dir, recursive: true);
         }
 
-        $current = $mixin_dir;
-
-        foreach (explode('\\', $namespace) as $dir) {
-            $current = "{$current}/{$dir}";
-
-            if (!is_dir($current)) {
-                mkdir($current);
-            }
-        }
-
-        return $current;
+        return $dir;
     }
 
     /**

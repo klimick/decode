@@ -53,7 +53,7 @@ final class InferShapeAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             }
 
             if (Plugin::isMixinGenerationEnabled()) {
-                MetaMixinGenerator::saveShapeMixinTemplate(Plugin::getFolderForMixins(), $storage, $props);
+                MetaMixinGenerator::createShapeMetaMixin($storage, $props);
             }
         });
     }

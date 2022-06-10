@@ -61,7 +61,7 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
             }
 
             if (Plugin::isMixinGenerationEnabled()) {
-                MetaMixinGenerator::saveUnionMixinTemplate(Plugin::getFolderForMixins(), $storage, $cases);
+                MetaMixinGenerator::createUnionMetaMixin($storage, $cases);
             }
         });
     }
