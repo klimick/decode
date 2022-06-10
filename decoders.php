@@ -20,10 +20,11 @@ use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeFunctionReturnTypeP
 
 /**
  * @template T
- * @psalm-pure
  *
  * @param DecoderInterface<T> $with
  * @return Either<non-empty-list<DecodeErrorInterface>, T>
+ *
+ * @psalm-pure
  */
 function decode(mixed $value, DecoderInterface $with): Either
 {
@@ -32,10 +33,11 @@ function decode(mixed $value, DecoderInterface $with): Either
 
 /**
  * @template T
- * @psalm-pure
  *
  * @param DecoderInterface<T> $to
  * @return Option<T>
+ *
+ * @psalm-pure
  */
 function cast(mixed $value, DecoderInterface $to): Option
 {
@@ -48,12 +50,13 @@ function cast(mixed $value, DecoderInterface $to): Option
 
 /**
  * @template T
- * @psalm-pure
  *
  * @param DecoderInterface<T> $to
  * @return T
  *
  * @throws CastException
+ *
+ * @psalm-pure
  */
 function tryCast(mixed $value, DecoderInterface $to): mixed
 {
@@ -65,10 +68,10 @@ function tryCast(mixed $value, DecoderInterface $to): mixed
 }
 
 /**
- * @psalm-pure
- *
  * @param non-empty-list<non-empty-list<DecodeErrorInterface>> $errors
  * @return Either<non-empty-list<DecodeErrorInterface>, empty>
+ *
+ * @psalm-pure
  */
 function invalids(array $errors): Either
 {
@@ -76,9 +79,9 @@ function invalids(array $errors): Either
 }
 
 /**
- * @psalm-pure
- *
  * @return Either<non-empty-list<DecodeErrorInterface>, empty>
+ *
+ * @psalm-pure
  */
 function invalid(Context $context): Either
 {
@@ -89,10 +92,11 @@ function invalid(Context $context): Either
 
 /**
  * @template T
- * @psalm-pure
  *
  * @param T $value
  * @return Either<empty, T>
+ *
+ * @psalm-pure
  */
 function valid(mixed $value): Either
 {
@@ -101,6 +105,7 @@ function valid(mixed $value): Either
 
 /**
  * @return DecoderInterface<mixed>
+ *
  * @psalm-pure
  */
 function mixed(): DecoderInterface
@@ -113,7 +118,9 @@ function mixed(): DecoderInterface
  *
  * @param T $value
  * @return DecoderInterface<T>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
 function constantly(mixed $value): DecoderInterface
 {
@@ -122,6 +129,7 @@ function constantly(mixed $value): DecoderInterface
 
 /**
  * @return DecoderInterface<null>
+ *
  * @psalm-pure
  */
 function null(): DecoderInterface
@@ -131,6 +139,7 @@ function null(): DecoderInterface
 
 /**
  * @return DecoderInterface<int>
+ *
  * @psalm-pure
  */
 function int(): DecoderInterface
@@ -140,6 +149,7 @@ function int(): DecoderInterface
 
 /**
  * @return DecoderInterface<positive-int>
+ *
  * @psalm-pure
  */
 function positiveInt(): DecoderInterface
@@ -149,6 +159,7 @@ function positiveInt(): DecoderInterface
 
 /**
  * @return DecoderInterface<float>
+ *
  * @psalm-pure
  */
 function float(): DecoderInterface
@@ -158,6 +169,7 @@ function float(): DecoderInterface
 
 /**
  * @return DecoderInterface<numeric>
+ *
  * @psalm-pure
  */
 function numeric(): DecoderInterface
@@ -167,6 +179,7 @@ function numeric(): DecoderInterface
 
 /**
  * @return DecoderInterface<numeric-string>
+ *
  * @psalm-pure
  */
 function numericString(): DecoderInterface
@@ -176,6 +189,7 @@ function numericString(): DecoderInterface
 
 /**
  * @return DecoderInterface<bool>
+ *
  * @psalm-pure
  */
 function bool(): DecoderInterface
@@ -185,6 +199,7 @@ function bool(): DecoderInterface
 
 /**
  * @return DecoderInterface<string>
+ *
  * @psalm-pure
  */
 function string(): DecoderInterface
@@ -194,6 +209,7 @@ function string(): DecoderInterface
 
 /**
  * @return DecoderInterface<non-empty-string>
+ *
  * @psalm-pure
  */
 function nonEmptyString(): DecoderInterface
@@ -203,6 +219,7 @@ function nonEmptyString(): DecoderInterface
 
 /**
  * @return DecoderInterface<scalar>
+ *
  * @psalm-pure
  */
 function scalar(): DecoderInterface
@@ -212,6 +229,7 @@ function scalar(): DecoderInterface
 
 /**
  * @return DecoderInterface<DateTimeImmutable>
+ *
  * @psalm-pure
  */
 function datetime(string $timezone = 'UTC', null|string $fromFormat = null): DecoderInterface
@@ -221,6 +239,7 @@ function datetime(string $timezone = 'UTC', null|string $fromFormat = null): Dec
 
 /**
  * @return DecoderInterface<array-key>
+ *
  * @psalm-pure
  */
 function arrayKey(): DecoderInterface
@@ -234,6 +253,7 @@ function arrayKey(): DecoderInterface
  * @param T $head
  * @param T ...$tail
  * @return DecoderInterface<T>
+ *
  * @psalm-pure
  * @no-named-arguments
  */
@@ -247,7 +267,9 @@ function literal(mixed $head, mixed ...$tail): DecoderInterface
  *
  * @param DecoderInterface<T> $decoder
  * @return DecoderInterface<list<T>>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
 function listOf(DecoderInterface $decoder): DecoderInterface
 {
@@ -259,7 +281,9 @@ function listOf(DecoderInterface $decoder): DecoderInterface
  *
  * @param DecoderInterface<T> $decoder
  * @return DecoderInterface<non-empty-list<T>>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
 function nonEmptyListOf(DecoderInterface $decoder): DecoderInterface
 {
@@ -270,28 +294,32 @@ function nonEmptyListOf(DecoderInterface $decoder): DecoderInterface
  * @template K of array-key
  * @template V
  *
- * @param DecoderInterface<K> $keyDecoder
- * @param DecoderInterface<V> $valDecoder
+ * @param DecoderInterface<K> $key
+ * @param DecoderInterface<V> $value
  * @return DecoderInterface<array<K, V>>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
-function arrayOf(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): DecoderInterface
+function arrayOf(DecoderInterface $key, DecoderInterface $value): DecoderInterface
 {
-    return new ArrayOfDecoder($keyDecoder, $valDecoder);
+    return new ArrayOfDecoder($key, $value);
 }
 
 /**
  * @template K of array-key
  * @template V
  *
- * @param DecoderInterface<K> $keyDecoder
- * @param DecoderInterface<V> $valDecoder
+ * @param DecoderInterface<K> $key
+ * @param DecoderInterface<V> $value
  * @return DecoderInterface<non-empty-array<K, V>>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
-function nonEmptyArrayOf(DecoderInterface $keyDecoder, DecoderInterface $valDecoder): DecoderInterface
+function nonEmptyArrayOf(DecoderInterface $key, DecoderInterface $value): DecoderInterface
 {
-    return new NonEmptyArrayOfDecoder($keyDecoder, $valDecoder);
+    return new NonEmptyArrayOfDecoder($key, $value);
 }
 
 /**
@@ -299,7 +327,9 @@ function nonEmptyArrayOf(DecoderInterface $keyDecoder, DecoderInterface $valDeco
  *
  * @param DecoderInterface<T> $decoder
  * @return DecoderInterface<T>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
 function fromJson(DecoderInterface $decoder): DecoderInterface
 {
@@ -311,7 +341,9 @@ function fromJson(DecoderInterface $decoder): DecoderInterface
  *
  * @param DecoderInterface<T> $decoder
  * @return DecoderInterface<Option<T>>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
 function option(DecoderInterface $decoder): DecoderInterface
 {
@@ -325,7 +357,9 @@ function option(DecoderInterface $decoder): DecoderInterface
  * @param DecoderInterface<TLeft> $left
  * @param DecoderInterface<TRight> $right
  * @return DecoderInterface<Either<TLeft, TRight>>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
 function either(DecoderInterface $left, DecoderInterface $right): DecoderInterface
 {
@@ -334,29 +368,31 @@ function either(DecoderInterface $left, DecoderInterface $right): DecoderInterfa
 
 /**
  * @return ShapeDecoder<array<string, mixed>>
+ * @see ShapeFunctionReturnTypeProvider
  *
  * @psalm-pure
- * @see ShapeFunctionReturnTypeProvider
  */
-function shape(DecoderInterface ...$decoders): ShapeDecoder
+function shape(DecoderInterface ...$properties): ShapeDecoder
 {
     /**
      * Validated via psalm plugin hook at this moment
-     * @psalm-var array<int|string, DecoderInterface> $decoders
+     * @psalm-var array<int|string, DecoderInterface> $properties
      */
-    return new ShapeDecoder($decoders);
+    return new ShapeDecoder($properties);
 }
 
 /**
  * @template T
  *
- * @param class-string<T> $objectClass
+ * @param class-string<T> $class
  * @return ObjectDecoderFactory<T>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
-function object(string $objectClass): ObjectDecoderFactory
+function object(string $class): ObjectDecoderFactory
 {
-    return new ObjectDecoderFactory($objectClass);
+    return new ObjectDecoderFactory($class);
 }
 
 /**
@@ -364,6 +400,7 @@ function object(string $objectClass): ObjectDecoderFactory
  *
  * @param class-string<T> $of
  * @return DecoderInterface<T>
+ *
  * @psalm-pure
  */
 function instance(string $of): DecoderInterface
@@ -376,7 +413,9 @@ function instance(string $of): DecoderInterface
  *
  * @psalm-param pure-callable(): DecoderInterface<T> $type
  * @return DecoderInterface<T>
+ *
  * @psalm-pure
+ * @no-named-arguments
  */
 function rec(callable $type): DecoderInterface
 {
@@ -386,20 +425,22 @@ function rec(callable $type): DecoderInterface
 /**
  * @template T
  *
- * @param DecoderInterface<T> $first
- * @param DecoderInterface<T> $second
+ * @param DecoderInterface<T> $head
+ * @param DecoderInterface<T> $middle
  * @param DecoderInterface<T> ...$rest
  * @return UnionDecoder<T>
+ *
  * @psalm-pure
  * @no-named-arguments
  */
-function union(DecoderInterface $first, DecoderInterface $second, DecoderInterface ...$rest): UnionDecoder
+function union(DecoderInterface $head, DecoderInterface $middle, DecoderInterface ...$rest): UnionDecoder
 {
-    return new UnionDecoder([$first, $second, ...$rest]);
+    return new UnionDecoder([$head, $middle, ...$rest]);
 }
 
 /**
  * @param non-empty-string $with
+ *
  * @psalm-pure
  */
 function tagged(string $with): TaggedUnionDecoderFactory
@@ -410,20 +451,21 @@ function tagged(string $with): TaggedUnionDecoderFactory
 /**
  * @template T of array
  *
- * @param ShapeDecoder<T> $first
- * @param ShapeDecoder<T> $second
+ * @param ShapeDecoder<T> $head
+ * @param ShapeDecoder<T> $middle
  * @param ShapeDecoder<T> ...$rest
  * @return ShapeDecoder<array<string, mixed>>
  *
+ * @see IntersectionFunctionReturnTypeProvider
+ *
  * @psalm-pure
  * @no-named-arguments
- * @see IntersectionFunctionReturnTypeProvider
  */
-function intersection(ShapeDecoder $first, ShapeDecoder $second, ShapeDecoder ...$rest): ShapeDecoder
+function intersection(ShapeDecoder $head, ShapeDecoder $middle, ShapeDecoder ...$rest): ShapeDecoder
 {
     $toMerge = array_map(
         fn(ShapeDecoder $decoder) => $decoder->decoders,
-        [$first, $second, ...$rest],
+        [$head, $middle, ...$rest],
     );
 
     return new ShapeDecoder(array_merge(...$toMerge));
