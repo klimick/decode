@@ -63,9 +63,17 @@ final class ObjectMethodReturnTypeProvider implements MethodReturnTypeProviderIn
      */
     private static function toExpectedDecoderProps(ClassLikeStorage $storage): array
     {
-        return map($storage->properties, fn(PropertyStorage $property) => null !== $property->type
-            ? PsalmApi::$types->expandUnion($storage->name, $property->type)
-            : Type::getMixed());
+        return map($storage->properties, function(PropertyStorage $property) use ($storage) {
+            if (null === $property->type) {
+                return Type::getMixed();
+            }
+
+            $type = PsalmApi::$types->expandUnion($storage->name, $property->type);
+
+            return $property->has_default
+                ? PsalmApi::$types->asPossiblyUndefined($type)
+                : $type;
+        });
     }
 
     /**
@@ -104,8 +112,14 @@ final class ObjectMethodReturnTypeProvider implements MethodReturnTypeProviderIn
 
         foreach ($expected_shape as $property => $type) {
             if (!array_key_exists($property, $actual_shape)) {
-                $missing_properties[] = $property;
-            } elseif (!PsalmApi::$types->isTypeContainedByType($actual_shape[$property], $type)) {
+                if (!$type->possibly_undefined) {
+                    $missing_properties[] = $property;
+                }
+
+                continue;
+            }
+
+            if (!PsalmApi::$types->isTypeContainedByType($actual_shape[$property], $type)) {
                 $issue = new Issue\InvalidDecoderForProperty(
                     property: $property,
                     actual_type: $actual_shape[$property],

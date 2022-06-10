@@ -96,6 +96,25 @@ final class DecoderTest extends PsalmTest
                 type: 'RequiredObjectPropertyMissing',
                 message: 'Required decoders for properties missed: "age"',
             );
+
+        StaticTestCase::describe('Property with default value does not require decoder')
+            ->haveCode(function() {
+                return new class(0)
+                {
+                    public function __construct(
+                        public int $id,
+                        public string $name = 'no-name',
+                    ) {}
+
+                    /**
+                     * @return DecoderInterface<self>
+                     */
+                    public static function decoder(): DecoderInterface
+                    {
+                        return object(self::class)(id: int());
+                    }
+                };
+            });
     }
 
     public function testObjectDecoderNonexistentPropertyObjectPropertyIssue(): void
