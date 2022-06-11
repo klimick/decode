@@ -367,7 +367,7 @@ function either(DecoderInterface $left, DecoderInterface $right): DecoderInterfa
 }
 
 /**
- * @return ShapeDecoder<array<string, mixed>>
+ * @return ShapeDecoder<array<array-key, mixed>>
  * @see ShapeFunctionReturnTypeProvider
  *
  * @psalm-pure
@@ -454,7 +454,7 @@ function tagged(string $with): TaggedUnionDecoderFactory
  * @param ShapeDecoder<T> $head
  * @param ShapeDecoder<T> $middle
  * @param ShapeDecoder<T> ...$rest
- * @return ShapeDecoder<array<string, mixed>>
+ * @return ShapeDecoder<array<array-key, mixed>>
  *
  * @see IntersectionFunctionReturnTypeProvider
  *
