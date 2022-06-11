@@ -34,7 +34,7 @@ final class AllOfConstraint implements ConstraintInterface
     public function check(Context $context, mixed $value): iterable
     {
         foreach ($this->constraints as $constraint) {
-            yield from $constraint->check($context($constraint->name(), $value), $value);
+            yield from $constraint->check($context($constraint, $value), $value);
         }
     }
 }

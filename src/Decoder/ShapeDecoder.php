@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
-use Fp\Functional\Option\Option;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
 use Klimick\Decode\Decoder\Error\UndefinedError;
@@ -77,15 +76,8 @@ final class ShapeDecoder extends AbstractDecoder
                 continue;
             }
 
-            if (self::isUndefined($decodedKV->get())) {
-                if ($decoder->isPossiblyUndefined()) {
-                    continue;
-                }
-
-                if ($decoder instanceof OptionDecoder) {
-                    $decoded[$key] = Option::none();
-                    continue;
-                }
+            if (self::isUndefined($decodedKV->get()) && $decoder->isPossiblyUndefined()) {
+                continue;
             }
 
             $errors[] = $decodedKV->get();

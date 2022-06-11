@@ -32,14 +32,14 @@ final class NotConstraint implements ConstraintInterface
     {
         $hasErrors = false;
 
-        foreach ($this->constraint->check($context($this->constraint->name(), $value), $value) as $_) {
+        foreach ($this->constraint->check($context($this->constraint, $value), $value) as $_) {
             $hasErrors = true;
             break;
         }
 
         if (!$hasErrors) {
             yield invalid(
-                context: $context($this->constraint->name(), $value),
+                context: $context($this->constraint, $value),
                 constraint: $this->constraint,
             );
         }

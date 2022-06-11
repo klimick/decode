@@ -33,14 +33,14 @@ final class EveryConstraint implements ConstraintInterface
         $hasErrors = false;
 
         foreach ($value as $k => $v) {
-            foreach ($this->constraint->check($context($this->constraint->name(), $v, (string) $k), $v) as $_) {
+            foreach ($this->constraint->check($context($this->constraint, $v, $k), $v) as $_) {
                 $hasErrors = true;
             }
         }
 
         if ($hasErrors) {
             yield invalid(
-                context: $context($this->constraint->name(), $value),
+                context: $context($this->constraint, $value),
                 constraint: $this->constraint,
             );
         }

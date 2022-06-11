@@ -35,6 +35,6 @@ final class UnionDecoder extends AbstractDecoder
             }
         }
 
-        return invalid($context($this->name(), $value));
+        return invalid($context($this, $value));
     }
 }

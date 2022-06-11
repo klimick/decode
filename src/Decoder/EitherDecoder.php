@@ -41,7 +41,7 @@ final class EitherDecoder extends AbstractDecoder
             ->map(fn($decoded) => Either::right($decoded));
 
         return $left->orElse($right)->mapLeft(fn() => [
-            new TypeError($context($this->name(), $value)),
+            new TypeError($context($this, $value)),
         ]);
     }
 }

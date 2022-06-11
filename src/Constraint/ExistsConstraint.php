@@ -33,7 +33,7 @@ final class ExistsConstraint implements ConstraintInterface
         foreach ($value as $k => $v) {
             $hasErrors = false;
 
-            foreach ($this->constraint->check($context($this->constraint->name(), $v, (string) $k), $v) as $_) {
+            foreach ($this->constraint->check($context($this->constraint, $v, $k), $v) as $_) {
                 $hasErrors = true;
             }
 
@@ -43,7 +43,7 @@ final class ExistsConstraint implements ConstraintInterface
         }
 
         yield invalid(
-            context: $context($this->constraint->name(), $value),
+            context: $context($this->constraint, $value),
             constraint: $this->constraint,
         );
     }

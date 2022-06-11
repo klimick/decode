@@ -36,7 +36,7 @@ final class AnyOfConstraint implements ConstraintInterface
         $hasErrors = false;
 
         foreach ($this->constraints as $constraint) {
-            foreach ($constraint->check($context($constraint->name(), $value), $value) as $error) {
+            foreach ($constraint->check($context($constraint, $value), $value) as $error) {
                 yield $error;
                 $hasErrors = true;
             }

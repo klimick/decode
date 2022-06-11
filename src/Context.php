@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Klimick\Decode;
 
+use Klimick\Decode\Constraint\ConstraintInterface;
+use Klimick\Decode\Decoder\DecoderInterface;
+
 /**
  * @psalm-immutable
  */
@@ -24,9 +27,9 @@ final class Context
         ]);
     }
 
-    public function __invoke(string $name, mixed $actual, string $key = ''): self
+    public function __invoke(DecoderInterface|ConstraintInterface $name, mixed $actual, string|int $key = ''): self
     {
-        return new self([...$this->entries, new ContextEntry($name, $actual, $key)]);
+        return new self([...$this->entries, new ContextEntry($name->name(), $actual, (string) $key)]);
     }
 
     public function firstEntry(): ContextEntry

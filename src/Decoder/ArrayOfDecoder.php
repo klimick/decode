@@ -19,17 +19,17 @@ use function is_int;
 final class ArrayOfDecoder extends AbstractDecoder
 {
     /**
-     * @param DecoderInterface<TKey> $keyDecoder
-     * @param DecoderInterface<TVal> $valDecoder
+     * @param DecoderInterface<TKey> $key
+     * @param DecoderInterface<TVal> $value
      */
     public function __construct(
-        public DecoderInterface $keyDecoder,
-        public DecoderInterface $valDecoder,
+        public DecoderInterface $key,
+        public DecoderInterface $value,
     ) { }
 
     public function name(): string
     {
-        return "array<{$this->keyDecoder->name()}, {$this->valDecoder->name()}>";
+        return "array<{$this->key->name()}, {$this->value->name()}>";
     }
 
     public function decode(mixed $value, Context $context): Either
@@ -41,12 +41,12 @@ final class ArrayOfDecoder extends AbstractDecoder
         $decoded = [];
         $errors = [];
 
-        $checkIntToStringCoercion = $this->keyDecoder instanceof StringDecoder;
+        $checkIntToStringCoercion = $this->key instanceof StringDecoder;
 
         /** @psalm-suppress MixedAssignment */
         foreach ($value as $k => $v) {
-            $decodedK = $this->keyDecoder->decode($k, $context($this->keyDecoder->name(), $k, (string) $k));
-            $decodedV = $this->valDecoder->decode($v, $context($this->valDecoder->name(), $v, (string) $k));
+            $decodedK = $this->key->decode($k, $context($this->key, $k, $k));
+            $decodedV = $this->value->decode($v, $context($this->value, $v, $k));
 
             if ($decodedV->isLeft()) {
                 $errors[] = $decodedV->get();
@@ -62,7 +62,7 @@ final class ArrayOfDecoder extends AbstractDecoder
                 // PHP don't see difference between '1' and 1 for array key.
                 if ($checkIntToStringCoercion && is_int(array_key_last($decoded))) {
                     $errors[] = [
-                        new TypeError($context($this->keyDecoder->name(), (int) $k, (string) $k)),
+                        new TypeError($context($this->key, (int) $k, $k)),
                     ];
                 }
             }
