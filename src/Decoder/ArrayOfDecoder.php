@@ -8,6 +8,7 @@ use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use Klimick\Decode\Decoder\Error\TypeError;
 use function array_key_last;
+use function is_array;
 use function is_int;
 
 /**
@@ -42,11 +43,18 @@ final class ArrayOfDecoder extends AbstractDecoder
         $errors = [];
 
         $checkIntToStringCoercion = $this->key instanceof StringDecoder;
+        $keyHasAliases = !empty($this->key->getAliases());
+        $valueHasAliases = !empty($this->value->getAliases());
 
         /** @psalm-suppress MixedAssignment */
         foreach ($value as $k => $v) {
-            $decodedK = $this->key->decode($k, $context($this->key, $k, $k));
-            $decodedV = $this->value->decode($v, $context($this->value, $v, $k));
+            $decodedK = $keyHasAliases
+                ? ShapeAccessor::decodeProperty($context, $this->key, $k, $v)
+                : $this->key->decode($k, $context($this->key, $k, $k));
+
+            $decodedV = $valueHasAliases
+                ? ShapeAccessor::decodeProperty($context, $this->value, $k, $v)
+                : $this->value->decode($v, $context($this->value, $v, $k));
 
             if ($decodedV->isLeft()) {
                 $errors[] = $decodedV->get();

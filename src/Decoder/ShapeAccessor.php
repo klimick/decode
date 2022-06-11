@@ -32,10 +32,14 @@ final class ShapeAccessor
         Context $context,
         DecoderInterface $decoder,
         int|string $key,
-        array $shape,
+        mixed $shape,
     ): Either {
         if ($decoder instanceof ConstantlyDecoder) {
             return Either::right($decoder->constant);
+        }
+
+        if (!is_array($shape)) {
+            return self::undefinedError($context, $decoder, $key);
         }
 
         return at($shape, $key)
@@ -54,15 +58,23 @@ final class ShapeAccessor
                             return Either::right(Option::none());
                         }
 
-                        return Either::left([
-                            new UndefinedError(
-                                $context($decoder, actual: null, key: (string) $key),
-                                $decoder->getAliases(),
-                            ),
-                        ]);
+                        return self::undefinedError($context, $decoder, $key);
                     },
                 ),
             );
+    }
+
+    /**
+     * @return Either<non-empty-list<DecodeErrorInterface>, never>
+     */
+    private static function undefinedError(Context $context, DecoderInterface $decoder, int|string $key): Either
+    {
+        return Either::left([
+            new UndefinedError(
+                $context($decoder, actual: null, key: $key),
+                $decoder->getAliases(),
+            ),
+        ]);
     }
 
     /**

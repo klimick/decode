@@ -7,8 +7,9 @@ namespace Klimick\Decode\Decoder;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Context;
 use function array_is_list;
-use function Fp\Collection\every;
+use function Fp\Collection\exists;
 use function Fp\Collection\keys;
+use function is_int;
 
 /**
  * @template A
@@ -29,7 +30,7 @@ final class ArrayListOfDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
-        if (!is_array($value) || !every(keys($value), 'is_int')) {
+        if (!is_array($value) || exists(keys($value), fn($k) => !is_int($k))) {
             return invalid($context);
         }
 
