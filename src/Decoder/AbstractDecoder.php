@@ -41,16 +41,16 @@ abstract class AbstractDecoder implements DecoderInterface
     }
 
     /**
-     * @param non-empty-string $alias
-     * @param non-empty-string ...$rest
+     * @param non-empty-string $head
+     * @param non-empty-string ...$tail
      * @return DecoderInterface<T>
      *
      * @no-named-arguments
      */
-    public function from(string $alias, string ...$rest): DecoderInterface
+    public function from(string $head, string ...$tail): DecoderInterface
     {
         $self = clone $this;
-        $self->aliases = [$alias, ...$rest];
+        $self->aliases = [$head, ...$tail];
 
         return $self;
     }
@@ -89,15 +89,15 @@ abstract class AbstractDecoder implements DecoderInterface
     /**
      * @template ContravariantT
      *
-     * @param ConstraintInterface<ContravariantT> $first
-     * @param ConstraintInterface<ContravariantT> ...$rest
+     * @param ConstraintInterface<ContravariantT> $head
+     * @param ConstraintInterface<ContravariantT> ...$tail
      * @return DecoderInterface<T>
      *
      * @no-named-arguments
      */
-    public function constrained(ConstraintInterface $first, ConstraintInterface ...$rest): DecoderInterface
+    public function constrained(ConstraintInterface $head, ConstraintInterface ...$tail): DecoderInterface
     {
-        return new ConstrainedDecoder([$first, ...$rest], $this);
+        return (new ConstrainedDecoder([$head, ...$tail], $this))->from(...$this->aliases);
     }
 
     /**
@@ -108,6 +108,6 @@ abstract class AbstractDecoder implements DecoderInterface
      */
     public function map(Closure $to): DecoderInterface
     {
-        return new MapDecoder($this, $to);
+        return (new MapDecoder($this, $to))->from(...$this->aliases);
     }
 }

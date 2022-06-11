@@ -42,12 +42,12 @@ final class ShapeAccessor
             return self::undefinedError($context, $decoder, $key);
         }
 
-        return at($shape, $key)
-            ->orElse(fn() => Stream::emits($decoder->getAliases())
-                ->filterMap(fn($alias) => '$' !== $alias
-                    ? self::dotAccess(tail(explode('.', $alias)), $shape)
-                    : Option::some($shape))
-                ->firstElement())
+        return Stream::emits($decoder->getAliases())
+            ->filterMap(fn($alias) => '$' !== $alias
+                ? self::dotAccess(tail(explode('.', $alias)), $shape)
+                : Option::some($shape))
+            ->firstElement()
+            ->orElse(fn() => at($shape, $key))
             ->fold(
                 ifSome: fn($v) => $decoder->decode($v, $context($decoder, actual: $v, key: (string) $key)),
                 ifNone: fn() => $decoder->getDefault()->fold(

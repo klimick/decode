@@ -32,13 +32,13 @@ interface DecoderInterface
      * @template ContravariantT
      * @no-named-arguments
      *
-     * @param ConstraintInterface<ContravariantT> $first
-     * @param ConstraintInterface<ContravariantT> ...$rest
+     * @param ConstraintInterface<ContravariantT> $head
+     * @param ConstraintInterface<ContravariantT> ...$tail
      * @return DecoderInterface<T>
      *
      * @see ConstrainedMethodReturnTypeProvider Contravariant check happens via plugin
      */
-    public function constrained(ConstraintInterface $first, ConstraintInterface ...$rest): DecoderInterface;
+    public function constrained(ConstraintInterface $head, ConstraintInterface ...$tail): DecoderInterface;
 
     /**
      * @return DecoderInterface<T> & object{possiblyUndefined: true}
@@ -48,13 +48,13 @@ interface DecoderInterface
     public function isPossiblyUndefined(): bool;
 
     /**
-     * @param non-empty-string $alias
-     * @param non-empty-string ...$rest
+     * @param non-empty-string $head
+     * @param non-empty-string ...$tail
      * @return DecoderInterface<T>
      *
      * @no-named-arguments
      */
-    public function from(string $alias, string ...$rest): DecoderInterface;
+    public function from(string $head, string ...$tail): DecoderInterface;
 
     /**
      * @return list<non-empty-string>

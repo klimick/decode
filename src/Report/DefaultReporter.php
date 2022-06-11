@@ -76,10 +76,12 @@ final class DefaultReporter
 
     private static function pathFromContext(Context $context): string
     {
-        return preg_replace(
+        $path = preg_replace(
             self::INDEXED_ACCESS_WITHOUT_BRACKETS,
             self::TO_INDEXED_ACCESS_WITH_BRACKETS,
             $context->path(),
         );
+
+        return $path === '$.__root_value__' ? '$' : $path;
     }
 }
