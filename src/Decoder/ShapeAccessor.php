@@ -66,6 +66,7 @@ final class ShapeAccessor
 
     /**
      * @return Either<non-empty-list<DecodeErrorInterface>, never>
+     * @psalm-pure
      */
     private static function undefinedError(Context $context, DecoderInterface $decoder, int|string $key): Either
     {
