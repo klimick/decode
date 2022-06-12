@@ -27,14 +27,18 @@ final class UnionDecoder extends AbstractDecoder
 
     public function decode(mixed $value, Context $context): Either
     {
+        $errors = [];
+
         foreach ($this->decoders as $decoder) {
             $decoded = $decoder->decode($value, $context);
 
             if ($decoded->isRight()) {
                 return valid($decoded->get());
             }
+
+            $errors[] = $decoded->get();
         }
 
-        return invalid($context($this, $value));
+        return invalids($errors);
     }
 }
