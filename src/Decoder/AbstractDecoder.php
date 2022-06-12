@@ -26,7 +26,7 @@ abstract class AbstractDecoder implements DecoderInterface
     /**
      * @return DecoderInterface<T> & object{possiblyUndefined: true}
      */
-    public function orUndefined(): DecoderInterface
+    final public function orUndefined(): DecoderInterface
     {
         $self = clone $this;
         $self->possiblyUndefined = true;
@@ -35,7 +35,7 @@ abstract class AbstractDecoder implements DecoderInterface
         return $self;
     }
 
-    public function isPossiblyUndefined(): bool
+    final public function isPossiblyUndefined(): bool
     {
         return $this->possiblyUndefined;
     }
@@ -47,7 +47,7 @@ abstract class AbstractDecoder implements DecoderInterface
      *
      * @no-named-arguments
      */
-    public function from(string $head, string ...$tail): DecoderInterface
+    final public function from(string $head, string ...$tail): DecoderInterface
     {
         $self = clone $this;
         $self->aliases = [$head, ...$tail];
@@ -58,7 +58,7 @@ abstract class AbstractDecoder implements DecoderInterface
     /**
      * @return list<non-empty-string>
      */
-    public function getAliases(): array
+    final public function getAliases(): array
     {
         return $this->aliases;
     }
@@ -67,7 +67,7 @@ abstract class AbstractDecoder implements DecoderInterface
      * @param T $value
      * @return DecoderInterface<T>
      */
-    public function default(mixed $value): DecoderInterface
+    final public function default(mixed $value): DecoderInterface
     {
         $self = clone $this;
         $self->default = $value;
@@ -95,7 +95,7 @@ abstract class AbstractDecoder implements DecoderInterface
      *
      * @no-named-arguments
      */
-    public function constrained(ConstraintInterface $head, ConstraintInterface ...$tail): DecoderInterface
+    final public function constrained(ConstraintInterface $head, ConstraintInterface ...$tail): DecoderInterface
     {
         return !empty($this->aliases)
             ? (new ConstrainedDecoder([$head, ...$tail], $this))->from(...$this->aliases)
@@ -108,7 +108,7 @@ abstract class AbstractDecoder implements DecoderInterface
      * @param Closure(T): TMapped $to
      * @return DecoderInterface<TMapped>
      */
-    public function map(Closure $to): DecoderInterface
+    final public function map(Closure $to): DecoderInterface
     {
         return !empty($this->aliases)
             ? (new MapDecoder($this, $to))->from(...$this->aliases)
