@@ -10,7 +10,7 @@ namespace Klimick\Decode\Test\Static\Fixtures;
 final class PartialPerson
 {
     public function __construct(
-        public ?string $name,
-        public ?int $age,
+        public ?string $maybeName,
+        public ?int $maybeAge,
     ) {}
 }

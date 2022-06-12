@@ -17,7 +17,7 @@ final class UndefinedErrorReport
          * @psalm-readonly
          * @var list<string>
          */
-        public array $aliases,
+        public array $aliases = [],
     ) {}
 
     public function toString(): string
