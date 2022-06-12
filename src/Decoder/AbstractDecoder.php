@@ -97,7 +97,9 @@ abstract class AbstractDecoder implements DecoderInterface
      */
     public function constrained(ConstraintInterface $head, ConstraintInterface ...$tail): DecoderInterface
     {
-        return (new ConstrainedDecoder([$head, ...$tail], $this))->from(...$this->aliases);
+        return !empty($this->aliases)
+            ? (new ConstrainedDecoder([$head, ...$tail], $this))->from(...$this->aliases)
+            : (new ConstrainedDecoder([$head, ...$tail], $this));
     }
 
     /**
@@ -108,6 +110,8 @@ abstract class AbstractDecoder implements DecoderInterface
      */
     public function map(Closure $to): DecoderInterface
     {
-        return (new MapDecoder($this, $to))->from(...$this->aliases);
+        return !empty($this->aliases)
+            ? (new MapDecoder($this, $to))->from(...$this->aliases)
+            : (new MapDecoder($this, $to));
     }
 }
