@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithNested;
 use Klimick\Decode\Context;
 
 /**
@@ -16,16 +17,16 @@ final class NotConstraint implements ConstraintInterface
     /**
      * @param ConstraintInterface<T> $constraint
      */
-    public function __construct(public ConstraintInterface $constraint) { }
+    public function __construct(
+        public ConstraintInterface $constraint,
+    ) {}
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithNested
     {
-        return "NOT.{$this->constraint->name()}";
-    }
-
-    public function payload(): array
-    {
-        return $this->constraint->payload();
+        return ConstraintMetaWithNested::of(
+            name: 'NOT',
+            nested: $this->constraint->metadata(),
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -38,10 +39,7 @@ final class NotConstraint implements ConstraintInterface
         }
 
         if (!$hasErrors) {
-            yield invalid(
-                context: $context($this->constraint, $value),
-                constraint: $this->constraint,
-            );
+            yield invalid($context($this->constraint, $value));
         }
     }
 }

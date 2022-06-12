@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Klimick\Decode\Report;
 
 use Klimick\Decode\Constraint\ConstraintError;
+use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
+use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\Error\ConstraintsError;
 use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
 use Klimick\Decode\Decoder\Error\TypeError;
 use Klimick\Decode\Decoder\Error\UndefinedError;
 use ReflectionClass;
+use function assert;
 use function Fp\Collection\map;
 
 final class DefaultReporter
@@ -44,23 +47,26 @@ final class DefaultReporter
 
     private static function reportConstraintError(ConstraintError $error): ConstraintErrorReport
     {
+        $firstErr = $error->context->firstEntry();
+        assert($firstErr->instance instanceof ConstraintInterface);
+
         return new ConstraintErrorReport(
             path: self::pathFromContext($error->context),
-            constraint: $error->context->firstEntry()->name,
             value: $error->context->lastEntry()->actual,
-            payload: $error->payload,
+            meta: $firstErr->instance->metadata(),
         );
     }
 
     private static function reportTypeError(TypeError $error, bool $useShortClassNames): TypeErrorReport
     {
         $lastErr = $error->context->lastEntry();
+        assert($lastErr->instance instanceof DecoderInterface);
 
         return new TypeErrorReport(
             path: self::pathFromContext($error->context),
             expected: $useShortClassNames
-                ? self::formatExpectedType($lastErr->name)
-                : $lastErr->name,
+                ? self::formatExpectedType($lastErr->instance->name())
+                : $lastErr->instance->name(),
             actual: $lastErr->actual,
         );
     }

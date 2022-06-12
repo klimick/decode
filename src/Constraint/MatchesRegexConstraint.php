@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
 use Klimick\Decode\Context;
 
 /**
@@ -12,16 +13,18 @@ use Klimick\Decode\Context;
  */
 final class MatchesRegexConstraint implements ConstraintInterface
 {
-    public function __construct(public string $regex) { }
+    public function __construct(
+        public string $regex,
+    ) {}
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithPayload
     {
-        return 'MATCHES_REGEX';
-    }
-
-    public function payload(): array
-    {
-        return ['mustMatchesTo' => $this->regex];
+        return ConstraintMetaWithPayload::of(
+            name: 'MATCHES_REGEX',
+            payload: [
+                'mustMatchesTo' => $this->regex,
+            ],
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -30,6 +33,6 @@ final class MatchesRegexConstraint implements ConstraintInterface
             return;
         }
 
-        yield invalid($context, $this);
+        yield invalid($context);
     }
 }

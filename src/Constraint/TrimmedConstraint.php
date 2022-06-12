@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
 use Klimick\Decode\Context;
 
 /**
@@ -12,16 +13,14 @@ use Klimick\Decode\Context;
  */
 final class TrimmedConstraint implements ConstraintInterface
 {
-    public function name(): string
+    public function metadata(): ConstraintMetaWithPayload
     {
-        return 'TRIMMED';
-    }
-
-    public function payload(): array
-    {
-        return [
-            'message' => 'Value must not contain leading or trailing whitespaces',
-        ];
+        return ConstraintMetaWithPayload::of(
+            name: 'TRIMMED',
+            payload: [
+                'message' => 'Value must not contain leading or trailing whitespaces',
+            ],
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -30,6 +29,6 @@ final class TrimmedConstraint implements ConstraintInterface
             return;
         }
 
-        yield invalid($context, $this);
+        yield invalid($context);
     }
 }

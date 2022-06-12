@@ -32,11 +32,11 @@ function decode(mixed $value, DecoderInterface $with): Either
 
     if ($hasAliases) {
         return shape(__root_value__: $with)
-            ->decode($value, Context::root($with->name(), $value))
+            ->decode($value, Context::root($with, $value))
             ->map(fn($decoded) => $decoded['__root_value__']);
     }
 
-    return $with->decode($value, Context::root($with->name(), $value));
+    return $with->decode($value, Context::root($with, $value));
 }
 
 /**

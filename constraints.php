@@ -9,9 +9,9 @@ use Klimick\Decode\Context;
 /**
  * @psalm-pure
  */
-function invalid(Context $context, ConstraintInterface $constraint): ConstraintError
+function invalid(Context $context): ConstraintError
 {
-    return new ConstraintError($context, $constraint->name(), $constraint->payload());
+    return new ConstraintError($context);
 }
 
 /**
@@ -23,7 +23,7 @@ function invalid(Context $context, ConstraintInterface $constraint): ConstraintE
  */
 function equal(mixed $to): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\EqualConstraint($to);
+    return new EqualConstraint($to);
 }
 
 /**
@@ -34,8 +34,8 @@ function equal(mixed $to): ConstraintInterface
  */
 function greater(mixed $than): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\ComparisonConstraint(
-        type: \Klimick\Decode\Constraint\ComparisonConstraint::OP_GREATER,
+    return new ComparisonConstraint(
+        type: ComparisonConstraint::OP_GREATER,
         value: $than,
     );
 }
@@ -48,8 +48,8 @@ function greater(mixed $than): ConstraintInterface
  */
 function greaterOrEqual(mixed $to): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\ComparisonConstraint(
-        type: \Klimick\Decode\Constraint\ComparisonConstraint::OP_GREATER_OR_EQUAL,
+    return new ComparisonConstraint(
+        type: ComparisonConstraint::OP_GREATER_OR_EQUAL,
         value: $to,
     );
 }
@@ -62,8 +62,8 @@ function greaterOrEqual(mixed $to): ConstraintInterface
  */
 function less(mixed $than): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\ComparisonConstraint(
-        type: \Klimick\Decode\Constraint\ComparisonConstraint::OP_LESS,
+    return new ComparisonConstraint(
+        type: ComparisonConstraint::OP_LESS,
         value: $than,
     );
 }
@@ -76,8 +76,8 @@ function less(mixed $than): ConstraintInterface
  */
 function lessOrEqual(mixed $to): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\ComparisonConstraint(
-        type: \Klimick\Decode\Constraint\ComparisonConstraint::OP_LESS_OR_EQUAL,
+    return new ComparisonConstraint(
+        type: ComparisonConstraint::OP_LESS_OR_EQUAL,
         value: $to,
     );
 }
@@ -91,7 +91,7 @@ function lessOrEqual(mixed $to): ConstraintInterface
  */
 function inRange(mixed $from, mixed $to): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\InRangeConstraint($from, $to);
+    return new InRangeConstraint($from, $to);
 }
 
 /**
@@ -102,7 +102,7 @@ function inRange(mixed $from, mixed $to): ConstraintInterface
  */
 function minLength(int $is): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\MinLengthConstraint($is);
+    return new MinLengthConstraint($is);
 }
 
 /**
@@ -113,7 +113,7 @@ function minLength(int $is): ConstraintInterface
  */
 function maxLength(int $is): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\MaxLengthConstraint($is);
+    return new MaxLengthConstraint($is);
 }
 
 /**
@@ -124,7 +124,7 @@ function maxLength(int $is): ConstraintInterface
  */
 function startsWith(string $string): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\StartsWithConstraint($string);
+    return new StartsWithConstraint($string);
 }
 
 /**
@@ -135,7 +135,7 @@ function startsWith(string $string): ConstraintInterface
  */
 function endsWith(string $string): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\EndsWithConstraint($string);
+    return new EndsWithConstraint($string);
 }
 
 /**
@@ -145,7 +145,7 @@ function endsWith(string $string): ConstraintInterface
  */
 function uuid(): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\UuidConstraint();
+    return new UuidConstraint();
 }
 
 /**
@@ -155,7 +155,7 @@ function uuid(): ConstraintInterface
  */
 function trimmed(): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\TrimmedConstraint();
+    return new TrimmedConstraint();
 }
 
 /**
@@ -166,7 +166,7 @@ function trimmed(): ConstraintInterface
  */
 function matchesRegex(string $regex): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\MatchesRegexConstraint($regex);
+    return new MatchesRegexConstraint($regex);
 }
 
 /**
@@ -178,7 +178,7 @@ function matchesRegex(string $regex): ConstraintInterface
  */
 function every(ConstraintInterface $constraint): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\EveryConstraint($constraint);
+    return new EveryConstraint($constraint);
 }
 
 /**
@@ -190,7 +190,7 @@ function every(ConstraintInterface $constraint): ConstraintInterface
  */
 function exists(ConstraintInterface $constraint): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\ExistsConstraint($constraint);
+    return new ExistsConstraint($constraint);
 }
 
 /**
@@ -202,7 +202,7 @@ function exists(ConstraintInterface $constraint): ConstraintInterface
  */
 function inCollection(mixed $value): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\InCollectionConstraint($value);
+    return new InCollectionConstraint($value);
 }
 
 /**
@@ -213,7 +213,7 @@ function inCollection(mixed $value): ConstraintInterface
  */
 function maxSize(int $is): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\MaxSizeConstraint($is);
+    return new MaxSizeConstraint($is);
 }
 
 /**
@@ -224,7 +224,7 @@ function maxSize(int $is): ConstraintInterface
  */
 function minSize(int $is): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\MinSizeConstraint($is);
+    return new MinSizeConstraint($is);
 }
 
 /**
@@ -236,9 +236,9 @@ function minSize(int $is): ConstraintInterface
  * @param ConstraintInterface<T> ...$tail
  * @return ConstraintInterface<T>
  */
-function allOf(ConstraintInterface $head, ConstraintInterface ...$tail): ConstraintInterface
+function andX(ConstraintInterface $head, ConstraintInterface ...$tail): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\AllOfConstraint([$head, ...$tail]);
+    return new AndConstraint([$head, ...$tail]);
 }
 
 /**
@@ -250,9 +250,9 @@ function allOf(ConstraintInterface $head, ConstraintInterface ...$tail): Constra
  * @param ConstraintInterface<T> ...$tail
  * @return ConstraintInterface<T>
  */
-function anyOf(ConstraintInterface $head, ConstraintInterface ...$tail): ConstraintInterface
+function orX(ConstraintInterface $head, ConstraintInterface ...$tail): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\AnyOfConstraint([$head, ...$tail]);
+    return new OrConstraint([$head, ...$tail]);
 }
 
 /**
@@ -265,5 +265,5 @@ function anyOf(ConstraintInterface $head, ConstraintInterface ...$tail): Constra
  */
 function not(ConstraintInterface $constraint): ConstraintInterface
 {
-    return new \Klimick\Decode\Constraint\NotConstraint($constraint);
+    return new NotConstraint($constraint);
 }

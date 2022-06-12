@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
 use Klimick\Decode\Context;
 
 /**
@@ -15,16 +16,18 @@ final class EndsWithConstraint implements ConstraintInterface
     /**
      * @param non-empty-string $value
      */
-    public function __construct(public string $value) { }
+    public function __construct(
+        public string $value,
+    ) {}
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithPayload
     {
-        return 'ENDS_WITH';
-    }
-
-    public function payload(): array
-    {
-        return ['mustEndsWith' => $this->value];
+        return ConstraintMetaWithPayload::of(
+            name: 'ENDS_WITH',
+            payload: [
+                'mustEndsWith' => $this->value,
+            ],
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -33,6 +36,6 @@ final class EndsWithConstraint implements ConstraintInterface
             return;
         }
 
-        yield invalid($context, $this);
+        yield invalid($context);
     }
 }

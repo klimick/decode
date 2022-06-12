@@ -7,8 +7,8 @@ namespace Klimick\Decode\Decoder;
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Context;
-use Klimick\Decode\ContextEntry;
 use Klimick\Decode\Decoder\Error\ConstraintsError;
+use function Fp\Collection\flatMap;
 
 /**
  * @template T
@@ -35,28 +35,19 @@ final class ConstrainedDecoder extends AbstractDecoder
     {
         return $this->decoder
             ->decode($value, $context)
-            ->flatMap(function($decoded) use ($context) {
-                if (null === $decoded) {
-                    return Either::right($decoded);
+            ->flatMap(function($value) use ($context) {
+                if (null === $value) {
+                    return Either::right($value);
                 }
 
-                $errors = [];
-
-                foreach ($this->constraints as $constraint) {
-                    $constraintCtx = new Context([
-                        new ContextEntry($constraint->name(), $decoded, $context->path()),
-                    ]);
-
-                    foreach ($constraint->check($constraintCtx, $decoded) as $error) {
-                        $errors[] = $error;
-                    }
-                }
+                $path = $context->path();
+                $errors = flatMap($this->constraints, fn($c) => $c->check(Context::root($c, $value, $path), $value));
 
                 return !empty($errors)
                     ? Either::left([
                         new ConstraintsError($errors),
                     ])
-                    : Either::right($decoded);
+                    : Either::right($value);
             });
     }
 }

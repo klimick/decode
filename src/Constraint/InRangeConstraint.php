@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
 use Klimick\Decode\Context;
 
 /**
@@ -19,19 +20,17 @@ final class InRangeConstraint implements ConstraintInterface
     public function __construct(
         public mixed $from,
         public mixed $to,
-    ) { }
+    ) {}
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithPayload
     {
-        return 'IN_RANGE';
-    }
-
-    public function payload(): array
-    {
-        return [
-            'mustBeGreaterOrEqualTo' => $this->from,
-            'mustBeLessOrEqualTo' => $this->to,
-        ];
+        return ConstraintMetaWithPayload::of(
+            name: 'IN_RANGE',
+            payload: [
+                'mustBeGreaterOrEqualTo' => $this->from,
+                'mustBeLessOrEqualTo' => $this->to,
+            ],
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -40,6 +39,6 @@ final class InRangeConstraint implements ConstraintInterface
             return;
         }
 
-        yield invalid($context, $this);
+        yield invalid($context);
     }
 }

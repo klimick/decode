@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
 use Klimick\Decode\Context;
 
 /**
@@ -17,16 +18,14 @@ final class MinLengthConstraint implements ConstraintInterface
      */
     public function __construct(public int $minLength) { }
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithPayload
     {
-        return 'MIN_LENGTH';
-    }
-
-    public function payload(): array
-    {
-        return [
-            'minLengthMustBe' => $this->minLength,
-        ];
+        return ConstraintMetaWithPayload::of(
+            name: 'MIN_LENGTH',
+            payload: [
+                'minLengthMustBe' => $this->minLength,
+            ],
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -35,6 +34,6 @@ final class MinLengthConstraint implements ConstraintInterface
             return;
         }
 
-        yield invalid($context, $this);
+        yield invalid($context);
     }
 }

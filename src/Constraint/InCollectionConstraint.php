@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
 use Klimick\Decode\Context;
 
 /**
@@ -16,16 +17,16 @@ final class InCollectionConstraint implements ConstraintInterface
     /**
      * @param T $item
      */
-    public function __construct(public mixed $item) { }
+    public function __construct(public mixed $item) {}
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithPayload
     {
-        return 'IN_COLLECTION';
-    }
-
-    public function payload(): array
-    {
-        return ['mustBePresent' => $this->item];
+        return ConstraintMetaWithPayload::of(
+            name: 'IN_COLLECTION',
+            payload: [
+                'mustBePresent' => $this->item,
+            ],
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -36,6 +37,6 @@ final class InCollectionConstraint implements ConstraintInterface
             }
         }
 
-        yield invalid($context, $this);
+        yield invalid($context);
     }
 }

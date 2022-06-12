@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
 use Klimick\Decode\Context;
 
 /**
@@ -15,18 +16,18 @@ final class MaxLengthConstraint implements ConstraintInterface
     /**
      * @param positive-int $maxLength
      */
-    public function __construct(public int $maxLength) { }
+    public function __construct(
+        public int $maxLength,
+    ) {}
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithPayload
     {
-        return 'MAX_LENGTH';
-    }
-
-    public function payload(): array
-    {
-        return [
-            'maxLengthMustBe' => $this->maxLength,
-        ];
+        return ConstraintMetaWithPayload::of(
+            name: 'MAX_LENGTH',
+            payload: [
+                'maxLengthMustBe' => $this->maxLength,
+            ],
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -35,6 +36,6 @@ final class MaxLengthConstraint implements ConstraintInterface
             return;
         }
 
-        yield invalid($context, $this);
+        yield invalid($context);
     }
 }

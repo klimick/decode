@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithNested;
 use Klimick\Decode\Context;
 
 /**
@@ -16,16 +17,14 @@ final class ExistsConstraint implements ConstraintInterface
     /**
      * @param ConstraintInterface<TVal> $constraint
      */
-    public function __construct(public ConstraintInterface $constraint) { }
+    public function __construct(public ConstraintInterface $constraint) {}
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithNested
     {
-        return "EXISTS.{$this->constraint->name()}";
-    }
-
-    public function payload(): array
-    {
-        return $this->constraint->payload();
+        return ConstraintMetaWithNested::of(
+            name: 'EXISTS',
+            nested: $this->constraint->metadata(),
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -42,9 +41,6 @@ final class ExistsConstraint implements ConstraintInterface
             }
         }
 
-        yield invalid(
-            context: $context($this->constraint, $value),
-            constraint: $this->constraint,
-        );
+        yield invalid($context($this->constraint, $value));
     }
 }

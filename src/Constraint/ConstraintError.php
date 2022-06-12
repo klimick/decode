@@ -11,12 +11,7 @@ use Klimick\Decode\Context;
  */
 final class ConstraintError
 {
-    /**
-     * @param non-empty-string $constraint
-     */
     public function __construct(
         public Context $context,
-        public string $constraint,
-        public array $payload,
-    ) { }
+    ) {}
 }

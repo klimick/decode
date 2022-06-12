@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaInterface;
 use Klimick\Decode\Context;
 
 /**
@@ -12,15 +13,7 @@ use Klimick\Decode\Context;
  */
 interface ConstraintInterface
 {
-    /**
-     * @return non-empty-string
-     */
-    public function name(): string;
-
-    /**
-     * @return array<array-key, mixed>
-     */
-    public function payload(): array;
+    public function metadata(): ConstraintMetaInterface;
 
     /**
      * @param T $value

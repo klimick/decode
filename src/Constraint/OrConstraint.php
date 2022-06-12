@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithNested;
 use Klimick\Decode\Context;
 use function Fp\Collection\map;
 
@@ -12,23 +13,19 @@ use function Fp\Collection\map;
  * @implements ConstraintInterface<T>
  * @psalm-immutable
  */
-final class AnyOfConstraint implements ConstraintInterface
+final class OrConstraint implements ConstraintInterface
 {
     /**
      * @param non-empty-list<ConstraintInterface<T>> $constraints
      */
-    public function __construct(public array $constraints) { }
+    public function __construct(public array $constraints) {}
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithNested
     {
-        $constraints = implode(', ', map($this->constraints, fn($c) => $c->name()));
-
-        return "ANY_OF({$constraints})";
-    }
-
-    public function payload(): array
-    {
-        return map($this->constraints, fn(ConstraintInterface $c) => $c->payload());
+        return ConstraintMetaWithNested::of(
+            name: 'OR',
+            nested: map($this->constraints, fn(ConstraintInterface $c) => $c->metadata()),
+        );
     }
 
     public function check(Context $context, mixed $value): iterable

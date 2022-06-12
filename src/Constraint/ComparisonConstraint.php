@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Constraint;
 
 use Closure;
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
 use Klimick\Decode\Context;
 
 /**
@@ -25,23 +26,16 @@ final class ComparisonConstraint implements ConstraintInterface
     public function __construct(
         public string $type,
         public mixed $value,
-    ) { }
+    ) {}
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithPayload
     {
-        return $this->type;
-    }
-
-    public function payload(): array
-    {
-        $prop = match ($this->type) {
-            self::OP_LESS => 'mustBeLessThan',
-            self::OP_GREATER => 'mustBeGreaterThan',
-            self::OP_LESS_OR_EQUAL => 'mustBeLessOrEqualTo',
-            self::OP_GREATER_OR_EQUAL => 'mustBeGreaterOrEqualTo',
-        };
-
-        return [$prop => $this->value];
+        return ConstraintMetaWithPayload::of(
+            name: $this->type,
+            payload: [
+                'value' => $this->value,
+            ],
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -52,7 +46,7 @@ final class ComparisonConstraint implements ConstraintInterface
             return;
         }
 
-        yield invalid($context, $this);
+        yield invalid($context);
     }
 
     /**

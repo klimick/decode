@@ -6,6 +6,8 @@ namespace Klimick\Decode;
 
 use Klimick\Decode\Constraint\ConstraintInterface;
 use Klimick\Decode\Decoder\DecoderInterface;
+use function array_key_first;
+use function array_key_last;
 
 /**
  * @psalm-immutable
@@ -15,31 +17,33 @@ final class Context
     /**
      * @param non-empty-list<ContextEntry> $entries
      */
-    public function __construct(public array $entries) { }
+    private function __construct(public array $entries) { }
 
     /**
      * @psalm-pure
      */
-    public static function root(string $name, mixed $actual): self
+    public static function root(DecoderInterface|ConstraintInterface $instance, mixed $actual, int|string $key = '$'): self
     {
         return new self([
-            new ContextEntry($name, $actual, '$'),
+            new ContextEntry($instance, $actual, (string) $key),
         ]);
     }
 
-    public function __invoke(DecoderInterface|ConstraintInterface $name, mixed $actual, string|int $key = ''): self
+    public function __invoke(DecoderInterface|ConstraintInterface $instance, mixed $actual, string|int $key = ''): self
     {
-        return new self([...$this->entries, new ContextEntry($name->name(), $actual, (string) $key)]);
+        return new self([...$this->entries, new ContextEntry($instance, $actual, (string) $key)]);
     }
 
     public function firstEntry(): ContextEntry
     {
-        return $this->entries[0];
+        $firstKey = array_key_first($this->entries);
+        return $this->entries[$firstKey];
     }
 
     public function lastEntry(): ContextEntry
     {
-        return $this->entries[count($this->entries) - 1];
+        $lastKey = array_key_last($this->entries);
+        return $this->entries[$lastKey];
     }
 
     public function path(): string

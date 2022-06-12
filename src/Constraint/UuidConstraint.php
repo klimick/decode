@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
+use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
 use Klimick\Decode\Context;
 
 /**
@@ -14,16 +15,14 @@ final class UuidConstraint implements ConstraintInterface
 {
     private const UUID_REGEX = '/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i';
 
-    public function name(): string
+    public function metadata(): ConstraintMetaWithPayload
     {
-        return 'UUID';
-    }
-
-    public function payload(): array
-    {
-        return [
-            'message' => 'Value must be valid uuid string',
-        ];
+        return ConstraintMetaWithPayload::of(
+            name: 'UUID',
+            payload: [
+                'message' => 'Value must be valid uuid string',
+            ],
+        );
     }
 
     public function check(Context $context, mixed $value): iterable
@@ -32,6 +31,6 @@ final class UuidConstraint implements ConstraintInterface
             return;
         }
 
-        yield invalid($context, $this);
+        yield invalid($context);
     }
 }
