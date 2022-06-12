@@ -27,7 +27,7 @@ final class MapDecoder extends AbstractDecoder
 
     public function name(): string
     {
-        return $this->decoder->name();
+        return "MapFrom<{$this->decoder->name()}>";
     }
 
     public function decode(mixed $value, Context $context): Either
