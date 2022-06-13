@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Report;
 
-use Klimick\Decode\Error\ConstraintError;
 use Klimick\Decode\Error\DecodeError;
 use ReflectionClass;
-use function array_merge;
+use function Fp\Cast\asList;
 use function Fp\Collection\map;
+use function Fp\Collection\unique;
+use function Klimick\Decode\Utils\groupMapReduce;
 
 final class DefaultReporter
 {
@@ -20,48 +21,113 @@ final class DefaultReporter
      */
     public static function report(array $errors, bool $useShortClassNames = false): ErrorReport
     {
-        $typeErrors = map($errors, fn($error) => match ($error->kind) {
-            DecodeError::KIND_TYPE_ERROR => [
-                self::reportDecodeError($error, $useShortClassNames),
-            ],
-            DecodeError::KIND_UNDEFINED_ERROR => [
-                new UndefinedErrorReport(
-                    self::formatContextPath($error->context->path()),
-                    $error->aliases,
-                ),
-            ],
-            DecodeError::KIND_CONSTRAINT_ERRORS => map(
-                $error->constraintErrors,
-                fn($e) => self::reportConstraintError($e),
-            )
-        });
+        $typeErrors = [];
+        $undefinedErrors = [];
+        $constraintErrors = [];
 
-        return new ErrorReport(array_merge(...$typeErrors));
+        foreach ($errors as $error) {
+            switch ($error->kind) {
+                case DecodeError::KIND_TYPE_ERROR:
+                    $lastErr = $error->context->lastEntry();
+
+                    $typeErrors[] = new TypeErrorReport(
+                        path: self::formatContextPath($error->context->path()),
+                        expected: $useShortClassNames
+                            ? self::formatExpectedType($lastErr->instance->name())
+                            : $lastErr->instance->name(),
+                        actual: $lastErr->actual,
+                    );
+                    break;
+
+                case DecodeError::KIND_UNDEFINED_ERROR:
+                    $undefinedErrors[] = new UndefinedErrorReport(
+                        self::formatContextPath($error->context->path()),
+                        $error->aliases,
+                    );
+                    break;
+
+                case DecodeError::KIND_CONSTRAINT_ERRORS:
+                    foreach ($error->constraintErrors as $e) {
+                        $firstErr = $e->context->firstEntry();
+                        $lastErr = $e->context->lastEntry();
+
+                        $constraintErrors[] = new ConstraintErrorReport(
+                            path: self::formatContextPath($e->context->path()),
+                            value: $lastErr->actual,
+                            meta: $firstErr->instance->metadata(),
+                        );
+                    }
+                    break;
+            }
+        }
+
+        return new ErrorReport([
+            ...self::mergeTypeErrors($typeErrors),
+            ...self::mergeUndefinedErrors($undefinedErrors),
+            ...self::mergeConstraintErrors($constraintErrors),
+        ]);
     }
 
-    private static function reportConstraintError(ConstraintError $error): ConstraintErrorReport
+    /**
+     * @param list<TypeErrorReport> $errors
+     * @return list<TypeErrorReport>
+     */
+    private static function mergeTypeErrors(array $errors): array
     {
-        $firstErr = $error->context->firstEntry();
-        $lastErr = $error->context->lastEntry();
-
-        return new ConstraintErrorReport(
-            path: self::formatContextPath($error->context->path()),
-            value: $lastErr->actual,
-            meta: $firstErr->instance->metadata(),
+        $grouped = groupMapReduce(
+            $errors,
+            fn(TypeErrorReport $e) => sprintf('%s-%s', $e->path, ActualValueToString::for($e->actual)),
+            fn(TypeErrorReport $e) => [
+                'path' => $e->path,
+                'expected' => explode(' | ', $e->expected),
+                'actual' => $e->actual,
+            ],
+            fn(array $lhs, array $rhs) => [
+                'path' => $lhs['path'],
+                'expected' => [...$lhs['expected'], ...$rhs['expected']],
+                'actual' => $lhs['actual'],
+            ],
         );
+
+        return map(asList($grouped), fn(array $e) => new TypeErrorReport(
+            path: $e['path'],
+            expected: implode(' | ', array_unique($e['expected'])),
+            actual: $e['actual']
+        ));
     }
 
-    private static function reportDecodeError(DecodeError $error, bool $useShortClassNames): TypeErrorReport|UndefinedErrorReport
+    /**
+     * @param list<ConstraintErrorReport> $errors
+     * @return list<ConstraintErrorReport>
+     */
+    private static function mergeConstraintErrors(array $errors): array
     {
-        $lastErr = $error->context->lastEntry();
+        return unique($errors, fn(ConstraintErrorReport $e) => $e->toString());
+    }
 
-        return new TypeErrorReport(
-            path: self::formatContextPath($error->context->path()),
-            expected: $useShortClassNames
-                ? self::formatExpectedType($lastErr->instance->name())
-                : $lastErr->instance->name(),
-            actual: $lastErr->actual,
+    /**
+     * @param list<UndefinedErrorReport> $errors
+     * @return list<UndefinedErrorReport>
+     */
+    private static function mergeUndefinedErrors(array $errors): array
+    {
+        $grouped = groupMapReduce(
+            $errors,
+            fn(UndefinedErrorReport $e) => $e->path,
+            fn(UndefinedErrorReport $e) => [
+                'path' => $e->path,
+                'aliases' => $e->aliases,
+            ],
+            fn(array $lhs, array $rhs) => [
+                'path' => $lhs['path'],
+                'aliases' => [...$lhs['aliases'], ...$rhs['aliases']],
+            ],
         );
+
+        return map(asList($grouped), fn(array $e) => new UndefinedErrorReport(
+            path: $e['path'],
+            aliases: asList(array_unique($e['aliases'])),
+        ));
     }
 
     private static function formatExpectedType(string $union): string

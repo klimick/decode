@@ -16,7 +16,8 @@
         },
         "files": [
             "decoders.php",
-            "constraints.php"
+            "constraints.php",
+            "utils.php"
         ]
     },
     "autoload-dev": {
