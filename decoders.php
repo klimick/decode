@@ -156,16 +156,6 @@ function int(): DecoderInterface
 }
 
 /**
- * @return DecoderInterface<positive-int>
- *
- * @psalm-pure
- */
-function positiveInt(): DecoderInterface
-{
-    return new PositiveIntDecoder();
-}
-
-/**
  * @return DecoderInterface<float>
  *
  * @psalm-pure
