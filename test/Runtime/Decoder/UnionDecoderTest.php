@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Test\Runtime\Decoder;
 
+use Klimick\Decode\Report\ConstraintErrorReport;
 use Klimick\Decode\Report\ErrorReport;
 use Klimick\Decode\Report\TypeErrorReport;
+use Klimick\Decode\Report\UndefinedErrorReport;
 use Klimick\Decode\Test\Runtime\Assert;
 use PHPUnit\Framework\TestCase;
+use function Klimick\Decode\Constraint\minLength;
 use function Klimick\Decode\Decoder\bool;
 use function Klimick\Decode\Decoder\decode;
+use function Klimick\Decode\Decoder\float;
 use function Klimick\Decode\Decoder\int;
+use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Decoder\union;
 
@@ -31,6 +36,43 @@ final class UnionDecoderTest extends TestCase
                 new TypeErrorReport('$', $decoder->name(), $value),
             ]),
             actualDecoded: decode($value, $decoder),
+        );
+    }
+
+    public function testMergeErrorsForTheSameField(): void
+    {
+        $constraint = minLength(is: 2);
+        $decoder = union(
+            shape(
+                test1: string(),
+                test2: int()->from('$.test1alias'),
+                test3: string()->constrained($constraint),
+            ),
+            shape(
+                test1: union(int(), float()),
+                test2: int()->from('$.test2alias'),
+                test3: string()->constrained($constraint),
+            ),
+        );
+
+        Assert::decodeFailed(
+            expectedReport: new ErrorReport([
+                new TypeErrorReport(
+                    path: '$.test1',
+                    expected: 'string | int | float',
+                    actual: ['invalid'],
+                ),
+                new UndefinedErrorReport(
+                    path: '$.test2',
+                    aliases: ['$.test1alias', '$.test2alias'],
+                ),
+                new ConstraintErrorReport(
+                    path: '$.test3',
+                    value: 'F',
+                    meta: $constraint->metadata(),
+                ),
+            ]),
+            actualDecoded: decode(['test1' => ['invalid'], 'test3' => 'F'], $decoder),
         );
     }
 
