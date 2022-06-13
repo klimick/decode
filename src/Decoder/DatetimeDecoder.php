@@ -9,8 +9,8 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
+use Klimick\Decode\Error\Context;
+use Klimick\Decode\Error\DecodeError;
 
 /**
  * @psalm-immutable
@@ -39,7 +39,9 @@ final class DatetimeDecoder extends AbstractDecoder
     }
 
     /**
-     * @return Closure(string): Either<non-empty-list<DecodeErrorInterface>, DateTimeImmutable>
+     * @param Context<DecoderInterface> $context
+     * @return Closure(string): Either<non-empty-list<DecodeError>, DateTimeImmutable>
+     *
      * @psalm-pure
      */
     private static function createWithConstructor(Context $context, DateTimeZone $timezone): Closure
@@ -56,7 +58,9 @@ final class DatetimeDecoder extends AbstractDecoder
     }
 
     /**
-     * @return Closure(string): Either<non-empty-list<DecodeErrorInterface>, DateTimeImmutable>
+     * @param Context<DecoderInterface> $context
+     * @return Closure(string): Either<non-empty-list<DecodeError>, DateTimeImmutable>
+     *
      * @psalm-pure
      */
     private static function createFromFormat(Context $context, DateTimeZone $timezone, string $format): Closure

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Constraint;
 
-use Klimick\Decode\Context;
+use Klimick\Decode\Error\ConstraintError;
+use Klimick\Decode\Error\Context;
 
 /**
+ * @param Context<ConstraintInterface> $context
  * @psalm-pure
  */
 function invalid(Context $context): ConstraintError

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Context;
+use Klimick\Decode\Error\Context;
 
 /**
  * @extends AbstractDecoder<scalar>

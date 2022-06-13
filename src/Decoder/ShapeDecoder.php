@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
-use Klimick\Decode\Decoder\Error\UndefinedError;
+use Klimick\Decode\Error\Context;
+use Klimick\Decode\Error\DecodeError;
 use function Fp\Collection\filter;
 use function Fp\Collection\map;
 use function in_array;
@@ -89,11 +88,11 @@ final class ShapeDecoder extends AbstractDecoder
     }
 
     /**
-     * @param non-empty-list<DecodeErrorInterface> $errors
+     * @param non-empty-list<DecodeError> $errors
      * @psalm-pure
      */
     private static function isUndefined(array $errors): bool
     {
-        return 1 === count($errors) && $errors[0] instanceof UndefinedError;
+        return 1 === count($errors) && $errors[0]->kind === DecodeError::KIND_UNDEFINED_ERROR;
     }
 }

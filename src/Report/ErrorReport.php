@@ -7,7 +7,6 @@ namespace Klimick\Decode\Report;
 use Fp\Collections\ArrayList;
 use JsonSerializable;
 use Stringable;
-use function Fp\Collection\filter;
 use const PHP_EOL;
 
 final class ErrorReport implements JsonSerializable, Stringable
@@ -15,54 +14,20 @@ final class ErrorReport implements JsonSerializable, Stringable
     public function __construct(
         /**
          * @psalm-readonly
-         * @var list<TypeErrorReport>
+         * @var list<TypeErrorReport|ConstraintErrorReport|UndefinedErrorReport>
          */
-        public array $typeErrors = [],
-        /**
-         * @psalm-readonly
-         * @var list<ConstraintErrorReport>
-         */
-        public array $constraintErrors = [],
-        /**
-         * @psalm-readonly
-         * @var list<UndefinedErrorReport>
-         */
-        public array $undefinedErrors = [],
+        public array $errors = [],
     ) { }
 
     public function __toString(): string
     {
-        $parts = [];
-
-        if (!empty($this->typeErrors)) {
-            $parts[] = ArrayList::collect($this->typeErrors)
-                ->map(fn(TypeErrorReport $e) => $e->toString())
-                ->mkString(sep: PHP_EOL);
-        }
-
-        if (!empty($this->constraintErrors)) {
-            $parts[] = ArrayList::collect($this->constraintErrors)
-                ->map(fn(ConstraintErrorReport $e) => $e->toString())
-                ->mkString(sep: PHP_EOL);
-        }
-
-        if (!empty($this->undefinedErrors)) {
-            $parts[] = ArrayList::collect($this->undefinedErrors)
-                ->map(fn(UndefinedErrorReport $e) => $e->toString())
-                ->mkString(sep: PHP_EOL);
-        }
-
-        return implode(PHP_EOL, $parts);
+        return ArrayList::collect($this->errors)
+            ->map(fn($e) => $e->toString())
+            ->mkString(sep: PHP_EOL);
     }
 
     public function jsonSerialize(): array
     {
-        $values = [
-            'typeErrors' => $this->typeErrors,
-            'constraintErrors' => $this->constraintErrors,
-            'undefinedErrors' => $this->undefinedErrors,
-        ];
-
-        return filter($values, fn($v) => !empty($v), preserveKeys: true);
+        return $this->errors;
     }
 }

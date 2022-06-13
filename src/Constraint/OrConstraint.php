@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Constraint;
 
 use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithNested;
-use Klimick\Decode\Context;
+use Klimick\Decode\Error\Context;
 use function Fp\Collection\map;
 
 /**

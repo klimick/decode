@@ -6,7 +6,7 @@ namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Context;
+use Klimick\Decode\Error\Context;
 
 /**
  * @template-covariant T

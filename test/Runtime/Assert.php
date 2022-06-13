@@ -6,7 +6,7 @@ namespace Klimick\Decode\Test\Runtime;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
+use Klimick\Decode\Error\DecodeError;
 use Klimick\Decode\Report\DefaultReporter;
 use Klimick\Decode\Report\ErrorReport;
 use function PHPUnit\Framework\assertEquals;
@@ -15,7 +15,7 @@ final class Assert
 {
     /**
      * @param ErrorReport $expectedReport
-     * @param Either<non-empty-list<DecodeErrorInterface>, mixed> $actualDecoded
+     * @param Either<non-empty-list<DecodeError>, mixed> $actualDecoded
      */
     public static function decodeFailed(ErrorReport $expectedReport, Either $actualDecoded): void
     {
@@ -30,7 +30,7 @@ final class Assert
      * @template T
      *
      * @param T $expectedValue
-     * @param Either<non-empty-list<DecodeErrorInterface>, T> $actualDecoded
+     * @param Either<non-empty-list<DecodeError>, T> $actualDecoded
      */
     public static function decodeSuccess(mixed $expectedValue, Either $actualDecoded): void
     {

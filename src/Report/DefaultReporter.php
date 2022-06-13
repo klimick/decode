@@ -4,16 +4,10 @@ declare(strict_types=1);
 
 namespace Klimick\Decode\Report;
 
-use Klimick\Decode\Constraint\ConstraintError;
-use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\DecoderInterface;
-use Klimick\Decode\Decoder\Error\ConstraintsError;
-use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
-use Klimick\Decode\Decoder\Error\TypeError;
-use Klimick\Decode\Decoder\Error\UndefinedError;
+use Klimick\Decode\Error\ConstraintError;
+use Klimick\Decode\Error\DecodeError;
 use ReflectionClass;
-use function assert;
+use function array_merge;
 use function Fp\Collection\map;
 
 final class DefaultReporter
@@ -22,48 +16,47 @@ final class DefaultReporter
     private const TO_INDEXED_ACCESS_WITH_BRACKETS = '[$1]';
 
     /**
-     * @param non-empty-list<DecodeErrorInterface> $errors
+     * @param non-empty-list<DecodeError> $errors
      */
     public static function report(array $errors, bool $useShortClassNames = false): ErrorReport
     {
-        $typeErrors = [];
-        $constraintErrors = [];
-        $undefinedErrors = [];
+        $typeErrors = map($errors, fn($error) => match ($error->kind) {
+            DecodeError::KIND_TYPE_ERROR => [
+                self::reportDecodeError($error, $useShortClassNames),
+            ],
+            DecodeError::KIND_UNDEFINED_ERROR => [
+                new UndefinedErrorReport(
+                    self::formatContextPath($error->context->path()),
+                    $error->aliases,
+                ),
+            ],
+            DecodeError::KIND_CONSTRAINT_ERRORS => map(
+                $error->constraintErrors,
+                fn($e) => self::reportConstraintError($e),
+            )
+        });
 
-        foreach ($errors as $error) {
-            if ($error instanceof TypeError) {
-                $typeErrors[] = self::reportTypeError($error, $useShortClassNames);
-            } elseif ($error instanceof ConstraintsError) {
-                foreach ($error->errors as $e) {
-                    $constraintErrors[] = self::reportConstraintError($e);
-                }
-            } elseif ($error instanceof UndefinedError) {
-                $undefinedErrors[] = new UndefinedErrorReport(self::pathFromContext($error->context), $error->aliases);
-            }
-        }
-
-        return new ErrorReport($typeErrors, $constraintErrors, $undefinedErrors);
+        return new ErrorReport(array_merge(...$typeErrors));
     }
 
     private static function reportConstraintError(ConstraintError $error): ConstraintErrorReport
     {
         $firstErr = $error->context->firstEntry();
-        assert($firstErr->instance instanceof ConstraintInterface);
+        $lastErr = $error->context->lastEntry();
 
         return new ConstraintErrorReport(
-            path: self::pathFromContext($error->context),
-            value: $error->context->lastEntry()->actual,
+            path: self::formatContextPath($error->context->path()),
+            value: $lastErr->actual,
             meta: $firstErr->instance->metadata(),
         );
     }
 
-    private static function reportTypeError(TypeError $error, bool $useShortClassNames): TypeErrorReport
+    private static function reportDecodeError(DecodeError $error, bool $useShortClassNames): TypeErrorReport|UndefinedErrorReport
     {
         $lastErr = $error->context->lastEntry();
-        assert($lastErr->instance instanceof DecoderInterface);
 
         return new TypeErrorReport(
-            path: self::pathFromContext($error->context),
+            path: self::formatContextPath($error->context->path()),
             expected: $useShortClassNames
                 ? self::formatExpectedType($lastErr->instance->name())
                 : $lastErr->instance->name(),
@@ -80,12 +73,12 @@ final class DefaultReporter
         return implode(' | ', $formatted);
     }
 
-    private static function pathFromContext(Context $context): string
+    private static function formatContextPath(string $path): string
     {
         $path = preg_replace(
             self::INDEXED_ACCESS_WITHOUT_BRACKETS,
             self::TO_INDEXED_ACCESS_WITH_BRACKETS,
-            $context->path(),
+            $path,
         );
 
         return $path === '$.__root_value__' ? '$' : $path;

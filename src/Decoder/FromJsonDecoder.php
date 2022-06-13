@@ -6,7 +6,7 @@ namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
 use JsonException;
-use Klimick\Decode\Context;
+use Klimick\Decode\Error\Context;
 
 /**
  * @template T

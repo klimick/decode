@@ -6,7 +6,7 @@ namespace Klimick\Decode\Constraint;
 
 use Closure;
 use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
-use Klimick\Decode\Context;
+use Klimick\Decode\Error\Context;
 
 /**
  * @implements ConstraintInterface<numeric>

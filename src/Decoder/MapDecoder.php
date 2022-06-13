@@ -6,7 +6,7 @@ namespace Klimick\Decode\Decoder;
 
 use Closure;
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Context;
+use Klimick\Decode\Error\Context;
 
 /**
  * @template TDecoded

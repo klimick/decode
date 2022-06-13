@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Klimick\Decode\Constraint;
 
 use Klimick\Decode\Constraint\Metadata\ConstraintMetaWithPayload;
-use Klimick\Decode\Context;
+use Klimick\Decode\Error\Context;
 
 /**
  * @implements ConstraintInterface<numeric>

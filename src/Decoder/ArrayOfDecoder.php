@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Error\TypeError;
+use Klimick\Decode\Error\Context;
+use Klimick\Decode\Error\DecodeError;
 use function array_key_last;
 use function is_array;
 use function is_int;
@@ -70,7 +70,7 @@ final class ArrayOfDecoder extends AbstractDecoder
                 // PHP don't see difference between '1' and 1 for array key.
                 if ($checkIntToStringCoercion && is_int(array_key_last($decoded))) {
                     $errors[] = [
-                        new TypeError($context($this->key, (int) $k, $k)),
+                        DecodeError::typeError($context($this->key, (int) $k, $k)),
                     ];
                 }
             }

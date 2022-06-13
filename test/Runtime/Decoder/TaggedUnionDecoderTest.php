@@ -47,21 +47,17 @@ final class TaggedUnionDecoderTest extends TestCase
     public function testDecodeFailed(): void
     {
         Assert::decodeFailed(
-            expectedReport: new ErrorReport(
-                undefinedErrors: [
-                    new UndefinedErrorReport('$.type'),
-                ]
-            ),
+            expectedReport: new ErrorReport([
+                new UndefinedErrorReport('$.type'),
+            ]),
             actualDecoded: decode(null, self::getDecoder()),
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport(
-                undefinedErrors: [
-                    new UndefinedErrorReport('$.name'),
-                    new UndefinedErrorReport('$.age'),
-                ]
-            ),
+            expectedReport: new ErrorReport([
+                new UndefinedErrorReport('$.name'),
+                new UndefinedErrorReport('$.age'),
+            ]),
             actualDecoded: decode(
                 value: ['type' => 'full'],
                 with: self::getDecoder(),
@@ -69,14 +65,10 @@ final class TaggedUnionDecoderTest extends TestCase
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport(
-                typeErrors: [
-                    new TypeErrorReport('$.name', 'string', 42),
-                ],
-                undefinedErrors: [
-                    new UndefinedErrorReport('$.age'),
-                ]
-            ),
+            expectedReport: new ErrorReport([
+                new TypeErrorReport('$.name', 'string', 42),
+                new UndefinedErrorReport('$.age'),
+            ]),
             actualDecoded: decode(
                 value: ['type' => 'full', 'name' => 42],
                 with: self::getDecoder(),
@@ -84,12 +76,10 @@ final class TaggedUnionDecoderTest extends TestCase
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport(
-                typeErrors: [
-                    new TypeErrorReport('$.name', 'string', 42),
-                    new TypeErrorReport('$.age', 'int', 'test'),
-                ],
-            ),
+            expectedReport: new ErrorReport([
+                new TypeErrorReport('$.name', 'string', 42),
+                new TypeErrorReport('$.age', 'int', 'test'),
+            ]),
             actualDecoded: decode(
                 value: ['type' => 'full', 'name' => 42, 'age' => 'test'],
                 with: self::getDecoder(),
@@ -97,12 +87,10 @@ final class TaggedUnionDecoderTest extends TestCase
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport(
-                undefinedErrors: [
-                    new UndefinedErrorReport('$.maybeName'),
-                    new UndefinedErrorReport('$.maybeAge'),
-                ]
-            ),
+            expectedReport: new ErrorReport([
+                new UndefinedErrorReport('$.maybeName'),
+                new UndefinedErrorReport('$.maybeAge'),
+            ]),
             actualDecoded: decode(
                 value: ['type' => 'partial'],
                 with: self::getDecoder(),

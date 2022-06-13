@@ -8,8 +8,8 @@ use Closure;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
+use Klimick\Decode\Error\Context;
+use Klimick\Decode\Error\DecodeError;
 use Klimick\PsalmDecode\Hook\MethodReturnTypeProvider\ConstrainedMethodReturnTypeProvider;
 
 /**
@@ -24,7 +24,8 @@ interface DecoderInterface
     public function name(): string;
 
     /**
-     * @return Either<non-empty-list<DecodeErrorInterface>, T>
+     * @param Context<DecoderInterface> $context
+     * @return Either<non-empty-list<DecodeError>, T>
      */
     public function decode(mixed $value, Context $context): Either;
 

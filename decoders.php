@@ -8,12 +8,11 @@ use Closure;
 use DateTimeImmutable;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Error\CastException;
-use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
-use Klimick\Decode\Decoder\Error\TypeError;
 use Klimick\Decode\Decoder\Factory\ObjectDecoderFactory;
 use Klimick\Decode\Decoder\Factory\TaggedUnionDecoderFactory;
+use Klimick\Decode\Error\CastException;
+use Klimick\Decode\Error\Context;
+use Klimick\Decode\Error\DecodeError;
 use Klimick\Decode\Report\DefaultReporter;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\IntersectionFunctionReturnTypeProvider;
 use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeFunctionReturnTypeProvider;
@@ -22,7 +21,7 @@ use Klimick\PsalmDecode\Hook\FunctionReturnTypeProvider\ShapeFunctionReturnTypeP
  * @template T
  *
  * @param DecoderInterface<T> $with
- * @return Either<non-empty-list<DecodeErrorInterface>, T>
+ * @return Either<non-empty-list<DecodeError>, T>
  *
  * @psalm-pure
  */
@@ -76,8 +75,8 @@ function tryCast(mixed $value, DecoderInterface $to): mixed
 }
 
 /**
- * @param non-empty-list<non-empty-list<DecodeErrorInterface>> $errors
- * @return Either<non-empty-list<DecodeErrorInterface>, empty>
+ * @param non-empty-list<non-empty-list<DecodeError>> $errors
+ * @return Either<non-empty-list<DecodeError>, empty>
  *
  * @psalm-pure
  */
@@ -87,14 +86,15 @@ function invalids(array $errors): Either
 }
 
 /**
- * @return Either<non-empty-list<DecodeErrorInterface>, empty>
+ * @param Context<DecoderInterface> $context
+ * @return Either<non-empty-list<DecodeError>, empty>
  *
  * @psalm-pure
  */
 function invalid(Context $context): Either
 {
     return Either::left([
-        new TypeError($context),
+        DecodeError::typeError($context),
     ]);
 }
 

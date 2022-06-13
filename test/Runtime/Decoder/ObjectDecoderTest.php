@@ -38,32 +38,24 @@ final class ObjectDecoderTest extends TestCase
     public function testDecodeFailed(): void
     {
         Assert::decodeFailed(
-            expectedReport: new ErrorReport(
-                undefinedErrors: [
-                    new UndefinedErrorReport('$.name'),
-                    new UndefinedErrorReport('$.age'),
-                ],
-            ),
+            expectedReport: new ErrorReport([
+                new UndefinedErrorReport('$.name'),
+                new UndefinedErrorReport('$.age'),
+            ]),
             actualDecoded: decode([], self::getDecoder()),
         );
         Assert::decodeFailed(
-            expectedReport: new ErrorReport(
-                typeErrors: [
-                    new TypeErrorReport('$.name', 'string', ['test']),
-                ],
-                undefinedErrors: [
-                    new UndefinedErrorReport('$.age'),
-                ],
-            ),
+            expectedReport: new ErrorReport([
+                new TypeErrorReport('$.name', 'string', ['test']),
+                new UndefinedErrorReport('$.age'),
+            ]),
             actualDecoded: decode(['name' => ['test']], self::getDecoder()),
         );
         Assert::decodeFailed(
-            expectedReport: new ErrorReport(
-                typeErrors: [
-                    new TypeErrorReport('$.name', 'string', ['test']),
-                    new TypeErrorReport('$.age', 'int', 'invalid'),
-                ],
-            ),
+            expectedReport: new ErrorReport([
+                new TypeErrorReport('$.name', 'string', ['test']),
+                new TypeErrorReport('$.age', 'int', 'invalid'),
+            ]),
             actualDecoded: decode(['name' => ['test'], 'age' => 'invalid'], self::getDecoder()),
         );
     }

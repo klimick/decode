@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Klimick\Decode\Decoder\Error;
+namespace Klimick\Decode\Error;
 
 use Exception;
 use Klimick\Decode\Report\ErrorReport;

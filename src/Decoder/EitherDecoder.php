@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Error\TypeError;
+use Klimick\Decode\Error\Context;
+use Klimick\Decode\Error\DecodeError;
 
 /**
  * @template TLeft
@@ -41,7 +41,7 @@ final class EitherDecoder extends AbstractDecoder
             ->map(fn($decoded) => Either::right($decoded));
 
         return $left->orElse($right)->mapLeft(fn() => [
-            new TypeError($context($this, $value)),
+            DecodeError::typeError($context($this, $value)),
         ]);
     }
 }

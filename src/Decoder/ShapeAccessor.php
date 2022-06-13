@@ -7,14 +7,13 @@ namespace Klimick\Decode\Decoder;
 use Fp\Functional\Either\Either;
 use Fp\Functional\Option\Option;
 use Fp\Streams\Stream;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Error\DecodeErrorInterface;
-use Klimick\Decode\Decoder\Error\UndefinedError;
-use function explode;
-use function is_array;
+use Klimick\Decode\Error\Context;
+use Klimick\Decode\Error\DecodeError;
 use function array_key_exists;
+use function explode;
 use function Fp\Collection\at;
 use function Fp\Collection\tail;
+use function is_array;
 
 /**
  * @psalm-immutable
@@ -24,8 +23,10 @@ final class ShapeAccessor
     /**
      * @template TDecoded
      *
+     * @param Context<DecoderInterface> $context
      * @param DecoderInterface<TDecoded> $decoder
-     * @return Either<non-empty-list<DecodeErrorInterface>, TDecoded>
+     * @return Either<non-empty-list<DecodeError>, TDecoded>
+     *
      * @psalm-pure
      */
     public static function decodeProperty(
@@ -65,15 +66,17 @@ final class ShapeAccessor
     }
 
     /**
-     * @return Either<non-empty-list<DecodeErrorInterface>, never>
+     * @param Context<DecoderInterface> $context
+     * @return Either<non-empty-list<DecodeError>, never>
+     *
      * @psalm-pure
      */
     private static function undefinedError(Context $context, DecoderInterface $decoder, int|string $key): Either
     {
         return Either::left([
-            new UndefinedError(
-                $context($decoder, actual: null, key: $key),
-                $decoder->getAliases(),
+            DecodeError::undefinedError(
+                context: $context($decoder, actual: null, key: $key),
+                aliases: $decoder->getAliases(),
             ),
         ]);
     }

@@ -6,8 +6,8 @@ namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Constraint\ConstraintInterface;
-use Klimick\Decode\Context;
-use Klimick\Decode\Decoder\Error\ConstraintsError;
+use Klimick\Decode\Error\Context;
+use Klimick\Decode\Error\DecodeError;
 use function Fp\Collection\flatMap;
 
 /**
@@ -45,7 +45,7 @@ final class ConstrainedDecoder extends AbstractDecoder
 
                 return !empty($errors)
                     ? Either::left([
-                        new ConstraintsError($errors),
+                        DecodeError::constraintErrors($context, $errors)
                     ])
                     : Either::right($value);
             });
