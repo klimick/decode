@@ -47,51 +47,51 @@ final class TaggedUnionDecoderTest extends TestCase
     public function testDecodeFailed(): void
     {
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new UndefinedErrorReport('$.type'),
             ]),
-            actualDecoded: decode(null, self::getDecoder()),
+            actual: decode(null, self::getDecoder()),
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new UndefinedErrorReport('$.name'),
                 new UndefinedErrorReport('$.age'),
             ]),
-            actualDecoded: decode(
+            actual: decode(
                 value: ['type' => 'full'],
                 with: self::getDecoder(),
             ),
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new TypeErrorReport('$.name', 'string', 42),
                 new UndefinedErrorReport('$.age'),
             ]),
-            actualDecoded: decode(
+            actual: decode(
                 value: ['type' => 'full', 'name' => 42],
                 with: self::getDecoder(),
             ),
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new TypeErrorReport('$.name', 'string', 42),
                 new TypeErrorReport('$.age', 'int', 'test'),
             ]),
-            actualDecoded: decode(
+            actual: decode(
                 value: ['type' => 'full', 'name' => 42, 'age' => 'test'],
                 with: self::getDecoder(),
             ),
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new UndefinedErrorReport('$.maybeName'),
                 new UndefinedErrorReport('$.maybeAge'),
             ]),
-            actualDecoded: decode(
+            actual: decode(
                 value: ['type' => 'partial'],
                 with: self::getDecoder(),
             ),

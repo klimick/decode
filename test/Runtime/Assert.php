@@ -14,16 +14,16 @@ use function PHPUnit\Framework\assertEquals;
 final class Assert
 {
     /**
-     * @param ErrorReport $expectedReport
-     * @param Either<non-empty-list<DecodeError>, mixed> $actualDecoded
+     * @param ErrorReport $expected
+     * @param Either<non-empty-list<DecodeError>, mixed> $actual
      */
-    public static function decodeFailed(ErrorReport $expectedReport, Either $actualDecoded): void
+    public static function decodeFailed(ErrorReport $expected, Either $actual): void
     {
-        $actualReport = $actualDecoded->isLeft()
-            ? DefaultReporter::report($actualDecoded->get())
+        $actualReport = $actual->isLeft()
+            ? DefaultReporter::report($actual->get())
             : new ErrorReport();
 
-        assertEquals($expectedReport, $actualReport);
+        assertEquals($expected, $actualReport);
     }
 
     /**

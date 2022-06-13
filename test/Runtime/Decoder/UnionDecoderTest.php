@@ -32,10 +32,10 @@ final class UnionDecoderTest extends TestCase
         $value = null;
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new TypeErrorReport('$', $decoder->name(), $value),
             ]),
-            actualDecoded: decode($value, $decoder),
+            actual: decode($value, $decoder),
         );
     }
 
@@ -56,7 +56,7 @@ final class UnionDecoderTest extends TestCase
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new TypeErrorReport(
                     path: '$.test1',
                     expected: 'string | int | float',
@@ -72,7 +72,7 @@ final class UnionDecoderTest extends TestCase
                     meta: $constraint->metadata(),
                 ),
             ]),
-            actualDecoded: decode(['test1' => ['invalid'], 'test3' => 'F'], $decoder),
+            actual: decode(['test1' => ['invalid'], 'test3' => 'F'], $decoder),
         );
     }
 

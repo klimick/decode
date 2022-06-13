@@ -6,27 +6,30 @@ namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Error\Context;
-use function Klimick\Decode\Utils\getTypename;
 
 /**
  * @template T
  * @extends AbstractDecoder<T>
  * @psalm-immutable
  */
-final class ConstantlyDecoder extends AbstractDecoder
+final class WithNameDecoder extends AbstractDecoder
 {
     /**
-     * @param T $constant
+     * @param non-empty-string $name
+     * @param DecoderInterface<T> $decoder
      */
-    public function __construct(public mixed $constant) { }
+    public function __construct(
+        public string $name,
+        public DecoderInterface $decoder,
+    ) {}
 
     public function name(): string
     {
-        return 'constant<' . getTypename($this->constant) . '>';
+        return $this->name;
     }
 
     public function decode(mixed $value, Context $context): Either
     {
-        return valid($this->constant);
+        return $this->decoder->decode($value, $context);
     }
 }

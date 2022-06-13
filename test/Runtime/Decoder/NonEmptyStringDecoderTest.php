@@ -24,10 +24,10 @@ final class NonEmptyStringDecoderTest extends TestCase
         $value = '';
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new TypeErrorReport('$', $decoder->name(), $value),
             ]),
-            actualDecoded: decode($value, $decoder),
+            actual: decode($value, $decoder),
         );
     }
 

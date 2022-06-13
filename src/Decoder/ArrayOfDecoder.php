@@ -10,6 +10,7 @@ use Klimick\Decode\Error\DecodeError;
 use function array_key_last;
 use function is_array;
 use function is_int;
+use function Klimick\Decode\Utils\getAliasedTypename;
 
 /**
  * @template TKey of array-key
@@ -43,8 +44,12 @@ final class ArrayOfDecoder extends AbstractDecoder
         $errors = [];
 
         $checkIntToStringCoercion = $this->key instanceof StringDecoder;
+
         $keyHasAliases = !empty($this->key->getAliases());
         $valueHasAliases = !empty($this->value->getAliases());
+
+        $keyTypename = new WithNameDecoder(getAliasedTypename($this->key), mixed());
+        $valueTypename = new WithNameDecoder(getAliasedTypename($this->value), mixed());
 
         /** @psalm-suppress MixedAssignment */
         foreach ($value as $k => $v) {
@@ -56,21 +61,31 @@ final class ArrayOfDecoder extends AbstractDecoder
                 ? ShapeAccessor::decodeProperty($context, $this->value, $k, $v)
                 : $this->value->decode($v, $context($this->value, $v, $k));
 
-            if ($decodedV->isLeft()) {
-                $errors[] = $decodedV->get();
+            if ($decodedK->isLeft()) {
+                $keyErrors = $decodedK->get();
+
+                $errors[] = $keyHasAliases && ShapeAccessor::isUndefined($keyErrors)
+                    ? [DecodeError::typeError($context($keyTypename, $v, $k))]
+                    : $keyErrors;
             }
 
-            if ($decodedK->isLeft()) {
-                $errors[] = $decodedK->get();
+            if ($decodedV->isLeft()) {
+                $valueErrors = $decodedV->get();
+
+                $errors[] = $valueHasAliases && ShapeAccessor::isUndefined($valueErrors)
+                    ? [DecodeError::typeError($context($valueTypename, $v, $k))]
+                    : $valueErrors;
             }
 
             if ($decodedK->isRight() && $decodedV->isRight()) {
                 $decoded[$decodedK->get()] = $decodedV->get();
 
                 // PHP don't see difference between '1' and 1 for array key.
-                if ($checkIntToStringCoercion && is_int(array_key_last($decoded))) {
+                $lastKey = array_key_last($decoded);
+
+                if ($checkIntToStringCoercion && is_int($lastKey)) {
                     $errors[] = [
-                        DecodeError::typeError($context($this->key, (int) $k, $k)),
+                        DecodeError::typeError($context($this->key, $lastKey, $k)),
                     ];
                 }
             }

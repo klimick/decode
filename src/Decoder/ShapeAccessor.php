@@ -9,11 +9,11 @@ use Fp\Functional\Option\Option;
 use Fp\Streams\Stream;
 use Klimick\Decode\Error\Context;
 use Klimick\Decode\Error\DecodeError;
-use function array_key_exists;
 use function explode;
 use function Fp\Collection\at;
 use function Fp\Collection\tail;
 use function is_array;
+use function Klimick\Decode\Utils\getByPath;
 
 /**
  * @psalm-immutable
@@ -45,7 +45,7 @@ final class ShapeAccessor
 
         return Stream::emits($decoder->getAliases())
             ->filterMap(fn($alias) => '$' !== $alias
-                ? self::dotAccess(tail(explode('.', $alias)), $shape)
+                ? getByPath(tail(explode('.', $alias)), $shape)
                 : Option::some($shape))
             ->firstElement()
             ->orElse(fn() => at($shape, $key))
@@ -82,29 +82,11 @@ final class ShapeAccessor
     }
 
     /**
-     * @param list<string> $path
-     * @return Option<mixed>
+     * @param non-empty-list<DecodeError> $errors
      * @psalm-pure
      */
-    private static function dotAccess(array $path, array $shape): Option
+    public static function isUndefined(array $errors): bool
     {
-        if (empty($path)) {
-            return Option::none();
-        }
-
-        $key = $path[0];
-        $rest = tail($path);
-
-        if (array_key_exists($key, $shape)) {
-            if (empty($rest)) {
-                return Option::some($shape[$key]);
-            }
-
-            if (is_array($shape[$key])) {
-                return self::dotAccess($rest, $shape[$key]);
-            }
-        }
-
-        return Option::none();
+        return 1 === count($errors) && $errors[0]->kind === DecodeError::KIND_UNDEFINED_ERROR;
     }
 }

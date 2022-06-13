@@ -23,17 +23,17 @@ final class DatetimeDecoderTest extends TestCase
     public function testDecodeFailure(): void
     {
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new TypeErrorReport('$', DateTimeImmutable::class, 'Wrong datetime value')
             ]),
-            actualDecoded: decode('Wrong datetime value', datetime()),
+            actual: decode('Wrong datetime value', datetime()),
         );
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new TypeErrorReport('$', DateTimeImmutable::class, '23:00:00 2022-06-11')
             ]),
-            actualDecoded: decode('23:00:00 2022-06-11', datetime(fromFormat: 'Y-m-d H:i:s')),
+            actual: decode('23:00:00 2022-06-11', datetime(fromFormat: 'Y-m-d H:i:s')),
         );
     }
 

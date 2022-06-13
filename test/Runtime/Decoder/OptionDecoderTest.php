@@ -38,10 +38,10 @@ final class OptionDecoderTest extends TestCase
         $value = 1;
 
         Assert::decodeFailed(
-            expectedReport: new ErrorReport([
+            expected: new ErrorReport([
                 new TypeErrorReport('$', $decoder->name(), $value),
             ]),
-            actualDecoded: decode($value, $decoder),
+            actual: decode($value, $decoder),
         );
     }
 
