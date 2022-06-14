@@ -17,6 +17,8 @@ use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\Event\MethodReturnTypeProviderEvent;
 use Psalm\Plugin\EventHandler\MethodReturnTypeProviderInterface;
 use Psalm\StatementsSource;
+use Psalm\Storage\FunctionLikeParameter;
+use Psalm\Type\Atomic\TClosure;
 use Psalm\Type\Atomic\TGenericObject;
 use Psalm\Type\Union;
 use function Fp\Evidence\proveOf;
@@ -40,8 +42,7 @@ final class ConstrainedMethodReturnTypeProvider implements MethodReturnTypeProvi
                     ->flatMap(fn($call_args) => self::mapCallArgs($call_args)),
                 decoder_type_param: yield proveOf($event->getStmt(), MethodCall::class)
                     ->flatMap(fn($method_call) => PsalmApi::$types->getType($event, $method_call->var))
-                    ->flatMap(fn($atomic) => DecoderType::getGeneric($atomic))
-                    ->map(fn($type) => PsalmApi::$types->asAlwaysDefined($type)),
+                    ->flatMap(fn($atomic) => DecoderType::getGeneric($atomic)),
             );
         });
 
@@ -71,13 +72,34 @@ final class ConstrainedMethodReturnTypeProvider implements MethodReturnTypeProvi
         Union $decoder_type_param,
     ): void
     {
-        foreach ($constrained_call_args as $call_arg) {
-            if (PsalmApi::$types->isTypeContainedByType($decoder_type_param, $call_arg->type)) {
+        $expected_constraint_as_closure = new Union([
+            new TClosure(
+                params: [new FunctionLikeParameter(name: '_', by_ref: false, type: $decoder_type_param)],
+            ),
+        ]);
+
+        foreach ($constrained_call_args as $offset => $call_arg) {
+            $actual_constraint_as_closure = new Union([
+                new TClosure(
+                    params: [new FunctionLikeParameter(name: '_', by_ref: false, type: $call_arg->type)],
+                ),
+            ]);
+
+            if (PsalmApi::$types->isTypeContainedByType($actual_constraint_as_closure, $expected_constraint_as_closure)) {
                 continue;
             }
 
             IssueBuffer::accepts(
-                new Issue\IncompatibleConstraint($call_arg->type, $decoder_type_param, $call_arg->location),
+                new Issue\IncompatibleConstraint(
+                    arg_offset: $offset + 1,
+                    expected: new Union([
+                        new TGenericObject(ConstraintInterface::class, [$decoder_type_param]),
+                    ]),
+                    actual: new Union([
+                        new TGenericObject(ConstraintInterface::class, [$call_arg->type]),
+                    ]),
+                    code_location: $call_arg->location,
+                ),
                 $source->getSuppressedIssues(),
             );
         }

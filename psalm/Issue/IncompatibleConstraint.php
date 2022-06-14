@@ -11,16 +11,14 @@ use Psalm\Type;
 final class IncompatibleConstraint extends CodeIssue
 {
     public function __construct(
-        Type\Union $constraints_type,
-        Type\Union $decoder_type_parameter,
+        int $arg_offset,
+        Type\Union $expected,
+        Type\Union $actual,
         CodeLocation $code_location,
     )
     {
         parent::__construct(
-            message: implode(' ', [
-                "Value of type {$decoder_type_parameter->getId()}",
-                "cannot be checked with constraints of type {$constraints_type->getId()}",
-            ]),
+            message: "Argument {$arg_offset} expects {$expected->getId()}, {$actual->getId()} provided",
             code_location: $code_location,
         );
     }

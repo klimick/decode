@@ -6,6 +6,7 @@ namespace Klimick\Decode\Test\Static;
 
 use Fp\PsalmToolkit\StaticTest\PsalmTest;
 use Fp\PsalmToolkit\StaticTest\StaticTestCase;
+use Klimick\Decode\Constraint\ConstraintInterface;
 use function Klimick\Decode\Constraint\greater;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\shape;
@@ -31,7 +32,10 @@ final class HighOrderIssueTest extends PsalmTest
             )
             ->seePsalmIssue(
                 type: 'IncompatibleConstraint',
-                message: 'Value of type string cannot be checked with constraints of type numeric',
+                message: 'Argument 1 expects #[constraint]<string>, #[constraint]<numeric> provided',
+                args: [
+                    'constraint' => ConstraintInterface::class,
+                ]
             );
     }
 }
