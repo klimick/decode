@@ -243,4 +243,22 @@ final class ArrayOfDecoderTest extends TestCase
             ], $array),
         );
     }
+
+    public function testDecodeWithAliasedKeyAndDefaultValue(): void
+    {
+        $array = arrayOf(string()->from('$.key'), string()->from('$.val')->default('__default'));
+
+        Assert::decodeSuccess(
+            expectedValue: [
+                'k1' => 'fst',
+                'k2' => '__default',
+                'k3' => 'thr',
+            ],
+            actualDecoded: decode([
+                ['key' => 'k1', 'val' => 'fst'],
+                ['key' => 'k2'],
+                ['key' => 'k3', 'val' => 'thr'],
+            ], $array),
+        );
+    }
 }
