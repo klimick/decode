@@ -10,7 +10,6 @@ use Klimick\Decode\Test\Runtime\Assert;
 use PHPUnit\Framework\TestCase;
 use function Klimick\Decode\Decoder\arrayOf;
 use function Klimick\Decode\Decoder\decode;
-use function Klimick\Decode\Decoder\bool;
 use function Klimick\Decode\Decoder\int;
 use function Klimick\Decode\Decoder\shape;
 use function Klimick\Decode\Decoder\string;
@@ -179,18 +178,69 @@ final class ArrayOfDecoderTest extends TestCase
         );
     }
 
-    public function testDecodeSuccess(): void
+    public function testDecodeSimpleArray(): void
     {
-        $decoder = bool();
+        $decoder = arrayOf(int(), string());
+        $value = [1 => 'fst', 2 => 'snd', 3 => 'thr'];
 
         Assert::decodeSuccess(
-            expectedValue: true,
-            actualDecoded: decode(true, $decoder),
+            expectedValue: $value,
+            actualDecoded: decode($value, $decoder),
         );
+    }
+
+    public function testDecodeWithAliasedKey(): void
+    {
+        $shape = shape(key: string(), val: string());
+        $array = arrayOf(string()->from('$.key'), $shape);
 
         Assert::decodeSuccess(
-            expectedValue: false,
-            actualDecoded: decode(false, $decoder),
+            expectedValue: [
+                'k1' => ['key' => 'k1', 'val' => 'fst'],
+                'k2' => ['key' => 'k2', 'val' => 'snd'],
+                'k3' => ['key' => 'k3', 'val' => 'thr'],
+            ],
+            actualDecoded: decode([
+                ['key' => 'k1', 'val' => 'fst'],
+                ['key' => 'k2', 'val' => 'snd'],
+                ['key' => 'k3', 'val' => 'thr'],
+            ], $array),
+        );
+    }
+
+    public function testDecodeWithAliasedValue(): void
+    {
+        $array = arrayOf(int(), string()->from('$.val'));
+
+        Assert::decodeSuccess(
+            expectedValue: [
+                0 => 'fst',
+                1 => 'snd',
+                2 => 'thr',
+            ],
+            actualDecoded: decode([
+                ['val' => 'fst'],
+                ['val' => 'snd'],
+                ['val' => 'thr'],
+            ], $array),
+        );
+    }
+
+    public function testDecodeWithAliasedKeyValue(): void
+    {
+        $array = arrayOf(string()->from('$.key'), string()->from('$.val'));
+
+        Assert::decodeSuccess(
+            expectedValue: [
+                'k1' => 'fst',
+                'k2' => 'snd',
+                'k3' => 'thr',
+            ],
+            actualDecoded: decode([
+                ['key' => 'k1', 'val' => 'fst'],
+                ['key' => 'k2', 'val' => 'snd'],
+                ['key' => 'k3', 'val' => 'thr'],
+            ], $array),
         );
     }
 }
