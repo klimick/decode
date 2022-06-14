@@ -6,7 +6,10 @@ namespace Klimick\Decode\Decoder;
 
 use Fp\Functional\Either\Either;
 use Klimick\Decode\Error\Context;
+use function Fp\Collection\every;
+use function Fp\Collection\exists;
 use function Fp\Collection\filter;
+use function Fp\Collection\keys;
 use function Fp\Collection\map;
 use function in_array;
 use function is_int;
@@ -27,8 +30,14 @@ final class ShapeDecoder extends AbstractDecoder
 
     public function name(): string
     {
-        $properties = implode(', ', map($this->decoders, function(DecoderInterface $decoder, int|string $property) {
-            if (is_int($property)) {
+        $isTuple = every(keys($this->decoders), fn(string|int $key) => is_int($key));
+        $hasUndefined = exists($this->decoders, fn(DecoderInterface $decoder) => $decoder->isPossiblyUndefined());
+
+        $properties = implode(', ', map($this->decoders, function(DecoderInterface $decoder, int|string $property) use (
+            $isTuple,
+            $hasUndefined,
+        ) {
+            if ($isTuple && !$hasUndefined) {
                 return $decoder->name();
             }
 
