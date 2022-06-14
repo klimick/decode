@@ -48,8 +48,8 @@ final class ArrayOfDecoder extends AbstractDecoder
         $keyHasAliases = !empty($this->key->getAliases());
         $valueHasAliases = !empty($this->value->getAliases());
 
-        $keyTypename = new WithNameDecoder(getAliasedTypename($this->key), mixed());
-        $valueTypename = new WithNameDecoder(getAliasedTypename($this->value), mixed());
+        $keyTypename = mixed()->rename(getAliasedTypename($this->key));
+        $valueTypename = mixed()->rename(getAliasedTypename($this->value));
 
         /** @psalm-suppress MixedAssignment */
         foreach ($value as $k => $v) {

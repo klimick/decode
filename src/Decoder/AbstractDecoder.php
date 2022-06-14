@@ -110,4 +110,13 @@ abstract class AbstractDecoder implements DecoderInterface
     {
         return new MapDecoder($this, $to);
     }
+
+    /**
+     * @param non-empty-string $to
+     * @return DecoderInterface<T>
+     */
+    public function rename(string $to): DecoderInterface
+    {
+        return new WithNameDecoder($to, $this);
+    }
 }

@@ -80,4 +80,10 @@ interface DecoderInterface
      * @return DecoderInterface<TMapped>
      */
     public function map(Closure $to): DecoderInterface;
+
+    /**
+     * @param non-empty-string $to
+     * @return DecoderInterface<T>
+     */
+    public function rename(string $to): DecoderInterface;
 }
