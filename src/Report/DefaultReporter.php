@@ -9,7 +9,7 @@ use ReflectionClass;
 use function Fp\Cast\asList;
 use function Fp\Collection\map;
 use function Fp\Collection\unique;
-use function Klimick\Decode\Utils\groupMapReduce;
+use function Fp\Collection\groupMapReduce;
 
 final class DefaultReporter
 {
