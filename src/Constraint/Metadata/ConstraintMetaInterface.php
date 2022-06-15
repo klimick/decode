@@ -9,8 +9,4 @@ namespace Klimick\Decode\Constraint\Metadata;
  */
 interface ConstraintMetaInterface
 {
-    /**
-     * @return non-empty-string
-     */
-    public function name(): string;
 }

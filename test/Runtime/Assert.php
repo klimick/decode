@@ -17,13 +17,13 @@ final class Assert
      * @param ErrorReport $expected
      * @param Either<non-empty-list<DecodeError>, mixed> $actual
      */
-    public static function decodeFailed(ErrorReport $expected, Either $actual): void
+    public static function decodeFailed(ErrorReport $expected, Either $actual, bool $useShortClassName = false): void
     {
         $actualReport = $actual->isLeft()
-            ? DefaultReporter::report($actual->get())
-            : new ErrorReport();
+            ? DefaultReporter::report($actual->get(), $useShortClassName)->toString()
+            : 'No errors!';
 
-        assertEquals($expected, $actualReport);
+        assertEquals($expected->toString(), $actualReport);
     }
 
     /**
@@ -34,8 +34,11 @@ final class Assert
      */
     public static function decodeSuccess(mixed $expectedValue, Either $actualDecoded): void
     {
-        $case = $actualDecoded->isRight() ? 'Right' : 'Left';
-        assertEquals($expectedValue, $actualDecoded->get(), "actualDecoded should be Right, but actually {$case}");
+        $actual = $actualDecoded
+            ->mapLeft(fn($errors) => DefaultReporter::report($errors)->toString())
+            ->get();
+
+        assertEquals($expectedValue, $actual);
     }
 
     /**

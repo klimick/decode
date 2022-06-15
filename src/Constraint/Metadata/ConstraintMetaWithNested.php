@@ -27,9 +27,4 @@ final class ConstraintMetaWithNested implements ConstraintMetaInterface
     {
         return new self($name, $nested);
     }
-
-    public function name(): string
-    {
-        return $this->name;
-    }
 }

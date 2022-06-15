@@ -27,12 +27,4 @@ final class ConstraintMetaWithPayload implements ConstraintMetaInterface
     {
         return new self($name, $payload);
     }
-
-    /**
-     * @return non-empty-string
-     */
-    public function name(): string
-    {
-        return $this->name;
-    }
 }

@@ -8,8 +8,12 @@ use Klimick\Decode\Report\ConstraintErrorReport;
 use Klimick\Decode\Report\ErrorReport;
 use Klimick\Decode\Test\Runtime\Assert;
 use PHPUnit\Framework\TestCase;
+use function Klimick\Decode\Constraint\andX;
+use function Klimick\Decode\Constraint\every;
+use function Klimick\Decode\Constraint\maxLength;
 use function Klimick\Decode\Constraint\minLength;
 use function Klimick\Decode\Decoder\decode;
+use function Klimick\Decode\Decoder\listOf;
 use function Klimick\Decode\Decoder\null;
 use function Klimick\Decode\Decoder\string;
 use function Klimick\Decode\Decoder\union;
@@ -23,25 +27,29 @@ final class ConstrainedDecoderTest extends TestCase
 
     public function testDecodeFailedIfConstraintFailed(): void
     {
-        $constraint = minLength(is: 3);
-        $decoder = string()->constrained($constraint);
+        $constraint = every(
+            andX(minLength(is: 3), maxLength(is: 10)),
+        );
+        $decoder = listOf(string())->constrained($constraint);
 
         Assert::decodeFailed(
             expected: new ErrorReport([
-                new ConstraintErrorReport('$', 'vi', $constraint->metadata())
+                new ConstraintErrorReport('$', ['vi'], $constraint->metadata())
             ]),
-            actual: decode('vi', $decoder),
+            actual: decode(['vi'], $decoder),
         );
     }
 
     public function testDecodeSuccessIfConstraintSuccess(): void
     {
-        $constraint = minLength(is: 2);
-        $decoder = string()->constrained($constraint);
+        $constraint = every(
+            andX(minLength(is: 2), maxLength(is: 10)),
+        );
+        $decoder = listOf(string())->constrained($constraint);
 
         Assert::decodeSuccess(
-            expectedValue: 'vi',
-            actualDecoded: decode('vi', $decoder),
+            expectedValue: ['vi'],
+            actualDecoded: decode(['vi'], $decoder),
         );
     }
 

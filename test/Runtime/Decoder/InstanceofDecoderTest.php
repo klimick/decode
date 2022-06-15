@@ -27,9 +27,10 @@ final class InstanceofDecoderTest extends TestCase
 
         Assert::decodeFailed(
             expected: new ErrorReport([
-                new TypeErrorReport('$', $decoder->name(), $actual),
+                new TypeErrorReport('$', 'Person', $actual),
             ]),
             actual: decode($actual, $decoder),
+            useShortClassName: true,
         );
     }
 

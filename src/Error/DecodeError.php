@@ -71,9 +71,4 @@ final class DecodeError implements ErrorInterface
             constraintErrors: $constraintErrors,
         );
     }
-
-    public function context(): Context
-    {
-        return $this->context;
-    }
 }

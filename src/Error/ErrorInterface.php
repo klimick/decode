@@ -12,8 +12,4 @@ namespace Klimick\Decode\Error;
  */
 interface ErrorInterface
 {
-    /**
-     * @return Context<T>
-     */
-    public function context(): Context;
 }

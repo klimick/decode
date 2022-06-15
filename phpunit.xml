@@ -14,6 +14,8 @@
         <include>
             <directory>src</directory>
             <directory>modules</directory>
+            <file>decoders.php</file>
+            <file>constraints.php</file>
         </include>
         <report>
             <clover outputFile="build/logs/clover.xml"/>

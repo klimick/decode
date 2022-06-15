@@ -18,9 +18,4 @@ final class ConstraintError implements ErrorInterface
     public function __construct(
         public Context $context,
     ) {}
-
-    public function context(): Context
-    {
-        return $this->context;
-    }
 }

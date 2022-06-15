@@ -170,7 +170,7 @@ final class ArrayOfDecoderTest extends TestCase
 
         Assert::decodeFailed(
             expected: new ErrorReport([
-                new TypeErrorReport('$[0]', $k->name(), '1'),
+                new TypeErrorReport('$[0]', $k->name(), 1),
             ]),
             actual: decode([
                 ['key' => '1', 'val' => 42],
