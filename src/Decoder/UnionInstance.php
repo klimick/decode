@@ -58,8 +58,10 @@ trait UnionInstance
             $offset++;
         }
 
-        return $original instanceof TaggedUnionDecoder
+        $unionInstance = $original instanceof TaggedUnionDecoder
             ? new TaggedUnionDecoder($original->tag, $mapped)
             : new UnionDecoder($mapped);
+
+        return $unionInstance->rename(static::class);
     }
 }
