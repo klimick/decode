@@ -81,6 +81,7 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
     {
         $storage->pseudo_property_get_types['$value'] = $cases;
         $storage->sealed_properties = true;
+        $storage->sealed_methods = true;
     }
 
     private static function addUnionMethod(ClassLikeStorage $storage): void
