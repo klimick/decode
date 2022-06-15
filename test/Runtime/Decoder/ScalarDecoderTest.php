@@ -37,24 +37,24 @@ final class ScalarDecoderTest extends TestCase
         $decoder = scalar();
 
         Assert::decodeSuccess(
-            expectedValue: 1.0,
-            actualDecoded: decode(1.0, $decoder),
+            expected: 1.0,
+            actual: decode(1.0, $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: 1,
-            actualDecoded: decode(1, $decoder),
+            expected: 1,
+            actual: decode(1, $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: '1',
-            actualDecoded: decode('1', $decoder),
+            expected: '1',
+            actual: decode('1', $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: true,
-            actualDecoded: decode(true, $decoder),
+            expected: true,
+            actual: decode(true, $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: false,
-            actualDecoded: decode(false, $decoder),
+            expected: false,
+            actual: decode(false, $decoder),
         );
     }
 }

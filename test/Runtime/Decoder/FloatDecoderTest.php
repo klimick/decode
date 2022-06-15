@@ -37,8 +37,8 @@ final class FloatDecoderTest extends TestCase
         $value = 1.0;
 
         Assert::decodeSuccess(
-            expectedValue: $value,
-            actualDecoded: decode($value, $decoder),
+            expected: $value,
+            actual: decode($value, $decoder),
         );
     }
 }

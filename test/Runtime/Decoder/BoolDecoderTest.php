@@ -36,13 +36,13 @@ final class BoolDecoderTest extends TestCase
         $decoder = bool();
 
         Assert::decodeSuccess(
-            expectedValue: true,
-            actualDecoded: decode(true, $decoder),
+            expected: true,
+            actual: decode(true, $decoder),
         );
 
         Assert::decodeSuccess(
-            expectedValue: false,
-            actualDecoded: decode(false, $decoder),
+            expected: false,
+            actual: decode(false, $decoder),
         );
     }
 }

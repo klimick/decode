@@ -64,16 +64,16 @@ final class RecDecoderTest extends TestCase
     public function testDecodeSuccess(): void
     {
         Assert::decodeSuccess(
-            expectedValue: new Department('test', []),
-            actualDecoded: decode(['name' => 'test', 'subDepartments' => []], self::getDecoder()),
+            expected: new Department('test', []),
+            actual: decode(['name' => 'test', 'subDepartments' => []], self::getDecoder()),
         );
         Assert::decodeSuccess(
-            expectedValue: new Department('test', [
+            expected: new Department('test', [
                 new Department('nested1', []),
                 new Department('nested2', []),
                 new Department('nested3', []),
             ]),
-            actualDecoded: decode(
+            actual: decode(
                 ['name' => 'test', 'subDepartments' => [
                     ['name' => 'nested1', 'subDepartments' => []],
                     ['name' => 'nested2', 'subDepartments' => []],

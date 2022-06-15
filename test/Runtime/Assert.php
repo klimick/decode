@@ -29,16 +29,14 @@ final class Assert
     /**
      * @template T
      *
-     * @param T $expectedValue
-     * @param Either<non-empty-list<DecodeError>, T> $actualDecoded
+     * @param T $expected
+     * @param Either<non-empty-list<DecodeError>, T> $actual
      */
-    public static function decodeSuccess(mixed $expectedValue, Either $actualDecoded): void
+    public static function decodeSuccess(mixed $expected, Either $actual): void
     {
-        $actual = $actualDecoded
+        assertEquals($expected, $actual
             ->mapLeft(fn($errors) => DefaultReporter::report($errors)->toString())
-            ->get();
-
-        assertEquals($expectedValue, $actual);
+            ->get());
     }
 
     /**

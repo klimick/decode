@@ -36,8 +36,8 @@ final class MapDecoderTest extends TestCase
         $decoder = int()->map(fn(int $i) => (string) $i);
 
         Assert::decodeSuccess(
-            expectedValue: '1',
-            actualDecoded: decode(1, $decoder),
+            expected: '1',
+            actual: decode(1, $decoder),
         );
     }
 }

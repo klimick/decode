@@ -48,8 +48,8 @@ final class ConstrainedDecoderTest extends TestCase
         $decoder = listOf(string())->constrained($constraint);
 
         Assert::decodeSuccess(
-            expectedValue: ['vi'],
-            actualDecoded: decode(['vi'], $decoder),
+            expected: ['vi'],
+            actual: decode(['vi'], $decoder),
         );
     }
 
@@ -59,8 +59,8 @@ final class ConstrainedDecoderTest extends TestCase
         $decoder = union(string(), null())->constrained($constraint);
 
         Assert::decodeSuccess(
-            expectedValue: null,
-            actualDecoded: decode(null, $decoder),
+            expected: null,
+            actual: decode(null, $decoder),
         );
     }
 }

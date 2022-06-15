@@ -37,8 +37,8 @@ final class WithNameDecoderTest extends TestCase
         $decoder = int()->rename('Integer');
 
         Assert::decodeSuccess(
-            expectedValue: 42,
-            actualDecoded: decode(42, $decoder),
+            expected: 42,
+            actual: decode(42, $decoder),
         );
     }
 }

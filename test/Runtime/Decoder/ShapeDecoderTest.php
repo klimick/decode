@@ -76,8 +76,8 @@ final class ShapeDecoderTest extends TestCase
         $decoder = shape(f: string());
 
         Assert::decodeSuccess(
-            expectedValue: ['f' => '42'],
-            actualDecoded: decode(['f' => '42'], $decoder),
+            expected: ['f' => '42'],
+            actual: decode(['f' => '42'], $decoder),
         );
     }
 
@@ -86,8 +86,8 @@ final class ShapeDecoderTest extends TestCase
         $decoder = shape(f: string()->orUndefined());
 
         Assert::decodeSuccess(
-            expectedValue: [],
-            actualDecoded: decode([], $decoder),
+            expected: [],
+            actual: decode([], $decoder),
         );
     }
 
@@ -96,8 +96,8 @@ final class ShapeDecoderTest extends TestCase
         $decoder = shape(f: string()->default('42'));
 
         Assert::decodeSuccess(
-            expectedValue: ['f' => '42'],
-            actualDecoded: decode([], $decoder),
+            expected: ['f' => '42'],
+            actual: decode([], $decoder),
         );
     }
 
@@ -106,8 +106,8 @@ final class ShapeDecoderTest extends TestCase
         $decoder = shape(f: option(string()));
 
         Assert::decodeSuccess(
-            expectedValue: ['f' => Option::none()],
-            actualDecoded: decode([], $decoder),
+            expected: ['f' => Option::none()],
+            actual: decode([], $decoder),
         );
     }
 
@@ -119,8 +119,8 @@ final class ShapeDecoderTest extends TestCase
         );
 
         Assert::decodeSuccess(
-            expectedValue: ['f' => '42', 'a' => true],
-            actualDecoded: decode(['f' => '42'], $decoder),
+            expected: ['f' => '42', 'a' => true],
+            actual: decode(['f' => '42'], $decoder),
         );
     }
 
@@ -129,8 +129,8 @@ final class ShapeDecoderTest extends TestCase
         $decoder = shape(f: string()->from('$.nested.value'));
 
         Assert::decodeSuccess(
-            expectedValue: ['f' => '42'],
-            actualDecoded: decode(['nested' => ['value' => '42']], $decoder),
+            expected: ['f' => '42'],
+            actual: decode(['nested' => ['value' => '42']], $decoder),
         );
     }
 
@@ -155,8 +155,8 @@ final class ShapeDecoderTest extends TestCase
         );
 
         Assert::decodeSuccess(
-            expectedValue: ['a' => '_', 'b' => '_'],
-            actualDecoded: decode(['a' => '_', 'b' => '_', 'c' => '_'], $decoder->pick(['a', 'b'])),
+            expected: ['a' => '_', 'b' => '_'],
+            actual: decode(['a' => '_', 'b' => '_', 'c' => '_'], $decoder->pick(['a', 'b'])),
         );
     }
 
@@ -169,8 +169,8 @@ final class ShapeDecoderTest extends TestCase
         );
 
         Assert::decodeSuccess(
-            expectedValue: ['c' => '_'],
-            actualDecoded: decode(['a' => '_', 'b' => '_', 'c' => '_'], $decoder->omit(['a', 'b'])),
+            expected: ['c' => '_'],
+            actual: decode(['a' => '_', 'b' => '_', 'c' => '_'], $decoder->omit(['a', 'b'])),
         );
     }
 }

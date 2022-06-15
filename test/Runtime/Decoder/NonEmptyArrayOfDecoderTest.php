@@ -32,8 +32,8 @@ final class NonEmptyArrayOfDecoderTest extends TestCase
         $decoder = nonEmptyArrayOf(int(), string());
 
         Assert::decodeSuccess(
-            expectedValue: [42 => 'success'],
-            actualDecoded: decode([42 => 'success'], $decoder),
+            expected: [42 => 'success'],
+            actual: decode([42 => 'success'], $decoder),
         );
     }
 }

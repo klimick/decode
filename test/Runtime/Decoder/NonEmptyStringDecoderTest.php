@@ -37,8 +37,8 @@ final class NonEmptyStringDecoderTest extends TestCase
         $value = 'some non-empty-string value';
 
         Assert::decodeSuccess(
-            expectedValue: $value,
-            actualDecoded: decode($value, $decoder),
+            expected: $value,
+            actual: decode($value, $decoder),
         );
     }
 }

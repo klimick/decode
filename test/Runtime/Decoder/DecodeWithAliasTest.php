@@ -30,8 +30,8 @@ final class DecodeWithAliasTest extends TestCase
         $decoder = int()->from('$.number');
 
         Assert::decodeSuccess(
-            expectedValue: 42,
-            actualDecoded: decode(['number' => 42], $decoder),
+            expected: 42,
+            actual: decode(['number' => 42], $decoder),
         );
     }
 }

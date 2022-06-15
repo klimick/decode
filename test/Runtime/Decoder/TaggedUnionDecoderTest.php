@@ -101,24 +101,24 @@ final class TaggedUnionDecoderTest extends TestCase
     public function testDecodeSuccess(): void
     {
         Assert::decodeSuccess(
-            expectedValue: new Person(name: 'test', age: 42),
-            actualDecoded: decode(['type' => 'full', 'name' => 'test', 'age' => 42], self::getDecoder()),
+            expected: new Person(name: 'test', age: 42),
+            actual: decode(['type' => 'full', 'name' => 'test', 'age' => 42], self::getDecoder()),
         );
         Assert::decodeSuccess(
-            expectedValue: new PartialPerson(maybeName: null, maybeAge: null),
-            actualDecoded: decode(['type' => 'partial', 'maybeName' => null, 'maybeAge' => null], self::getDecoder()),
+            expected: new PartialPerson(maybeName: null, maybeAge: null),
+            actual: decode(['type' => 'partial', 'maybeName' => null, 'maybeAge' => null], self::getDecoder()),
         );
         Assert::decodeSuccess(
-            expectedValue: new PartialPerson(maybeName: 'test', maybeAge: null),
-            actualDecoded: decode(['type' => 'partial', 'maybeName' => 'test', 'maybeAge' => null], self::getDecoder()),
+            expected: new PartialPerson(maybeName: 'test', maybeAge: null),
+            actual: decode(['type' => 'partial', 'maybeName' => 'test', 'maybeAge' => null], self::getDecoder()),
         );
         Assert::decodeSuccess(
-            expectedValue: new PartialPerson(maybeName: null, maybeAge: 42),
-            actualDecoded: decode(['type' => 'partial', 'maybeName' => null, 'maybeAge' => 42], self::getDecoder()),
+            expected: new PartialPerson(maybeName: null, maybeAge: 42),
+            actual: decode(['type' => 'partial', 'maybeName' => null, 'maybeAge' => 42], self::getDecoder()),
         );
         Assert::decodeSuccess(
-            expectedValue: new PartialPerson(maybeName: 'test', maybeAge: 42),
-            actualDecoded: decode(['type' => 'partial', 'maybeName' => 'test', 'maybeAge' => 42], self::getDecoder()),
+            expected: new PartialPerson(maybeName: 'test', maybeAge: 42),
+            actual: decode(['type' => 'partial', 'maybeName' => 'test', 'maybeAge' => 42], self::getDecoder()),
         );
     }
 }

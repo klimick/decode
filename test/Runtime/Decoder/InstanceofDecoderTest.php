@@ -40,8 +40,8 @@ final class InstanceofDecoderTest extends TestCase
         $person = new Person(name: 'test', age: 42);
 
         Assert::decodeSuccess(
-            expectedValue: $person,
-            actualDecoded: decode($person, $decoder),
+            expected: $person,
+            actual: decode($person, $decoder),
         );
     }
 }

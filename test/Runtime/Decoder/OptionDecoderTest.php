@@ -51,32 +51,32 @@ final class OptionDecoderTest extends TestCase
         $strOrNullDecoder = option(union(string(), null()));
 
         Assert::decodeSuccess(
-            expectedValue: Option::some('str'),
-            actualDecoded: decode('str', $strDecoder),
+            expected: Option::some('str'),
+            actual: decode('str', $strDecoder),
         );
         Assert::decodeSuccess(
-            expectedValue: Option::none(),
-            actualDecoded: decode(null, $strDecoder),
+            expected: Option::none(),
+            actual: decode(null, $strDecoder),
         );
         Assert::decodeSuccess(
-            expectedValue: Option::some(null),
-            actualDecoded: decode(null, $strOrNullDecoder),
+            expected: Option::some(null),
+            actual: decode(null, $strOrNullDecoder),
         );
         Assert::decodeSuccess(
-            expectedValue: ['value' => Option::some('str')],
-            actualDecoded: decode(['value' => 'str'], shape(value: $strDecoder)),
+            expected: ['value' => Option::some('str')],
+            actual: decode(['value' => 'str'], shape(value: $strDecoder)),
         );
         Assert::decodeSuccess(
-            expectedValue: ['value' => Option::none()],
-            actualDecoded: decode([], shape(value: $strDecoder)),
+            expected: ['value' => Option::none()],
+            actual: decode([], shape(value: $strDecoder)),
         );
         Assert::decodeSuccess(
-            expectedValue: ['value' => Option::none()],
-            actualDecoded: decode(['value' => null], shape(value: $strDecoder)),
+            expected: ['value' => Option::none()],
+            actual: decode(['value' => null], shape(value: $strDecoder)),
         );
         Assert::decodeSuccess(
-            expectedValue: ['value' => Option::some(null)],
-            actualDecoded: decode(['value' => null], shape(value: $strOrNullDecoder)),
+            expected: ['value' => Option::some(null)],
+            actual: decode(['value' => null], shape(value: $strOrNullDecoder)),
         );
     }
 }

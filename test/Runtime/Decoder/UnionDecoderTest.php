@@ -81,16 +81,16 @@ final class UnionDecoderTest extends TestCase
         $decoder = union(int(), string(), bool());
 
         Assert::decodeSuccess(
-            expectedValue: 1,
-            actualDecoded: decode(1, $decoder),
+            expected: 1,
+            actual: decode(1, $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: 'str',
-            actualDecoded: decode('str', $decoder),
+            expected: 'str',
+            actual: decode('str', $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: true,
-            actualDecoded: decode(true, $decoder),
+            expected: true,
+            actual: decode(true, $decoder),
         );
     }
 }

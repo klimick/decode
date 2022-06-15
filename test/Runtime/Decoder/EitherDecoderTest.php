@@ -39,12 +39,12 @@ final class EitherDecoderTest extends TestCase
         $decoder = either(int(), string());
 
         Assert::decodeSuccess(
-            expectedValue: Either::left(1),
-            actualDecoded: decode(1, $decoder),
+            expected: Either::left(1),
+            actual: decode(1, $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: Either::right('1'),
-            actualDecoded: decode('1', $decoder),
+            expected: Either::right('1'),
+            actual: decode('1', $decoder),
         );
     }
 }

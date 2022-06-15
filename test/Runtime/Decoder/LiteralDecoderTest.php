@@ -36,8 +36,8 @@ final class LiteralDecoderTest extends TestCase
     public function testDecodeSuccessWithExpectedLiteral(): void
     {
         Assert::decodeSuccess(
-            expectedValue: 42,
-            actualDecoded: decode(42, literal(42)),
+            expected: 42,
+            actual: decode(42, literal(42)),
         );
     }
 }

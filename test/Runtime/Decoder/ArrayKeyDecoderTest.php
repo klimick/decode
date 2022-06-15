@@ -33,16 +33,16 @@ final class ArrayKeyDecoderTest extends TestCase
     public function testDecodeSuccessForIntArrayKey(): void
     {
         Assert::decodeSuccess(
-            expectedValue: 42,
-            actualDecoded: decode(42, arrayKey()),
+            expected: 42,
+            actual: decode(42, arrayKey()),
         );
     }
 
     public function testDecodeSuccessForStringArrayKey(): void
     {
         Assert::decodeSuccess(
-            expectedValue: 'key-42',
-            actualDecoded: decode('key-42', arrayKey()),
+            expected: 'key-42',
+            actual: decode('key-42', arrayKey()),
         );
     }
 }

@@ -63,8 +63,8 @@ final class ObjectDecoderTest extends TestCase
     public function testDecodeSuccess(): void
     {
         Assert::decodeSuccess(
-            expectedValue: new Person(name: 'test', age: 42),
-            actualDecoded: decode(['name' => 'test', 'age' => 42], self::getDecoder()),
+            expected: new Person(name: 'test', age: 42),
+            actual: decode(['name' => 'test', 'age' => 42], self::getDecoder()),
         );
     }
 }

@@ -36,20 +36,20 @@ final class NumericDecoderTest extends TestCase
         $decoder = numeric();
 
         Assert::decodeSuccess(
-            expectedValue: 1.0,
-            actualDecoded: decode(1.0, $decoder),
+            expected: 1.0,
+            actual: decode(1.0, $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: 1,
-            actualDecoded: decode(1, $decoder),
+            expected: 1,
+            actual: decode(1, $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: '1',
-            actualDecoded: decode('1', $decoder),
+            expected: '1',
+            actual: decode('1', $decoder),
         );
         Assert::decodeSuccess(
-            expectedValue: '1.0',
-            actualDecoded: decode('1.0', $decoder),
+            expected: '1.0',
+            actual: decode('1.0', $decoder),
         );
     }
 }

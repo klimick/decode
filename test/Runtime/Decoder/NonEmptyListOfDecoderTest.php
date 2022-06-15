@@ -31,8 +31,8 @@ final class NonEmptyListOfDecoderTest extends TestCase
         $decoder = nonEmptyListOf(int());
 
         Assert::decodeSuccess(
-            expectedValue: [42],
-            actualDecoded: decode([42], $decoder),
+            expected: [42],
+            actual: decode([42], $decoder),
         );
     }
 }

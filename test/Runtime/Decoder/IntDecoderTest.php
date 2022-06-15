@@ -37,8 +37,8 @@ final class IntDecoderTest extends TestCase
         $value = 1;
 
         Assert::decodeSuccess(
-            expectedValue: $value,
-            actualDecoded: decode($value, $decoder),
+            expected: $value,
+            actual: decode($value, $decoder),
         );
     }
 }

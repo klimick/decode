@@ -37,8 +37,8 @@ final class StringDecoderTest extends TestCase
         $value = 'some string value';
 
         Assert::decodeSuccess(
-            expectedValue: $value,
-            actualDecoded: decode($value, $decoder),
+            expected: $value,
+            actual: decode($value, $decoder),
         );
     }
 }

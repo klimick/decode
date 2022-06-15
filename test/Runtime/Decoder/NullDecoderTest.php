@@ -36,8 +36,8 @@ final class NullDecoderTest extends TestCase
         $decoder = null();
 
         Assert::decodeSuccess(
-            expectedValue: null,
-            actualDecoded: decode(null, $decoder),
+            expected: null,
+            actual: decode(null, $decoder),
         );
     }
 }

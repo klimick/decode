@@ -40,13 +40,13 @@ final class DatetimeDecoderTest extends TestCase
     public function testDecodeSuccess(): void
     {
         Assert::decodeSuccess(
-            expectedValue: new DateTimeImmutable('2022-06-11 23:00:00', new DateTimeZone('UTC')),
-            actualDecoded: decode('2022-06-11 23:00:00', datetime()),
+            expected: new DateTimeImmutable('2022-06-11 23:00:00', new DateTimeZone('UTC')),
+            actual: decode('2022-06-11 23:00:00', datetime()),
         );
 
         Assert::decodeSuccess(
-            expectedValue: new DateTimeImmutable('2022-06-11 23:00:00', new DateTimeZone('UTC')),
-            actualDecoded: decode('2022-06-11 23:00:00', datetime(fromFormat: 'Y-m-d H:i:s')),
+            expected: new DateTimeImmutable('2022-06-11 23:00:00', new DateTimeZone('UTC')),
+            actual: decode('2022-06-11 23:00:00', datetime(fromFormat: 'Y-m-d H:i:s')),
         );
     }
 }

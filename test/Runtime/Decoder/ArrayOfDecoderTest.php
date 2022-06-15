@@ -184,8 +184,8 @@ final class ArrayOfDecoderTest extends TestCase
         $value = [1 => 'fst', 2 => 'snd', 3 => 'thr'];
 
         Assert::decodeSuccess(
-            expectedValue: $value,
-            actualDecoded: decode($value, $decoder),
+            expected: $value,
+            actual: decode($value, $decoder),
         );
     }
 
@@ -195,12 +195,12 @@ final class ArrayOfDecoderTest extends TestCase
         $array = arrayOf(string()->from('$.key'), $shape);
 
         Assert::decodeSuccess(
-            expectedValue: [
+            expected: [
                 'k1' => ['key' => 'k1', 'val' => 'fst'],
                 'k2' => ['key' => 'k2', 'val' => 'snd'],
                 'k3' => ['key' => 'k3', 'val' => 'thr'],
             ],
-            actualDecoded: decode([
+            actual: decode([
                 ['key' => 'k1', 'val' => 'fst'],
                 ['key' => 'k2', 'val' => 'snd'],
                 ['key' => 'k3', 'val' => 'thr'],
@@ -213,12 +213,12 @@ final class ArrayOfDecoderTest extends TestCase
         $array = arrayOf(int(), string()->from('$.val'));
 
         Assert::decodeSuccess(
-            expectedValue: [
+            expected: [
                 0 => 'fst',
                 1 => 'snd',
                 2 => 'thr',
             ],
-            actualDecoded: decode([
+            actual: decode([
                 ['val' => 'fst'],
                 ['val' => 'snd'],
                 ['val' => 'thr'],
@@ -231,12 +231,12 @@ final class ArrayOfDecoderTest extends TestCase
         $array = arrayOf(string()->from('$.key'), string()->from('$.val'));
 
         Assert::decodeSuccess(
-            expectedValue: [
+            expected: [
                 'k1' => 'fst',
                 'k2' => 'snd',
                 'k3' => 'thr',
             ],
-            actualDecoded: decode([
+            actual: decode([
                 ['key' => 'k1', 'val' => 'fst'],
                 ['key' => 'k2', 'val' => 'snd'],
                 ['key' => 'k3', 'val' => 'thr'],
@@ -249,12 +249,12 @@ final class ArrayOfDecoderTest extends TestCase
         $array = arrayOf(string()->from('$.key'), string()->from('$.val')->default('__default'));
 
         Assert::decodeSuccess(
-            expectedValue: [
+            expected: [
                 'k1' => 'fst',
                 'k2' => '__default',
                 'k3' => 'thr',
             ],
-            actualDecoded: decode([
+            actual: decode([
                 ['key' => 'k1', 'val' => 'fst'],
                 ['key' => 'k2'],
                 ['key' => 'k3', 'val' => 'thr'],
