@@ -20,7 +20,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ github.sha }}
+          key: php-${{ runner.os }}-${{ github.sha }}
 
   psalm:
     runs-on: ubuntu-latest
@@ -33,7 +33,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ github.sha }}
+          key: php-${{ runner.os }}-${{ github.sha }}
 
       - name: Run psalm validation
         run: vendor/bin/psalm --output-format=github --shepherd
@@ -55,13 +55,13 @@ jobs:
         uses: actions/cache@v2
         with:
           path: vendor
-          key: ${{ runner.os }}-php-${{ github.sha }}
+          key: php-${{ runner.os }}-${{ github.sha }}
 
       - name: Run test suite
         run: php vendor/bin/phpunit
 
-#      - name: Check PhpUnit coverage percentage
-#        run: php vendor/bin/coverage-check build/logs/clover.xml 85
+      - name: Check PhpUnit coverage percentage
+        run: php vendor/bin/coverage-check build/logs/clover.xml 100
 
       - name: Upload coverage results to Coveralls
         env:
