@@ -35,6 +35,9 @@ jobs:
           path: vendor
           key: php-${{ runner.os }}-${{ github.sha }}
 
+      - name: Show psalm version
+        run: vendor/bin/psalm --version
+
       - name: Run psalm validation
         run: vendor/bin/psalm --output-format=github --shepherd
 
