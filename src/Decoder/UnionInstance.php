@@ -51,6 +51,7 @@ trait UnionInstance
         $mapped = [];
         $offset = 0;
 
+        /** @var TaggedUnionDecoder|UnionDecoder $original */
         $original = self::union();
 
         foreach ($original->decoders as $key => $decoder) {
