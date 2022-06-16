@@ -19,7 +19,7 @@ jobs:
         run: vendor/bin/psalm --version
 
       - name: Run psalm validation
-        run: vendor/bin/psalm --output-format=github --shepherd
+        run: vendor/bin/psalm --output-format=github
 
   test:
     runs-on: ubuntu-latest
