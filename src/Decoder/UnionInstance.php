@@ -59,6 +59,7 @@ trait UnionInstance
             $offset++;
         }
 
+        /** @psalm-suppress InvalidScalarArgument */
         $unionInstance = $original instanceof TaggedUnionDecoder
             ? new TaggedUnionDecoder($original->tag, $mapped)
             : new UnionDecoder($mapped);

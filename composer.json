@@ -31,7 +31,7 @@
         "symfony/polyfill-php81": "^1.26"
     },
     "require-dev": {
-        "vimeo/psalm": "^4.15",
+        "vimeo/psalm": "4.23.0",
         "klimick/psalm-show-type": "^1.0",
         "psalm/plugin-phpunit": "^0.15.1",
         "phpunit/phpunit": "^9.5",

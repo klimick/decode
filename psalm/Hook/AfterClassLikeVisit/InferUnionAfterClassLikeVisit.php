@@ -58,6 +58,8 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
                 self::addMatchMethod($storage, $cases);
                 self::addIsMethod($storage);
                 self::addTypeMethod($storage);
+            } else {
+                print_r($storage->name . PHP_EOL);
             }
 
             if (Plugin::isMixinGenerationEnabled()) {
