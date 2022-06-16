@@ -51,7 +51,6 @@ trait UnionInstance
         $mapped = [];
         $offset = 0;
 
-        /** @var TaggedUnionDecoder|UnionDecoder $original */
         $original = self::union();
 
         foreach ($original->decoders as $key => $decoder) {
@@ -59,7 +58,6 @@ trait UnionInstance
             $offset++;
         }
 
-        /** @psalm-suppress InvalidScalarArgument */
         $unionInstance = $original instanceof TaggedUnionDecoder
             ? new TaggedUnionDecoder($original->tag, $mapped)
             : new UnionDecoder($mapped);

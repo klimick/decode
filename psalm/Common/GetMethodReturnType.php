@@ -10,7 +10,6 @@ use Fp\PsalmToolkit\Toolkit\PsalmApi;
 use Klimick\Decode\Decoder\DecoderInterface;
 use Klimick\Decode\Decoder\InferShape;
 use Klimick\Decode\Decoder\InferUnion;
-use Klimick\Decode\Test\Static\Fixtures\TaggedUserOrProject;
 use PhpParser\Node;
 use PhpParser\Node\Expr;
 use PhpParser\Node\Stmt\ClassMethod;
@@ -79,7 +78,7 @@ final class GetMethodReturnType
                 ->map(fn($stmts) => ArrayList::collect($stmts));
 
             $single_return_expr = yield self::getSingleReturnExpr($file_statements, $method_name);
-            $statements_analyzer = yield self::createStatementsAnalyzer($class, $file_statements, $file_path);
+            $statements_analyzer = yield self::createStatementsAnalyzer($file_statements, $file_path);
 
             self::inferComplexTypes(
                 self: $class,
@@ -132,9 +131,9 @@ final class GetMethodReturnType
      * @psalm-suppress InternalClass
      * @psalm-suppress InternalMethod
      */
-    public static function createStatementsAnalyzer(string $class, ArrayList $file_statements, string $file_path): Option
+    public static function createStatementsAnalyzer(ArrayList $file_statements, string $file_path): Option
     {
-        return Option::do(function() use ($class, $file_path, $file_statements) {
+        return Option::do(function() use ($file_path, $file_statements) {
             $node_data_provider = new NodeDataProvider();
             $namespace = $file_statements
                 ->firstOf(Namespace_::class)
@@ -152,13 +151,7 @@ final class GetMethodReturnType
                 ))
                 ->map(fn(FileAnalyzer $analyzer) => new NamespaceAnalyzer($namespace, $analyzer))
                 ->tap(fn(NamespaceAnalyzer $analyzer) => $analyzer->collectAnalyzableInformation())
-                ->tap(function(NamespaceAnalyzer $analyzer) use ($class) {
-                    if ($class !== TaggedUserOrProject::class) {
-                        $analyzer->addSuppressedIssues(['all']);
-                        return;
-                    }
-                    $analyzer->addSuppressedIssues(['UndefinedDocblockClass', 'UndefinedClass']);
-                })
+                ->tap(fn(NamespaceAnalyzer $analyzer) => $analyzer->addSuppressedIssues(['all']))
                 ->map(fn(NamespaceAnalyzer $analyzer) => new StatementsAnalyzer($analyzer, $node_data_provider));
         });
     }

@@ -13,12 +13,9 @@ use Klimick\PsalmDecode\Common\DecoderType;
 use Klimick\PsalmDecode\Common\GetMethodReturnType;
 use Klimick\PsalmDecode\Common\MetaMixinGenerator;
 use Klimick\PsalmDecode\Plugin;
-use Psalm\CodeLocation;
 use Psalm\Internal\MethodIdentifier;
 use Psalm\Internal\Type\TypeAlias\ClassTypeAlias;
-use Psalm\Issue\InvalidClass;
 use Psalm\Issue\InvalidReturnType;
-use Psalm\IssueBuffer;
 use Psalm\Plugin\EventHandler\AfterClassLikeVisitInterface;
 use Psalm\Plugin\EventHandler\Event\AfterClassLikeVisitEvent;
 use Psalm\Storage\Assertion;
@@ -44,24 +41,13 @@ final class InferUnionAfterClassLikeVisit implements AfterClassLikeVisitInterfac
         Option::do(function() use ($event) {
             $storage = $event->getStorage();
 
-            yield proveTrue(PsalmApi::$classlikes->classImplements($storage, InferUnion::class));
-
-            $cases = yield GetMethodReturnType::from(
+            $cases = yield proveTrue(PsalmApi::$classlikes->classImplements($storage, InferUnion::class))
+                ->flatMap(fn() => GetMethodReturnType::from(
                     class: $storage->name,
                     method_name: 'union',
                     deps: [$storage->name],
-                )
-                ->flatMap(fn($type) => DecoderType::getGeneric($type))
-                ->orElse(function() use ($storage, $event) {
-                    IssueBuffer::accepts(
-                        new InvalidClass(
-                            'Unable to analyze type info for ' . $storage->name,
-                            new CodeLocation($event->getStatementsSource(), $event->getStmt()),
-                            $storage->name
-                        )
-                    );
-                    return Option::none();
-                });
+                ))
+                ->flatMap(fn($type) => DecoderType::getGeneric($type));
 
             self::addTypeAlias($storage, $cases);
             self::addUnionMethod($storage);
